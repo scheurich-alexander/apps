@@ -1,0 +1,1956 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Train">
+<meta name="theme-color" content="#0a0a0c" id="themeColor">
+<title>Train – Krav Maga & Krafttraining</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  /* ============ THEMES ============ */
+  :root, :root[data-theme="dark"] {
+    --bg: #0a0a0c;
+    --surface: #15161a;
+    --surface-2: #1f2127;
+    --border: #2a2d35;
+    --text: #ecedf0;
+    --text-dim: #8a8d96;
+    --text-faint: #5a5d66;
+    --accent: #ef4444;
+    --accent-dim: rgba(239,68,68,0.15);
+    --orange: #f59e0b;
+    --green: #10b981;
+    --blue: #3b82f6;
+    --purple: #a855f7;
+  }
+  :root[data-theme="light"] {
+    --bg: #f6f7f9;
+    --surface: #ffffff;
+    --surface-2: #eef0f3;
+    --border: #d8dce2;
+    --text: #15161a;
+    --text-dim: #5a5d66;
+    --text-faint: #8a8d96;
+    --accent: #dc2626;
+    --accent-dim: rgba(220,38,38,0.10);
+    --orange: #d97706;
+    --green: #059669;
+    --blue: #2563eb;
+    --purple: #9333ea;
+  }
+  @media (prefers-color-scheme: light) {
+    :root[data-theme="auto"] {
+      --bg: #f6f7f9;
+      --surface: #ffffff;
+      --surface-2: #eef0f3;
+      --border: #d8dce2;
+      --text: #15161a;
+      --text-dim: #5a5d66;
+      --text-faint: #8a8d96;
+      --accent: #dc2626;
+      --accent-dim: rgba(220,38,38,0.10);
+      --orange: #d97706;
+      --green: #059669;
+      --blue: #2563eb;
+      --purple: #9333ea;
+    }
+  }
+  :root {
+    --safe-top: env(safe-area-inset-top);
+    --safe-bot: env(safe-area-inset-bottom);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; overflow: hidden; }
+  body { font-family: 'Manrope', -apple-system, sans-serif; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.5; overscroll-behavior: none; transition: background 0.2s, color 0.2s; }
+  .app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; padding-top: var(--safe-top); padding-bottom: calc(70px + var(--safe-bot)); }
+  header { padding: 14px 20px 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-shrink: 0; }
+  .title { font-weight: 900; font-size: 22px; letter-spacing: -0.03em; text-transform: uppercase; }
+  .title .accent { color: var(--accent); }
+  .header-btn { background: var(--surface-2); border: 1px solid var(--border); color: var(--text); width: 38px; height: 38px; border-radius: 10px; font-size: 16px; cursor: pointer; display: grid; place-items: center; }
+
+  main { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 20px; }
+
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); display: flex; padding: 8px 4px calc(8px + var(--safe-bot)); z-index: 50; }
+  .nav-btn { flex: 1; background: transparent; border: none; color: var(--text-faint); padding: 8px 2px; cursor: pointer; font-family: inherit; font-size: 9px; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 3px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .nav-btn .icon { font-size: 20px; line-height: 1; }
+  .nav-btn.active { color: var(--accent); }
+
+  /* HOME / Heute */
+  .hero { padding: 0 16px 20px; }
+  .hero-card { background: linear-gradient(135deg, var(--accent-dim), var(--surface)); border: 1px solid rgba(239,68,68,0.3); border-radius: 16px; padding: 18px; position: relative; overflow: hidden; }
+  .hero-card .label { font-size: 10px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+  .hero-card .greeting { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; }
+  .hero-card .sub { font-size: 13px; color: var(--text-dim); margin-top: 4px; }
+  .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+  .quick-btn { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 14px; border-radius: 12px; font-family: inherit; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+  .quick-btn .ic { font-size: 22px; }
+  .quick-btn:active { background: var(--surface-2); }
+
+  .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); font-weight: 700; padding: 4px 16px 8px; display: flex; justify-content: space-between; align-items: center; }
+  .section-title .more { font-size: 11px; color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* Karten-Reihe (horizontal scroll) */
+  .scroll-row { display: flex; gap: 10px; padding: 0 16px 16px; overflow-x: auto; scrollbar-width: none; }
+  .scroll-row::-webkit-scrollbar { display: none; }
+  .plan-card { flex: 0 0 220px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px; cursor: pointer; }
+  .plan-card:active { background: var(--surface-2); }
+  .plan-card .ic { font-size: 28px; margin-bottom: 8px; }
+  .plan-card .name { font-weight: 800; font-size: 14px; letter-spacing: -0.01em; }
+  .plan-card .meta { font-size: 11px; color: var(--text-dim); margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+  .plan-card .desc { font-size: 12px; color: var(--text-dim); margin-top: 6px; line-height: 1.4; }
+
+  /* Session-Liste */
+  .session-list { padding: 0 16px 16px; display: flex; flex-direction: column; gap: 8px; }
+  .session-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; cursor: pointer; display: flex; align-items: center; gap: 12px; }
+  .session-card:active { background: var(--surface-2); }
+  .session-icon { width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center; font-size: 22px; flex-shrink: 0; }
+  .session-icon.km { background: rgba(239,68,68,0.15); }
+  .session-icon.kmh { background: rgba(245,158,11,0.15); }
+  .session-icon.strength { background: rgba(59,130,246,0.15); }
+  .session-icon.cardio { background: rgba(16,185,129,0.15); }
+  .session-icon.mob { background: rgba(168,85,247,0.15); }
+  .session-info { flex: 1; min-width: 0; }
+  .session-info .name { font-weight: 700; font-size: 14px; }
+  .session-info .meta { font-size: 11px; color: var(--text-dim); margin-top: 2px; font-family: 'JetBrains Mono', monospace; }
+  .session-info .notes { font-size: 12px; color: var(--text-dim); margin-top: 4px; font-style: italic; }
+  .session-meta-right { text-align: right; font-size: 11px; color: var(--text-faint); }
+  .session-meta-right .dur { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--text); font-size: 13px; }
+
+  /* Stats */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 16px 16px; }
+  .stat-tile { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+  .stat-tile .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-faint); font-weight: 700; }
+  .stat-tile .val { font-family: 'JetBrains Mono', monospace; font-size: 26px; font-weight: 800; margin-top: 4px; letter-spacing: -0.02em; }
+  .stat-tile .sub { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+  .stat-tile .val.accent { color: var(--accent); }
+  .stat-tile .val.green { color: var(--green); }
+  .stat-tile .val.orange { color: var(--orange); }
+
+  .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; padding: 0 16px 16px; }
+  .week-cell { aspect-ratio: 1; background: var(--surface-2); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+  .week-cell .wd { font-size: 9px; color: var(--text-faint); text-transform: uppercase; font-weight: 700; }
+  .week-cell.done { background: var(--accent-dim); border: 1px solid var(--accent); }
+  .week-cell.today { box-shadow: 0 0 0 2px var(--orange); }
+  .week-cell .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-faint); }
+  .week-cell.done .dot { background: var(--accent); }
+
+  /* TECHNIKEN */
+  .tech-search { padding: 0 16px 10px; }
+  .tech-search input { width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 11px 14px; border-radius: 10px; font-family: inherit; font-size: 14px; }
+  .tech-categories { display: flex; gap: 6px; padding: 0 16px 12px; overflow-x: auto; scrollbar-width: none; }
+  .tech-categories::-webkit-scrollbar { display: none; }
+  .tech-cat-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); padding: 7px 12px; border-radius: 8px; font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.04em; }
+  .tech-cat-btn.active { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
+  .tech-list { padding: 0 16px 20px; display: flex; flex-direction: column; gap: 8px; }
+  .tech-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; cursor: pointer; display: flex; gap: 12px; align-items: center; }
+  .tech-card:active { background: var(--surface-2); }
+  .tech-thumb { width: 60px; height: 60px; background: var(--bg); border-radius: 10px; display: grid; place-items: center; flex-shrink: 0; border: 1px solid var(--border); }
+  .tech-thumb svg { width: 50px; height: 50px; }
+  .tech-info { flex: 1; min-width: 0; }
+  .tech-info .name { font-weight: 800; font-size: 14px; letter-spacing: -0.01em; }
+  .tech-info .cat { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; margin-top: 2px; }
+  .tech-info .short { font-size: 12px; color: var(--text-dim); margin-top: 4px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .tech-fav { font-size: 18px; color: var(--text-faint); cursor: pointer; padding: 4px; }
+  .tech-fav.active { color: var(--orange); }
+
+  /* TECHNIK-DETAIL */
+  .tech-detail { padding: 0 16px 20px; }
+  .tech-detail-header { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 16px; padding-top: 4px; }
+  .tech-detail-svg { width: 140px; height: 140px; background: var(--surface); border-radius: 14px; border: 1px solid var(--border); padding: 14px; flex-shrink: 0; }
+  .tech-detail-svg svg { width: 100%; height: 100%; }
+  .tech-detail-title { flex: 1; }
+  .tech-detail-title .cat { font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .tech-detail-title h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; margin-top: 4px; }
+  .tech-detail-title .level { display: inline-block; background: var(--surface-2); color: var(--text-dim); padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; margin-top: 8px; letter-spacing: 0.04em; }
+  .back-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 8px; font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; margin: 0 16px 12px; display: inline-flex; align-items: center; gap: 6px; }
+  .tech-block { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+  .tech-block h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); font-weight: 700; margin-bottom: 8px; }
+  .tech-block ol, .tech-block ul { padding-left: 18px; }
+  .tech-block li { margin-bottom: 6px; font-size: 13px; line-height: 1.5; }
+  .tech-block.warn { background: rgba(239,68,68,0.05); border-color: rgba(239,68,68,0.25); }
+  .tech-block.warn h3 { color: var(--accent); }
+  .tech-block p { font-size: 13px; line-height: 1.5; color: var(--text); }
+  .tech-block a { color: var(--blue); text-decoration: none; }
+
+  /* TIMER */
+  .timer-screen { padding: 16px; }
+  .timer-presets { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+  .timer-preset { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px; cursor: pointer; text-align: left; }
+  .timer-preset:active { background: var(--surface-2); }
+  .timer-preset.active { background: var(--accent-dim); border-color: var(--accent); }
+  .timer-preset .name { font-weight: 800; font-size: 13px; }
+  .timer-preset .desc { font-size: 11px; color: var(--text-dim); margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+  .timer-config { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 16px; }
+  .timer-config .row { display: grid; grid-template-columns: 1fr 100px 100px; gap: 10px; align-items: center; margin-bottom: 10px; }
+  .timer-config .row:last-child { margin-bottom: 0; }
+  .timer-config label { font-size: 12px; font-weight: 600; }
+  .timer-config input { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 8px 10px; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-weight: 700; text-align: center; font-size: 14px; }
+  .timer-start-btn { width: 100%; background: var(--accent); color: white; border: none; padding: 16px; border-radius: 14px; font-family: inherit; font-weight: 800; font-size: 16px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.08em; }
+  .timer-start-btn:active { transform: scale(0.98); }
+
+  /* Timer Running */
+  .timer-running-screen { position: fixed; inset: 0; background: var(--bg); z-index: 300; padding: 30px 20px; padding-top: calc(30px + var(--safe-top)); padding-bottom: calc(30px + var(--safe-bot)); display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
+  .timer-running-screen.work { background: linear-gradient(180deg, rgba(239,68,68,0.2), var(--bg) 50%); }
+  .timer-running-screen.rest { background: linear-gradient(180deg, rgba(16,185,129,0.2), var(--bg) 50%); }
+  .timer-running-screen.prep { background: linear-gradient(180deg, rgba(245,158,11,0.2), var(--bg) 50%); }
+  .timer-phase { font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text-dim); margin-top: 20px; }
+  .timer-phase.work { color: var(--accent); }
+  .timer-phase.rest { color: var(--green); }
+  .timer-phase.prep { color: var(--orange); }
+  .timer-bigtime { font-family: 'JetBrains Mono', monospace; font-size: 110px; font-weight: 800; letter-spacing: -0.05em; line-height: 1; }
+  .timer-round { font-size: 18px; font-weight: 700; color: var(--text-dim); margin-top: 8px; font-family: 'JetBrains Mono', monospace; }
+  .timer-progress { width: 100%; max-width: 320px; height: 8px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+  .timer-progress-fill { height: 100%; background: var(--accent); transition: width 1s linear; }
+  .timer-controls { display: flex; gap: 14px; }
+  .timer-ctrl-btn { background: var(--surface-2); border: 1px solid var(--border); color: var(--text); width: 60px; height: 60px; border-radius: 50%; font-size: 22px; cursor: pointer; display: grid; place-items: center; }
+  .timer-ctrl-btn.primary { background: var(--accent); color: white; width: 80px; height: 80px; font-size: 28px; border: none; }
+  .timer-ctrl-btn:active { transform: scale(0.92); }
+
+  /* SETTINGS */
+  .settings-section { margin-bottom: 18px; }
+  .settings-section h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); font-weight: 700; margin-bottom: 10px; }
+  .theme-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .theme-opt { background: var(--bg); border: 1px solid var(--border); color: var(--text-dim); padding: 12px 4px; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: 12px; cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .theme-opt .ic { font-size: 20px; }
+  .theme-opt.active { background: var(--accent); color: white; border-color: var(--accent); }
+  .settings-btn { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 12px; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: 13px; cursor: pointer; }
+  .settings-btn:active { background: var(--surface-2); }
+  .settings-info { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+
+  /* MODAL */
+  .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 200; display: none; align-items: flex-end; justify-content: center; }
+  .modal-bg.show { display: flex; }
+  .modal { background: var(--surface); width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 20px 20px calc(20px + var(--safe-bot)); max-height: 92vh; overflow-y: auto; border-top: 1px solid var(--border); }
+  @media (min-width: 600px) { .modal-bg { align-items: center; } .modal { border-radius: 16px; max-height: 86vh; } }
+  .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 14px; }
+  .modal-title { font-weight: 800; font-size: 20px; margin-bottom: 14px; letter-spacing: -0.01em; }
+  .form-group { margin-bottom: 12px; }
+  .form-group label { display: block; font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; font-weight: 700; }
+  .form-group input, .form-group textarea, .form-group select { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 11px 14px; border-radius: 10px; font-family: inherit; font-size: 15px; }
+  .form-group textarea { min-height: 70px; resize: vertical; }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--accent); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
+  .modal-actions button { flex: 1; padding: 13px; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: 14px; cursor: pointer; border: none; }
+  .btn-cancel { background: var(--surface-2); color: var(--text); }
+  .btn-save { background: var(--accent); color: white; }
+  .btn-delete { background: rgba(239,68,68,0.12); color: var(--accent); margin-top: 8px; width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(239,68,68,0.3); font-family: inherit; font-weight: 600; font-size: 12px; cursor: pointer; }
+
+  .type-pills { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+  .type-pill { background: var(--bg); border: 1px solid var(--border); color: var(--text-dim); padding: 12px 8px; border-radius: 10px; cursor: pointer; font-family: inherit; font-size: 12px; font-weight: 700; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .type-pill .ic { font-size: 22px; }
+  .type-pill.active { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
+
+  .intensity-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+  .int-btn { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 10px 4px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 11px; font-weight: 700; }
+  .int-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+  .empty { text-align: center; padding: 30px 16px; color: var(--text-faint); font-size: 13px; }
+
+  /* PLAN-DETAIL */
+  .plan-detail { padding: 0 16px 20px; }
+  .plan-step { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 8px; }
+  .plan-step .head { display: flex; justify-content: space-between; align-items: center; }
+  .plan-step .num { width: 28px; height: 28px; background: var(--accent-dim); color: var(--accent); border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 13px; font-family: 'JetBrains Mono', monospace; }
+  .plan-step .name { font-weight: 700; font-size: 14px; }
+  .plan-step .meta { font-size: 11px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+  .plan-step .desc { font-size: 12px; color: var(--text-dim); margin-top: 6px; padding-left: 36px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="title">Train<span class="accent">.</span></div>
+    <button class="header-btn" id="settingsBtn">⚙</button>
+  </header>
+  <main id="mainContent"></main>
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-tab="home"><span class="icon">🏠</span>Home</button>
+    <button class="nav-btn" data-tab="techniques"><span class="icon">🥊</span>Techniken</button>
+    <button class="nav-btn" data-tab="plans"><span class="icon">📋</span>Pläne</button>
+    <button class="nav-btn" data-tab="timer"><span class="icon">⏱️</span>Timer</button>
+    <button class="nav-btn" data-tab="stats"><span class="icon">📊</span>Statistik</button>
+  </nav>
+</div>
+
+<!-- Session-Modal -->
+<div class="modal-bg" id="sessionBg">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="sessionTitle">Training loggen</div>
+    <div class="form-group">
+      <label>Art des Trainings</label>
+      <div class="type-pills" id="typePills">
+        <div class="type-pill" data-type="km"><span class="ic">🥊</span>Krav Maga (Verein)</div>
+        <div class="type-pill" data-type="kmh"><span class="ic">🏠</span>Krav Maga (Home)</div>
+        <div class="type-pill" data-type="strength"><span class="ic">🏋️</span>Krafttraining</div>
+        <div class="type-pill" data-type="cardio"><span class="ic">🏃</span>Cardio</div>
+        <div class="type-pill" data-type="mob"><span class="ic">🧘</span>Mobility</div>
+        <div class="type-pill" data-type="other"><span class="ic">⚡</span>Sonstiges</div>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Datum</label>
+        <input type="date" id="sDate">
+      </div>
+      <div class="form-group">
+        <label>Dauer (Min)</label>
+        <input type="number" id="sDuration" inputmode="numeric" value="60">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Intensität</label>
+      <div class="intensity-bar" id="intensityBar">
+        <button class="int-btn" data-i="1">😌<br>Locker</button>
+        <button class="int-btn" data-i="2">🙂<br>Moderat</button>
+        <button class="int-btn active" data-i="3">😤<br>Solide</button>
+        <button class="int-btn" data-i="4">🥵<br>Hart</button>
+        <button class="int-btn" data-i="5">💀<br>Brutal</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Notizen (optional)</label>
+      <textarea id="sNotes" placeholder="z.B. Was geübt, wie gefühlt, was verbessern..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" id="sCancel">Abbrechen</button>
+      <button class="btn-save" id="sSave">Speichern</button>
+    </div>
+    <button class="btn-delete" id="sDelete" style="display:none">Eintrag löschen</button>
+  </div>
+</div>
+
+<!-- Settings-Modal -->
+<div class="modal-bg" id="settingsBg">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Einstellungen</div>
+
+    <div class="settings-section">
+      <h3>🎨 Erscheinungsbild</h3>
+      <div class="theme-options">
+        <button class="theme-opt" data-theme="auto"><span class="ic">⚙️</span>Automatisch</button>
+        <button class="theme-opt" data-theme="light"><span class="ic">☀️</span>Hell</button>
+        <button class="theme-opt" data-theme="dark"><span class="ic">🌙</span>Dunkel</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>💾 Backup</h3>
+      <div class="form-row">
+        <button class="settings-btn" id="settingsExportBtn">📤 Export</button>
+        <button class="settings-btn" id="settingsImportBtn">📥 Import</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>ℹ️ Status</h3>
+      <div class="settings-info" id="settingsStats">–</div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" id="settingsCloseBtn">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// =============================================================
+// TECHNIKEN-BIBLIOTHEK (Anfänger / P1-Niveau)
+// =============================================================
+const TECHNIQUES = [
+  // GRUNDLAGEN
+  { id:'stance', cat:'basics', catName:'Grundlagen', level:'P1', name:'Kampfstellung (Fighting Stance)',
+    short:'Die wichtigste Position. Stabil, beweglich, bereit zu schlagen und auszuweichen.',
+    svg: 'stance',
+    steps: [
+      'Linker Fuß vorne (für Rechtshänder), rechter Fuß hinten – Schrittlänge ca. eine Schulterbreite',
+      'Hintere Ferse leicht abgehoben, Gewicht 50/50 auf beiden Beinen',
+      'Knie leicht gebeugt, federn können',
+      'Hüfte um ~45° zur Seite gedreht (kleineres Ziel)',
+      'Hände hoch: vordere Faust auf Augenhöhe vor dem Gesicht, hintere am Kinn/Wange',
+      'Ellbogen eng am Körper, schützen Rippen',
+      'Kinn gesenkt, durch Augenbrauen schauen, Schulter leicht hoch'
+    ],
+    keys: [
+      'Stabilität UND Mobilität gleichzeitig – nicht steif!',
+      'Hände schützen den Kopf, Ellbogen die Rippen',
+      'Aus dieser Position MUSS jeder Schlag, jede Abwehr, jeder Schritt starten'
+    ],
+    mistakes: [
+      'Hände zu tief (Gesicht offen)',
+      'Gewicht auf hinterem Bein (langsame vordere Hand)',
+      'Beine zu breit (langsam) oder zu eng (instabil)',
+      'Frontalstellung (großes Ziel)'
+    ],
+    drill: 'Täglich 5 Min Schattenboxen aus der Stellung. Im Spiegel checken: bleiben Hände oben, auch wenn du müde wirst?',
+    tags: ['Basis', 'Pflicht']
+  },
+  { id:'footwork', cat:'basics', catName:'Grundlagen', level:'P1', name:'Beinarbeit (Footwork)',
+    short:'Bewegen ohne die Stellung zu verlieren. Push-Step in alle vier Richtungen.',
+    svg: 'footwork',
+    steps: [
+      'Vorwärts: vorderer Fuß setzt zuerst ab, hinterer folgt schiebend – Abstand bleibt gleich',
+      'Rückwärts: hinterer Fuß zuerst, vorderer folgt',
+      'Seitwärts links: linker Fuß raus, rechter folgt',
+      'Seitwärts rechts: rechter Fuß raus, linker folgt',
+      'Füße kreuzen sich NIE'
+    ],
+    keys: [
+      'Kleine, schnelle Schritte – kein Hüpfen',
+      'Hände bleiben oben, Stellung bleibt erhalten',
+      'Immer wieder zur neutralen Distanz finden'
+    ],
+    mistakes: [
+      'Füße überkreuzen (gestolpert = down)',
+      'Springen statt gleiten',
+      'Hände sinken beim Bewegen'
+    ],
+    drill: '2x 2 Min: nur Footwork in alle Richtungen. Mit Partner: einer "drückt", anderer weicht aus.',
+    tags: ['Basis']
+  },
+
+  // SCHLÄGE
+  { id:'jab', cat:'strikes', catName:'Schläge', level:'P1', name:'Gerade Vorhand (Jab)',
+    short:'Schnellster Schlag, mit der vorderen Hand. Distanz finden, Gegner stören.',
+    svg: 'jab',
+    steps: [
+      'Aus Kampfstellung: vordere Faust schießt geradeaus nach vorn',
+      'Schulter geht mit – nicht nur Arm',
+      'Faust dreht im letzten Moment (Daumen unten am Auftreffpunkt)',
+      'Treffpunkt mit den ersten zwei Knöcheln',
+      'Hintere Hand bleibt am Kinn – schützt!',
+      'Sofort zurück zur Ausgangsposition'
+    ],
+    keys: [
+      'Schnell raus, schneller zurück',
+      'Gewicht bleibt zentriert, nicht nach vorn fallen',
+      'Andere Hand bleibt OBEN – jeder Jab ohne Schutzhand ist gefährlich'
+    ],
+    mistakes: [
+      'Arm "telegrafiert" (Ellbogen geht erst zur Seite)',
+      'Hand wird unten gelassen nach Rückführung',
+      'Zu weit gestreckt → Ellbogen blockiert / Gleichgewicht weg'
+    ],
+    drill: '50 Jabs pro Seite an der Luft. Dann 30 Jabs am Boxsack. Tempo: 1-2 pro Sekunde, sauber.',
+    tags: ['Schlag', 'Boxsack']
+  },
+  { id:'cross', cat:'strikes', catName:'Schläge', level:'P1', name:'Gerade Hinterhand (Cross)',
+    short:'Der harte Schlag. Volle Kraft durch Hüfte und Rumpf, Knockout-Potential.',
+    svg: 'cross',
+    steps: [
+      'Aus Kampfstellung: Drehbewegung beginnt im hinteren Fuß',
+      'Hintere Ferse rotiert nach außen ("zerquetsche eine Zigarette")',
+      'Hüfte folgt der Drehung',
+      'Schulter folgt der Hüfte',
+      'Arm schießt geradlinig zum Ziel, Faust dreht ein',
+      'Vordere Hand schützt das Kinn',
+      'Vollständige Streckung – aber nicht überstrecken!',
+      'Zurück in die Stellung'
+    ],
+    keys: [
+      'Kraft kommt aus dem Boden über Hüfte → Schulter → Faust',
+      'Reihenfolge wichtig: Fuß-Hüfte-Schulter-Arm',
+      'Atmen! Beim Schlag scharf ausatmen ("Tss")'
+    ],
+    mistakes: [
+      '"Arm-Punch" ohne Hüftrotation = keine Kraft',
+      'Vordere Hand fällt nach unten',
+      'Kinn hebt sich → ungeschützt',
+      'Schritt vorwärts mit dem Cross (vs. Drehung an Ort)'
+    ],
+    drill: '10x Cross mit Fokus auf Hüfte (langsam). Dann 30x am Boxsack mit voller Kraft. Mit Partner: Pratzen halten lassen.',
+    tags: ['Schlag', 'Hauptwaffe']
+  },
+  { id:'hammer', cat:'strikes', catName:'Schläge', level:'P1', name:'Hammerfaust (Hammer Strike)',
+    short:'Krav-Maga-Klassiker. Hart, sicher (keine Knochenbrüche an der Faust), in alle Richtungen.',
+    svg: 'hammer',
+    steps: [
+      'Faust geballt, Daumen außen',
+      'Treffpunkt: Unterseite der Faust (Kleinfinger-Seite) – fleischig, kein Knochen',
+      'Kann geschlagen werden: nach unten (auf Kopf), seitwärts (Schläfe), nach hinten (Angreifer hinten)',
+      'Vollständige Schwingbewegung aus dem Arm + Rumpf',
+      'Bei seitlichem Hammer: Hüfte mit drehen wie beim Cross'
+    ],
+    keys: [
+      'Sicherer Schlag als Faust – kein Knöchel kann brechen',
+      'Funktioniert auch ohne Aufwärmen ("kalt")',
+      'Ideal gegen weiche Ziele: Nase, Schläfe, Genick, Genitalien'
+    ],
+    mistakes: [
+      'Schlag mit Knöcheln (= Faust) statt Unterseite',
+      'Daumen INNEN (kann brechen!)',
+      'Kraft nur aus dem Arm'
+    ],
+    drill: 'Hammer nach unten 20x, Hammer seitlich 20x pro Seite, Hammer nach hinten 20x. Am Pratzen oder Sandsack.',
+    tags: ['Krav Maga', 'Selbstverteidigung']
+  },
+  { id:'elbow', cat:'strikes', catName:'Schläge', level:'P1', name:'Ellbogenschlag (Elbow Strike)',
+    short:'Härtester Schlag im Krav Maga. Maximale Kraft auf engste Distanz.',
+    svg: 'elbow',
+    steps: [
+      '7 Hauptrichtungen: horizontal vorne, horizontal hinten, vertikal hoch, vertikal runter, nach hinten gerade, schräg hoch, schräg runter',
+      'Treffpunkt: Spitze des Ellbogens (Knochen)',
+      'Andere Hand schützt entweder das Gesicht oder fixiert den Gegner',
+      'Hüfte rotiert massiv mit – wie beim Cross, aber kürzer',
+      'Kompletten Körper hinter den Schlag bringen'
+    ],
+    keys: [
+      'Distanz unter Faustreichweite = Ellbogen-Distanz',
+      'Auf engste Distanz unschlagbar',
+      'Auch gut in der Defensive (Eindringling stoppen)'
+    ],
+    mistakes: [
+      'Zu weite Distanz versuchen (Ellbogen erreicht nicht)',
+      'Kein Hüfteinsatz',
+      'Andere Hand vergisst zu schützen'
+    ],
+    drill: 'Alle 7 Richtungen je 10x üben. Vor dem Spiegel oder am Pratzen. Konzentration auf Hüftrotation.',
+    tags: ['Krav Maga', 'Hauptwaffe', 'Close Range']
+  },
+
+  // KICKS
+  { id:'front-kick-groin', cat:'kicks', catName:'Tritte', level:'P1', name:'Front Kick zur Leiste',
+    short:'Der wichtigste Krav-Maga-Tritt. Schnell, kraftvoll, zielt auf empfindlichste Stelle.',
+    svg: 'frontkick',
+    steps: [
+      'Aus Kampfstellung: hinteres Bein zieht hoch (Knie zur Brust)',
+      'Bein streckt nach vorn – Treffpunkt ist die SCHIENBEIN-OBERFLÄCHE oder Spann',
+      'Hüfte schiebt nach vorn (gibt die Kraft)',
+      'Stützbein leicht gebeugt, Fuß steht stabil',
+      'Hände bleiben oben',
+      'Bein schnell zurückziehen (sonst gegriffen werden)',
+      'Zurück in Kampfstellung'
+    ],
+    keys: [
+      'Knie ZUERST hoch, dann Schienbein nach vorn',
+      'Hüfte gibt die Kraft – nicht der Quadrizeps',
+      'Ziel: Leiste – endet jeden Kampf'
+    ],
+    mistakes: [
+      'Direkt das Bein hochschwingen ohne Knie-Hub',
+      'Mit Zehen zielen (kann brechen)',
+      'Stützbein durchgestreckt → kein Gleichgewicht',
+      'Bein lang draußen lassen → kann gefangen werden'
+    ],
+    drill: '20 Front Kicks pro Bein, langsam für Technik. Dann 20 schnell. Sehr gut: am Pratzen mit Partner.',
+    tags: ['Krav Maga', 'Hauptwaffe', 'Selbstverteidigung']
+  },
+  { id:'front-kick-body', cat:'kicks', catName:'Tritte', level:'P1', name:'Front Kick zum Körper',
+    short:'Distanz halten, Gegner wegschieben. Wie der Leisten-Tritt, aber höher.',
+    svg: 'frontkick',
+    steps: [
+      'Wie Front Kick zur Leiste, aber Knie höher anheben',
+      'Treffpunkt mit dem BALLEN (Zehen hochgezogen!) oder mit dem Schienbein',
+      'Höhe: Bauch / Solar Plexus / Brust',
+      'Hüfte stößt mit'
+    ],
+    keys: [
+      'Zehen IMMER hochziehen, sonst Verletzung',
+      'Wieder: Hüfte schiebt, Bein streckt'
+    ],
+    mistakes: [
+      'Zehen vergessen (häufigster Fehler)',
+      'Zu hoch zielen ohne Flexibilität → Becken kippt'
+    ],
+    drill: '15x pro Bein an der Pratze oder Sandsack. Achten auf Zehen-Position.',
+    tags: ['Tritt']
+  },
+  { id:'roundkick', cat:'kicks', catName:'Tritte', level:'P1', name:'Round Kick (Halbkreis-Tritt)',
+    short:'Tritt von der Seite. Trifft mit dem Schienbein, sehr kraftvoll.',
+    svg: 'roundkick',
+    steps: [
+      'Aus Kampfstellung: Stützfuß dreht um ~90° nach außen (wichtig!)',
+      'Tretendes Bein hebt – Knie zeigt zum Ziel',
+      'Hüfte rotiert mit',
+      'Schienbein schlägt seitlich ins Ziel',
+      'Höhe: Oberschenkel (Low Kick), Bauch, Kopf',
+      'Hände schützen!',
+      'Schnell zurückziehen'
+    ],
+    keys: [
+      'Stützfuß-Drehung erlaubt die Hüftrotation',
+      'Schienbein, NICHT Spann (besser für reale Selbstverteidigung)',
+      'Für Anfänger: erstmal Low Kick (Oberschenkel)'
+    ],
+    mistakes: [
+      'Stützfuß bleibt frontal → Hüfte blockiert, kein Power',
+      'Tritt mit Spann/Zehen → schmerzhaft für DICH',
+      'Standbein durchgestreckt'
+    ],
+    drill: '20x pro Bein Low Kick am Sandsack. Erst langsam, Stützfuß-Drehung üben.',
+    tags: ['Tritt']
+  },
+  { id:'knee', cat:'kicks', catName:'Tritte', level:'P1', name:'Knee Strike (Knietritt)',
+    short:'Auf engste Distanz. Brutal effektiv bei geclinchten Gegner.',
+    svg: 'knee',
+    steps: [
+      'Gegner clinchen: Hände hinter Nacken/Schulter, Ellbogen eng',
+      'Gegner zu DIR ziehen, gleichzeitig Knie hoch',
+      'Knie trifft Bauch, Solarplexus, Oberschenkel oder Genitalien',
+      'Hüfte schiebt nach vorn',
+      'Fuß zeigt nach hinten (gestreckt)'
+    ],
+    keys: [
+      'Ziehen + Treten gleichzeitig = doppelte Kraft',
+      'Im Clinch sehr sicher (nah am Gegner = er kann nicht voll schlagen)'
+    ],
+    mistakes: [
+      'Nur das Knie hochziehen ohne Hüfteinsatz',
+      'Vergessen den Gegner zu ziehen'
+    ],
+    drill: 'Mit Partner: Clinch + Knietritt am Pratzen (Partner hält Pratze vor den Bauch). 10x pro Bein.',
+    tags: ['Krav Maga', 'Close Range']
+  },
+
+  // BEFREIUNGEN
+  { id:'choke-front', cat:'defense', catName:'Befreiungen', level:'P1', name:'Würgegriff von vorn (beidhändig)',
+    short:'Klassischer Krav-Maga-Test. Schnell, effektiv, jeder muss das können.',
+    svg: 'chokefront',
+    steps: [
+      'Gegner würgt mit beiden Händen am Hals von vorn',
+      'SOFORT: Kinn auf die Brust senken (Druck auf Halsschlagader reduzieren)',
+      '1. "Plucking": Beide eigene Hände greifen die Daumen/Hände des Gegners',
+      '2. Gleichzeitig: einen heftigen Schritt nach hinten + Hände wegreißen NACH UNTEN UND AUSSEN',
+      '3. Sofort Gegenangriff: Front Kick zur Leiste / Knie / Cross zum Kopf',
+      '4. Distanz schaffen, fluchten oder weitere Gegenangriffe'
+    ],
+    keys: [
+      'GLEICHZEITIG: Plucken UND Konter – nicht erst befreien, dann nachdenken',
+      'Kinn runter rettet dir das Bewusstsein',
+      'Schritt nach hinten gibt Distanz und Kraft'
+    ],
+    mistakes: [
+      'Versuchen Arme nach OBEN zu drücken (Mensch zu stark)',
+      'Erst befreien, dann gucken – sofort kontern!',
+      'Kinn oben lassen (Halsschlagader offen)'
+    ],
+    drill: 'Mit Partner langsam üben. Partner würgt sanft, du übst Plucking + sofort Kniestoß zum (gepolsterten) Bauch.',
+    tags: ['Selbstverteidigung', 'Pflicht', 'Krav Maga']
+  },
+  { id:'choke-back', cat:'defense', catName:'Befreiungen', level:'P1', name:'Würgegriff von hinten (beidhändig)',
+    short:'Schwieriger weil Gegner unsichtbar. Schnelle Drehung + Kontern.',
+    svg: 'chokeback',
+    steps: [
+      'Kinn auf die Brust',
+      'Arm hoch ("nach der Sonne greifen") – z.B. der rechte Arm hoch und über den Kopf',
+      'Mit dem hochgehobenen Arm scharf rotieren / drehen Richtung dieser Schulter',
+      'Während des Drehens: Ellbogen schlägt ZUM Gegner',
+      'Jetzt stehst du seitlich zum Gegner, der Würgegriff ist gelöst',
+      'Kontern: Hammer, Knie, Front Kick'
+    ],
+    keys: [
+      'Arm hoch CREATES Platz',
+      'Dreh + Schlag = eine Bewegung',
+      'Niemals lange mit dem Rücken zum Gegner stehen'
+    ],
+    mistakes: [
+      'Versuchen sich nach vorn weg zu beugen (geht nicht)',
+      'Arm nicht hoch genug',
+      'Kein Konter direkt im Anschluss'
+    ],
+    drill: 'Mit Partner: Partner würgt sanft von hinten, du übst Drehen + Ellbogen. 5x rechts, 5x links.',
+    tags: ['Selbstverteidigung', 'Pflicht']
+  },
+  { id:'wrist-grab', cat:'defense', catName:'Befreiungen', level:'P1', name:'Handgelenk-Befreiung',
+    short:'Gegner greift dein Handgelenk. Universal-Lösung: durch die Daumen-Lücke.',
+    svg: 'wristgrab',
+    steps: [
+      'Wenn jemand dein Handgelenk packt → die Schwachstelle ist immer der DAUMEN',
+      'Drehe deine Hand so, dass die Handkante (Daumenseite) gegen den Daumen des Gegners zeigt',
+      'Schneller Ruck nach OBEN und nach AUSSEN (vom Daumen weg)',
+      'Sofort eigenen Konter: Front Kick, Hammer'
+    ],
+    keys: [
+      'Daumen ist immer die schwächste Stelle eines Griffs',
+      'Schnelligkeit > Kraft',
+      'Sofort kontern, nicht "verhandeln"'
+    ],
+    mistakes: [
+      'Versuchen die ganze Hand wegzuziehen (Kraft gegen Kraft = verloren)',
+      'In die falsche Richtung ziehen'
+    ],
+    drill: 'Partner greift Handgelenk verschieden (einhändig, beidhändig). Du befreist 10x.',
+    tags: ['Selbstverteidigung']
+  },
+
+  // ABWEHR
+  { id:'defense-punch', cat:'defense', catName:'Abwehr', level:'P1', name:'Inside Defense (Faustabwehr)',
+    short:'Gegner schlägt geraden Schlag. Mit der Hand nach innen ablenken + sofort kontern.',
+    svg: 'insidedefense',
+    steps: [
+      'Sehe Faust kommen (geradlinig, Stirn/Nase Richtung)',
+      'Mit der gleichseitigen Hand (rechte Hand für rechte Faust des Gegners): leichter Schub nach innen',
+      'Handfläche schlägt seitlich gegen Unterarm/Handgelenk',
+      'Gegnerische Faust geht an deinem Kopf vorbei',
+      'GLEICHZEITIG (nicht danach): Cross mit der anderen Hand ins Gesicht',
+      'Weiter mit Folgeangriffen'
+    ],
+    keys: [
+      'Kleine Bewegung – nicht ausholen',
+      'Defense + Attack gleichzeitig (das ist Krav Maga)',
+      'Eigenen Kopf nicht aus der Linie nehmen (Verteidigung ist die Hand, nicht ausweichen)'
+    ],
+    mistakes: [
+      'Zu weite Defense-Bewegung',
+      'Erst verteidigen, dann zählen 1-2-3, dann kontern (zu langsam)',
+      'Kopf zurückziehen statt Hand benutzen'
+    ],
+    drill: 'Partner schlägt langsame Jabs/Crosses. Du defensiv + simultan Cross zurück. Langsam, sauber.',
+    tags: ['Krav Maga', 'Abwehr']
+  },
+
+  // BODENARBEIT
+  { id:'fall-back', cat:'ground', catName:'Bodenarbeit', level:'P1', name:'Fallschule rückwärts',
+    short:'Sicher zu Boden fallen ohne zu verletzen. Lebenswichtig.',
+    svg: 'fallback',
+    steps: [
+      'Beim Fallen: Kinn auf die Brust (NIE den Kopf aufschlagen)',
+      'Arme ausgestreckt, Handflächen nach unten',
+      'Hände + Unterarme schlagen den Boden gleichzeitig (verteilt den Aufprall)',
+      'Beine bleiben angewinkelt, Füße flach',
+      'Aufstehen: durch eine Seite rollen, dann hochkommen – nie mit Rücken zum potentiellen Angreifer'
+    ],
+    keys: [
+      'Kinn IMMER auf Brust beim Fallen',
+      'Hände schlagen den Boden VOR dem Kopf',
+      'Schnell wieder aufstehen oder defensive Bodenposition einnehmen'
+    ],
+    mistakes: [
+      'Mit dem Hinterkopf aufschlagen (Hirnerschütterung!)',
+      'Versuchen sich mit gestreckten Armen abzustützen (gebrochenes Handgelenk)',
+      'Lange liegen bleiben'
+    ],
+    drill: 'Auf Matte: 10x rückwärts fallen lassen. Fokus auf Kinn + Hand-Klatsch.',
+    tags: ['Basis', 'Pflicht']
+  },
+  { id:'guard', cat:'ground', catName:'Bodenarbeit', level:'P1', name:'Defensive Bodenposition',
+    short:'Wenn du am Boden bist und Gegner steht: nicht passiv liegen, sondern verteidigen.',
+    svg: 'guard',
+    steps: [
+      'Auf den Rücken, ein Bein zum Gegner gerichtet',
+      'Hände schützen Gesicht',
+      'Anderes Bein nach unten geknickt – Basis zum Drehen',
+      'Auf der Hüfte abrollen, NIE auf dem Rücken statisch liegen',
+      'Mit dem nahen Bein treten (Front Kick zur Leiste/Knie des Gegners)',
+      'Sobald möglich: aufstehen, dabei das Bein zum Gegner gerichtet halten'
+    ],
+    keys: [
+      'NIE flach auf dem Rücken',
+      'Bein zum Gegner = Schutz + Waffe',
+      'Aufstehen Priorität #1'
+    ],
+    mistakes: [
+      'Beine eng aneinander (Gegner kann durchgehen)',
+      'Hände unten',
+      'Versuchen am Boden zu "kämpfen" (Krav Maga: aufstehen!)'
+    ],
+    drill: 'Mit Partner: du am Boden, Partner steht. Verteidigen, treten, dann sicher aufstehen. 5x.',
+    tags: ['Krav Maga', 'Boden']
+  }
+];
+
+const TECH_CATS = [
+  { id:'all', name:'Alle' },
+  { id:'basics', name:'Grundlagen' },
+  { id:'strikes', name:'Schläge' },
+  { id:'kicks', name:'Tritte' },
+  { id:'defense', name:'Abwehr' },
+  { id:'ground', name:'Boden' },
+  { id:'favorites', name:'Favoriten ⭐' }
+];
+
+// =============================================================
+// TRAININGSPLÄNE (vorgefertigt)
+// =============================================================
+const PLANS = [
+  {
+    id: 'plan-km-home-30',
+    name: 'Krav Maga Home – 30 Min',
+    type: 'kmh',
+    icon: '🥊',
+    desc: 'Solo-Training zu Hause, Boxsack oder freie Übung',
+    duration: 30,
+    steps: [
+      { name: 'Aufwärmen', dur: '5 Min', desc: 'Seilspringen oder Hampelmänner, leichtes Schattenboxen', sets: '' },
+      { name: 'Schattenboxen', dur: '3 Runden × 2 Min', desc: 'Jab–Cross–Hook Kombinationen, Beinarbeit', sets: '' },
+      { name: 'Pause', dur: '1 Min', desc: 'Atmen, Wasser', sets: '' },
+      { name: 'Boxsack: Schläge', dur: '3 Runden × 2 Min', desc: 'Jab/Cross/Hammer/Ellbogen abwechselnd, hartes Tempo', sets: '' },
+      { name: 'Pause', dur: '1 Min', desc: '', sets: '' },
+      { name: 'Boxsack: Kicks', dur: '2 Runden × 2 Min', desc: 'Front Kick & Round Kick, beide Beine', sets: '' },
+      { name: 'Kombinationen', dur: '2 Runden × 2 Min', desc: 'z.B. Jab-Cross-Hook-Knee, Cross-Hammer-Front Kick', sets: '' },
+      { name: 'Cool-down', dur: '3 Min', desc: 'Dehnen, vor allem Hüfte und Schultern', sets: '' }
+    ]
+  },
+  {
+    id: 'plan-strength-fullbody',
+    name: 'Krafttraining Ganzkörper',
+    type: 'strength',
+    icon: '🏋️',
+    desc: 'Klassisches Ganzkörper-Workout, 3× pro Woche möglich',
+    duration: 60,
+    steps: [
+      { name: 'Aufwärmen', dur: '5 Min', desc: 'Mobility + leichtes Cardio', sets: '' },
+      { name: 'Kniebeugen', dur: '', desc: 'Beine + Po + Core', sets: '3 × 8-10' },
+      { name: 'Bankdrücken oder Liegestütze', dur: '', desc: 'Brust + Trizeps', sets: '3 × 8-12' },
+      { name: 'Kreuzheben oder Rumänisches Kreuzheben', dur: '', desc: 'Rücken + Beinrückseite', sets: '3 × 6-8' },
+      { name: 'Klimmzüge oder Latzug', dur: '', desc: 'Rücken + Bizeps', sets: '3 × 6-10' },
+      { name: 'Schulterdrücken', dur: '', desc: 'Schultern + Trizeps', sets: '3 × 8-10' },
+      { name: 'Plank', dur: '', desc: 'Core – 3× möglichst lange halten', sets: '3 × 30-60s' },
+      { name: 'Cool-down', dur: '5 Min', desc: 'Dehnen', sets: '' }
+    ]
+  },
+  {
+    id: 'plan-bag-rounds',
+    name: 'Boxsack Intervall',
+    type: 'kmh',
+    icon: '💥',
+    desc: 'Klassisches Boxer-Format: 6 Runden Boxsack',
+    duration: 24,
+    steps: [
+      { name: 'Aufwärmen', dur: '3 Min', desc: 'Seilspringen / Schattenboxen', sets: '' },
+      { name: 'Runde 1: Jabs', dur: '3 Min', desc: 'Nur Jabs, beidseitig, Footwork', sets: '' },
+      { name: 'Pause', dur: '1 Min', desc: '', sets: '' },
+      { name: 'Runde 2: Jab-Cross', dur: '3 Min', desc: 'Kombi 1-2, schnell und sauber', sets: '' },
+      { name: 'Pause', dur: '1 Min', desc: '', sets: '' },
+      { name: 'Runde 3: Kombos mit Hook', dur: '3 Min', desc: '1-2-3, 1-2-3-2', sets: '' },
+      { name: 'Pause', dur: '1 Min', desc: '', sets: '' },
+      { name: 'Runde 4: Tritte einbauen', dur: '3 Min', desc: 'Kombi + Front/Round Kick', sets: '' },
+      { name: 'Pause', dur: '1 Min', desc: '', sets: '' },
+      { name: 'Runde 5: Power', dur: '3 Min', desc: 'Maximale Kraft, jeder Schlag 100%', sets: '' },
+      { name: 'Pause', dur: '1 Min', desc: '', sets: '' },
+      { name: 'Runde 6: Burnout', dur: '3 Min', desc: 'Alles geben, alle Waffen', sets: '' },
+      { name: 'Cool-down', dur: '2 Min', desc: 'Dehnen, atmen', sets: '' }
+    ]
+  },
+  {
+    id: 'plan-conditioning',
+    name: 'Krav Maga Conditioning',
+    type: 'kmh',
+    icon: '🔥',
+    desc: 'Kraft + Ausdauer + Technik in einem',
+    duration: 25,
+    steps: [
+      { name: 'Aufwärmen', dur: '3 Min', desc: 'Hampelmann + Mobility', sets: '' },
+      { name: 'Circuit 1', dur: '5 Min', desc: '30s Liegestütze, 30s Hammer-Schläge, 30s Squats, 30s Front Kicks, 30s Plank. 2 Durchgänge.', sets: '' },
+      { name: 'Pause', dur: '1 Min', desc: '', sets: '' },
+      { name: 'Circuit 2', dur: '5 Min', desc: '30s Burpees, 30s Cross-Combos am Sack, 30s Lunges, 30s Round Kicks, 30s Mountain Climber. 2 Durchgänge.', sets: '' },
+      { name: 'Pause', dur: '1 Min', desc: '', sets: '' },
+      { name: 'Finisher', dur: '5 Min', desc: '100 Schläge so schnell wie möglich am Boxsack', sets: '' },
+      { name: 'Cool-down', dur: '5 Min', desc: 'Dehnen + Atmen', sets: '' }
+    ]
+  },
+  {
+    id: 'plan-mobility',
+    name: 'Mobility Routine',
+    type: 'mob',
+    icon: '🧘',
+    desc: 'An Ruhetagen oder zum Aufwärmen',
+    duration: 15,
+    steps: [
+      { name: 'Hüftöffner (Frosch)', dur: '60s', desc: 'Auf allen Vieren, Knie nach außen, Hüfte langsam senken', sets: '' },
+      { name: 'Cossack Squat', dur: '60s', desc: 'Tiefe Seit-Squats, je 30s links/rechts', sets: '' },
+      { name: 'Welt-größte Stretch', dur: '60s', desc: 'Ausfallschritt + Torsionsdrehung, je 30s', sets: '' },
+      { name: 'Cat-Cow', dur: '60s', desc: 'Wirbelsäule mobil machen', sets: '' },
+      { name: 'Schulter-Rotation', dur: '60s', desc: 'Beidarmig, vorwärts + rückwärts', sets: '' },
+      { name: 'Pancake Stretch', dur: '60s', desc: 'Beine weit, Oberkörper nach vorn', sets: '' },
+      { name: 'Tiefes Squat Hold', dur: '60s', desc: 'Tief in die Hocke, halten', sets: '' },
+      { name: 'Pigeon Pose', dur: '120s', desc: 'Tiefe Hüftdehnung, je 60s pro Seite', sets: '' }
+    ]
+  }
+];
+
+// =============================================================
+// TIMER-PRESETS
+// =============================================================
+const TIMER_PRESETS = [
+  { id:'boxer', name:'Boxer-Runden', rounds:3, work:180, rest:60, prep:10, desc:'3 Min Action, 1 Min Pause × 3' },
+  { id:'boxer-long', name:'Boxer 6 Runden', rounds:6, work:180, rest:60, prep:10, desc:'3 Min Action, 1 Min Pause × 6' },
+  { id:'tabata', name:'Tabata', rounds:8, work:20, rest:10, prep:10, desc:'20s Action / 10s Pause × 8' },
+  { id:'emom', name:'EMOM', rounds:10, work:60, rest:0, prep:5, desc:'Jede Minute starten × 10' },
+  { id:'amrap', name:'AMRAP 10', rounds:1, work:600, rest:0, prep:5, desc:'10 Min Vollgas' },
+  { id:'custom', name:'Eigene Einstellung', rounds:5, work:60, rest:30, prep:10, desc:'Selbst konfigurieren' }
+];
+
+// =============================================================
+// STATE
+// =============================================================
+const STORAGE_KEY = 'train_v1';
+const DAYS_DE = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+const MONTHS_SHORT = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+const TYPE_INFO = {
+  km: { name:'Krav Maga (Verein)', icon:'🥊', cls:'km' },
+  kmh: { name:'Krav Maga (Home)', icon:'🏠', cls:'kmh' },
+  strength: { name:'Krafttraining', icon:'🏋️', cls:'strength' },
+  cardio: { name:'Cardio', icon:'🏃', cls:'cardio' },
+  mob: { name:'Mobility', icon:'🧘', cls:'mob' },
+  other: { name:'Sonstiges', icon:'⚡', cls:'mob' }
+};
+
+let state = {
+  tab: 'home',
+  sessions: [],
+  customPlans: [],
+  favTechniques: [],
+  techCategory: 'all',
+  techSearch: '',
+  currentTechId: null,
+  currentPlanId: null,
+  // Timer
+  timerPreset: 'boxer',
+  timerConfig: { rounds: 3, work: 180, rest: 60, prep: 10 },
+  // Session-Modal
+  editingSession: null,
+  selectedType: 'km',
+  selectedIntensity: 3,
+  // Settings
+  theme: 'auto'
+};
+
+let timerState = null;
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const data = JSON.parse(raw);
+      state.sessions = data.sessions || [];
+      state.customPlans = data.customPlans || [];
+      state.favTechniques = data.favTechniques || [];
+      state.theme = data.theme || 'auto';
+    }
+  } catch(e) { console.warn('Load failed:', e); }
+  applyTheme();
+}
+function saveData() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      sessions: state.sessions,
+      customPlans: state.customPlans,
+      favTechniques: state.favTechniques,
+      theme: state.theme
+    }));
+  } catch(e) { console.warn('Save failed:', e); }
+}
+
+function applyTheme() {
+  const theme = state.theme || 'auto';
+  document.documentElement.setAttribute('data-theme', theme);
+  const isDark = theme === 'dark' ||
+                 (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const tc = document.getElementById('themeColor');
+  if (tc) tc.setAttribute('content', isDark ? '#0a0a0c' : '#f6f7f9');
+}
+
+// =============================================================
+// HELPERS
+// =============================================================
+const $ = id => document.getElementById(id);
+const mainEl = $('mainContent');
+
+function fmtDate(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function isToday(d) { return fmtDate(d) === fmtDate(new Date()); }
+function addDays(d, n) { const x = new Date(d); x.setDate(x.getDate()+n); return x; }
+function escape(s) { return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmtTime(sec) {
+  const m = Math.floor(sec/60);
+  const s = sec%60;
+  return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+}
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h < 5) return 'Späte Stunde,';
+  if (h < 11) return 'Guten Morgen,';
+  if (h < 14) return 'Hi,';
+  if (h < 18) return 'Guten Tag,';
+  if (h < 22) return 'Guten Abend,';
+  return 'Späte Stunde,';
+}
+
+// =============================================================
+// SVG-Skizzen für Techniken (einfache Strichfiguren)
+// =============================================================
+const SVGS = {
+  stance: `<svg viewBox="0 0 100 100" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="48" cy="20" r="7"/>
+    <path d="M48 27 L48 55"/>
+    <path d="M48 35 L36 45 M48 35 L60 42"/>
+    <circle cx="36" cy="45" r="2.5" fill="currentColor"/>
+    <circle cx="60" cy="42" r="2.5" fill="currentColor"/>
+    <path d="M48 55 L40 75 L36 88"/>
+    <path d="M48 55 L58 73 L66 86"/>
+  </svg>`,
+  footwork: `<svg viewBox="0 0 100 100" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <ellipse cx="35" cy="70" rx="10" ry="5"/>
+    <ellipse cx="65" cy="80" rx="10" ry="5"/>
+    <path d="M50 35 L30 35 M50 35 L70 35 M50 25 L50 45" stroke-dasharray="3 3"/>
+    <path d="M22 35 L30 30 M22 35 L30 40"/>
+    <path d="M78 35 L70 30 M78 35 L70 40"/>
+  </svg>`,
+  jab: `<svg viewBox="0 0 100 100" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="35" cy="25" r="7"/>
+    <path d="M35 32 L35 60"/>
+    <path d="M35 38 L85 38" stroke-width="2.5"/>
+    <circle cx="85" cy="38" r="4" fill="currentColor"/>
+    <path d="M78 38 L88 32 M78 38 L88 44" stroke-width="2.5" stroke="currentColor" fill="none" opacity="0.6"/>
+    <path d="M35 40 L30 50"/>
+    <circle cx="30" cy="50" r="2.5" fill="currentColor"/>
+    <path d="M35 60 L25 78 L23 90"/>
+    <path d="M35 60 L45 78 L50 90"/>
+  </svg>`,
+  cross: `<svg viewBox="0 0 100 100" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="30" cy="22" r="7"/>
+    <path d="M30 29 L35 58"/>
+    <path d="M30 36 L88 30" stroke-width="2.8"/>
+    <circle cx="88" cy="30" r="4.5" fill="currentColor"/>
+    <path d="M82 30 L92 24 M82 30 L92 36" stroke-width="2.5" stroke="currentColor" fill="none" opacity="0.6"/>
+    <path d="M32 38 L28 48"/>
+    <circle cx="28" cy="48" r="2.5" fill="currentColor"/>
+    <path d="M35 58 L22 78 L18 90"/>
+    <path d="M35 58 L52 80 L60 90"/>
+    <path d="M55 84 Q65 75 65 70" stroke-dasharray="2 2" opacity="0.5"/>
+  </svg>`,
+  hammer: `<svg viewBox="0 0 100 100" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="48" cy="20" r="7"/>
+    <path d="M48 27 L48 60"/>
+    <path d="M48 35 L72 22" stroke-width="2.5"/>
+    <rect x="69" y="18" width="10" height="10" fill="currentColor" transform="rotate(-25 74 23)"/>
+    <path d="M75 38 L82 50" stroke-width="1.5" opacity="0.5" stroke-dasharray="2 2"/>
+    <path d="M48 38 L35 48"/>
+    <circle cx="35" cy="48" r="2.5" fill="currentColor"/>
+    <path d="M48 60 L40 80 L36 92"/>
+    <path d="M48 60 L58 80 L62 92"/>
+  </svg>`,
+  elbow: `<svg viewBox="0 0 100 100" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="32" cy="22" r="7"/>
+    <path d="M32 29 L40 58"/>
+    <path d="M32 36 L62 28 L80 38" stroke-width="2.8"/>
+    <circle cx="62" cy="28" r="5" fill="currentColor"/>
+    <path d="M68 22 L75 18 M68 26 L78 24" stroke-width="1.5" opacity="0.6" stroke-dasharray="2 2"/>
+    <path d="M34 38 L28 50"/>
+    <circle cx="28" cy="50" r="2.5" fill="currentColor"/>
+    <path d="M40 58 L28 78 L25 90"/>
+    <path d="M40 58 L55 80 L62 90"/>
+  </svg>`,
+  frontkick: `<svg viewBox="0 0 100 100" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="25" cy="20" r="7"/>
+    <path d="M25 27 L30 55"/>
+    <path d="M25 35 L15 45"/>
+    <circle cx="15" cy="45" r="2.5" fill="currentColor"/>
+    <path d="M25 35 L35 45"/>
+    <circle cx="35" cy="45" r="2.5" fill="currentColor"/>
+    <path d="M30 55 L25 80 L22 92"/>
+    <path d="M30 55 L60 60 L82 65" stroke-width="2.6"/>
+    <path d="M82 65 L88 60 L88 70 Z" fill="currentColor"/>
+    <path d="M76 70 L86 72" stroke-width="1.5" opacity="0.5" stroke-dasharray="2 2"/>
+  </svg>`,
+  roundkick: `<svg viewBox="0 0 100 100" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="30" cy="22" r="7"/>
+    <path d="M30 29 L35 58"/>
+    <path d="M30 37 L20 47"/>
+    <circle cx="20" cy="47" r="2.5" fill="currentColor"/>
+    <path d="M30 37 L40 47"/>
+    <circle cx="40" cy="47" r="2.5" fill="currentColor"/>
+    <path d="M35 58 L30 80 L28 92"/>
+    <path d="M35 58 Q55 35 80 32" stroke-width="2.6"/>
+    <path d="M80 32 L86 26 L84 36 Z" fill="currentColor"/>
+    <path d="M68 28 L78 22" stroke-width="1.5" opacity="0.5" stroke-dasharray="2 2"/>
+  </svg>`,
+  knee: `<svg viewBox="0 0 100 100" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="32" cy="22" r="7"/>
+    <path d="M32 29 L35 55"/>
+    <path d="M32 36 L52 30"/>
+    <circle cx="52" cy="30" r="3" fill="currentColor"/>
+    <path d="M32 36 L48 42"/>
+    <circle cx="48" cy="42" r="3" fill="currentColor"/>
+    <path d="M35 55 L30 80 L26 92"/>
+    <path d="M35 55 L65 55 L75 75" stroke-width="2.6"/>
+    <circle cx="65" cy="55" r="4" fill="currentColor"/>
+    <path d="M71 50 L80 47" stroke-width="1.5" opacity="0.6" stroke-dasharray="2 2"/>
+  </svg>`,
+  chokefront: `<svg viewBox="0 0 100 100" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="35" cy="22" r="7"/>
+    <path d="M35 29 L35 58"/>
+    <path d="M30 32 L20 36" stroke-width="2.5"/>
+    <path d="M40 32 L30 36" stroke-width="2.5"/>
+    <circle cx="20" cy="36" r="3" fill="currentColor"/>
+    <circle cx="30" cy="36" r="3" fill="currentColor"/>
+    <circle cx="78" cy="22" r="7" opacity="0.7"/>
+    <path d="M78 29 L78 58" opacity="0.7"/>
+    <path d="M73 31 L52 28" stroke-width="2.5" opacity="0.7"/>
+    <path d="M83 31 L62 28" stroke-width="2.5" opacity="0.7"/>
+    <path d="M52 28 Q35 25 35 22" stroke-width="2" opacity="0.7"/>
+    <path d="M62 28 Q45 25 35 24" stroke-width="2" opacity="0.7"/>
+  </svg>`,
+  chokeback: `<svg viewBox="0 0 100 100" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="38" cy="22" r="7"/>
+    <path d="M38 29 L38 58"/>
+    <path d="M38 35 L48 18" stroke-width="2.5"/>
+    <circle cx="48" cy="18" r="3" fill="currentColor"/>
+    <path d="M38 35 L28 45"/>
+    <circle cx="28" cy="45" r="2.5" fill="currentColor"/>
+    <circle cx="65" cy="25" r="7" opacity="0.7"/>
+    <path d="M65 32 L65 60" opacity="0.7"/>
+    <path d="M60 36 L45 30" stroke-width="2" opacity="0.7"/>
+    <path d="M70 36 L52 28" stroke-width="2" opacity="0.7"/>
+  </svg>`,
+  wristgrab: `<svg viewBox="0 0 100 100" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="32" cy="22" r="7"/>
+    <path d="M32 29 L32 58"/>
+    <path d="M32 36 L70 42" stroke-width="2.5"/>
+    <circle cx="70" cy="42" r="3" fill="currentColor"/>
+    <ellipse cx="55" cy="38" rx="10" ry="5" stroke-dasharray="2 2" opacity="0.7"/>
+    <path d="M85 38 L80 42 M85 46 L80 42" stroke-width="2" opacity="0.6"/>
+    <path d="M32 38 L24 50"/>
+    <circle cx="24" cy="50" r="2.5" fill="currentColor"/>
+  </svg>`,
+  insidedefense: `<svg viewBox="0 0 100 100" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="30" cy="22" r="7"/>
+    <path d="M30 29 L30 58"/>
+    <path d="M30 36 L52 38" stroke-width="2.8"/>
+    <circle cx="52" cy="38" r="3.5" fill="currentColor"/>
+    <path d="M52 38 Q60 32 60 26" stroke-width="2" stroke-dasharray="2 2" opacity="0.6"/>
+    <circle cx="78" cy="22" r="7" opacity="0.7"/>
+    <path d="M78 29 L78 55" opacity="0.7"/>
+    <path d="M78 35 L60 38" stroke-width="2.5" opacity="0.7"/>
+    <circle cx="60" cy="38" r="3" fill="currentColor" opacity="0.7"/>
+  </svg>`,
+  fallback: `<svg viewBox="0 0 100 100" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="22" cy="65" r="7"/>
+    <path d="M28 68 L60 70 L78 65"/>
+    <path d="M28 70 L48 78 M28 70 L40 86"/>
+    <path d="M58 70 L70 60 M58 70 L75 78"/>
+    <path d="M15 88 L85 88" stroke-width="1.5" opacity="0.4"/>
+    <path d="M30 80 L42 85 M55 80 L68 85" stroke-width="1.5" opacity="0.6"/>
+  </svg>`,
+  guard: `<svg viewBox="0 0 100 100" stroke="currentColor" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="22" cy="62" r="7"/>
+    <path d="M28 65 L55 65"/>
+    <path d="M28 65 L20 78"/>
+    <circle cx="20" cy="78" r="2.5" fill="currentColor"/>
+    <path d="M28 65 L24 80"/>
+    <circle cx="24" cy="80" r="2.5" fill="currentColor"/>
+    <path d="M55 65 L75 50 L82 35" stroke-width="2.5"/>
+    <path d="M55 65 L70 75 L80 88"/>
+    <path d="M15 92 L85 92" stroke-width="1.5" opacity="0.4"/>
+  </svg>`
+};
+
+function getSVG(id) { return SVGS[id] || SVGS.stance; }
+
+// =============================================================
+// RENDER: HOME
+// =============================================================
+function renderHome() {
+  const today = new Date();
+  const todayStr = fmtDate(today);
+  const todaySessions = state.sessions.filter(s => s.date === todayStr);
+  const lastSessions = [...state.sessions].sort((a,b) => b.date.localeCompare(a.date) || b.created - a.created).slice(0, 5);
+
+  // Diese Woche
+  const weekStart = new Date(today);
+  const dow = weekStart.getDay();
+  weekStart.setDate(weekStart.getDate() + (dow === 0 ? -6 : 1 - dow));
+  const weekDays = [];
+  for (let i = 0; i < 7; i++) weekDays.push(addDays(weekStart, i));
+  const weekSessions = state.sessions.filter(s => {
+    const d = new Date(s.date);
+    return d >= weekStart && d <= addDays(weekStart, 6);
+  });
+
+  let html = `
+    <div class="hero">
+      <div class="hero-card">
+        <div class="label">${todaySessions.length > 0 ? '✓ Heute trainiert' : 'Heute'}</div>
+        <div class="greeting">${getGreeting()} Kämpfer.</div>
+        <div class="sub">${todaySessions.length > 0
+          ? `${todaySessions.length} Session${todaySessions.length > 1 ? 's' : ''} geloggt · weiter so`
+          : 'Bereit für dein Training?'}</div>
+        <div class="quick-actions">
+          <button class="quick-btn" id="quickLogBtn"><span class="ic">➕</span><span>Training loggen</span></button>
+          <button class="quick-btn" id="quickTimerBtn"><span class="ic">⏱️</span><span>Timer starten</span></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">Diese Woche</div>
+    <div class="week-grid">`;
+
+  weekDays.forEach(d => {
+    const ds = fmtDate(d);
+    const hasSession = weekSessions.some(s => s.date === ds);
+    const today = isToday(d);
+    html += `<div class="week-cell ${hasSession ? 'done' : ''} ${today ? 'today' : ''}">
+      <div class="wd">${DAYS_DE[d.getDay()]}</div>
+      <div style="font-size:14px; font-weight:700; font-family:'JetBrains Mono', monospace">${d.getDate()}</div>
+      <div class="dot"></div>
+    </div>`;
+  });
+  html += `</div>`;
+
+  // Plan-Vorschläge
+  html += `<div class="section-title">Schnellstart</div>
+    <div class="scroll-row">`;
+  PLANS.slice(0, 4).forEach(p => {
+    html += `<div class="plan-card" data-plan="${p.id}">
+      <div class="ic">${p.icon}</div>
+      <div class="name">${p.name}</div>
+      <div class="meta">${p.duration} Min · ${p.steps.length} Schritte</div>
+      <div class="desc">${p.desc}</div>
+    </div>`;
+  });
+  html += `</div>`;
+
+  // Letzte Sessions
+  if (lastSessions.length > 0) {
+    html += `<div class="section-title">Letzte Sessions</div>
+      <div class="session-list">`;
+    lastSessions.forEach(s => {
+      const t = TYPE_INFO[s.type] || TYPE_INFO.other;
+      const d = new Date(s.date);
+      const dateLabel = isToday(d) ? 'Heute' : `${DAYS_DE[d.getDay()]}, ${d.getDate()}. ${MONTHS_SHORT[d.getMonth()]}`;
+      const intLabel = ['😌 locker','🙂 moderat','😤 solide','🥵 hart','💀 brutal'][s.intensity - 1] || '';
+      html += `<div class="session-card" data-id="${s.id}">
+        <div class="session-icon ${t.cls}">${t.icon}</div>
+        <div class="session-info">
+          <div class="name">${t.name}</div>
+          <div class="meta">${dateLabel} · ${intLabel}</div>
+          ${s.notes ? `<div class="notes">${escape(s.notes.slice(0, 80))}${s.notes.length > 80 ? '…' : ''}</div>` : ''}
+        </div>
+        <div class="session-meta-right">
+          <div class="dur">${s.duration}m</div>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  mainEl.innerHTML = html;
+  $('quickLogBtn').addEventListener('click', () => openSession(null));
+  $('quickTimerBtn').addEventListener('click', () => { state.tab = 'timer'; render(); });
+  document.querySelectorAll('.plan-card[data-plan]').forEach(el => {
+    el.addEventListener('click', () => { state.currentPlanId = el.dataset.plan; state.tab = 'plans'; render(); });
+  });
+  document.querySelectorAll('.session-card[data-id]').forEach(el => {
+    el.addEventListener('click', () => openSession(el.dataset.id));
+  });
+}
+
+// =============================================================
+// RENDER: TECHNIKEN
+// =============================================================
+function renderTechniques() {
+  if (state.currentTechId) {
+    renderTechDetail();
+    return;
+  }
+  let html = `
+    <div class="section-title">Techniken-Bibliothek<span class="more">${TECHNIQUES.length}</span></div>
+    <div class="tech-search">
+      <input type="text" id="techSearch" placeholder="🔍 Suchen (z.B. 'Front Kick', 'Würgegriff')" value="${escape(state.techSearch)}">
+    </div>
+    <div class="tech-categories">`;
+  TECH_CATS.forEach(c => {
+    html += `<button class="tech-cat-btn ${state.techCategory === c.id ? 'active' : ''}" data-cat="${c.id}">${c.name}</button>`;
+  });
+  html += `</div>`;
+
+  let filtered = TECHNIQUES;
+  if (state.techCategory === 'favorites') {
+    filtered = TECHNIQUES.filter(t => state.favTechniques.includes(t.id));
+  } else if (state.techCategory !== 'all') {
+    filtered = TECHNIQUES.filter(t => t.cat === state.techCategory);
+  }
+  if (state.techSearch) {
+    const q = state.techSearch.toLowerCase();
+    filtered = filtered.filter(t =>
+      t.name.toLowerCase().includes(q) ||
+      t.short.toLowerCase().includes(q) ||
+      (t.tags || []).some(tag => tag.toLowerCase().includes(q))
+    );
+  }
+
+  html += `<div class="tech-list">`;
+  if (filtered.length === 0) {
+    html += `<div class="empty">${state.techCategory === 'favorites' ? 'Noch keine Favoriten. Tippe auf den Stern bei einer Technik.' : 'Keine Techniken gefunden.'}</div>`;
+  } else {
+    filtered.forEach(t => {
+      const isFav = state.favTechniques.includes(t.id);
+      html += `<div class="tech-card" data-id="${t.id}">
+        <div class="tech-thumb">${getSVG(t.svg)}</div>
+        <div class="tech-info">
+          <div class="name">${escape(t.name)}</div>
+          <div class="cat">${t.catName} · ${t.level}</div>
+          <div class="short">${escape(t.short)}</div>
+        </div>
+        <div class="tech-fav ${isFav ? 'active' : ''}" data-fav="${t.id}">${isFav ? '★' : '☆'}</div>
+      </div>`;
+    });
+  }
+  html += `</div>`;
+
+  mainEl.innerHTML = html;
+  $('techSearch').addEventListener('input', e => { state.techSearch = e.target.value; renderTechniques(); });
+  document.querySelectorAll('.tech-cat-btn').forEach(b => {
+    b.addEventListener('click', () => { state.techCategory = b.dataset.cat; renderTechniques(); });
+  });
+  document.querySelectorAll('.tech-card').forEach(el => {
+    el.addEventListener('click', e => {
+      if (e.target.closest('.tech-fav')) return;
+      state.currentTechId = el.dataset.id;
+      render();
+    });
+  });
+  document.querySelectorAll('.tech-fav').forEach(el => {
+    el.addEventListener('click', e => {
+      e.stopPropagation();
+      const id = el.dataset.fav;
+      if (state.favTechniques.includes(id)) {
+        state.favTechniques = state.favTechniques.filter(x => x !== id);
+      } else {
+        state.favTechniques.push(id);
+      }
+      saveData();
+      renderTechniques();
+    });
+  });
+}
+
+function renderTechDetail() {
+  const t = TECHNIQUES.find(x => x.id === state.currentTechId);
+  if (!t) { state.currentTechId = null; renderTechniques(); return; }
+  const isFav = state.favTechniques.includes(t.id);
+
+  let html = `<button class="back-btn" id="backBtn">← Zurück</button>
+    <div class="tech-detail">
+      <div class="tech-detail-header">
+        <div class="tech-detail-svg">${getSVG(t.svg)}</div>
+        <div class="tech-detail-title">
+          <div class="cat">${t.catName}</div>
+          <h2>${escape(t.name)}</h2>
+          <div class="level">Niveau ${t.level}</div>
+          <button class="back-btn" id="favTechBtn" style="margin:8px 0 0; padding: 4px 10px; background: ${isFav ? 'var(--accent-dim)' : 'var(--surface)'}; color: ${isFav ? 'var(--accent)' : 'var(--text)'}; display: block">${isFav ? '★ Favorit' : '☆ Als Favorit'}</button>
+        </div>
+      </div>
+      <div class="tech-block">
+        <h3>Worum geht's</h3>
+        <p>${escape(t.short)}</p>
+      </div>
+      <div class="tech-block">
+        <h3>Ausführung – Schritt für Schritt</h3>
+        <ol>${t.steps.map(s => `<li>${escape(s)}</li>`).join('')}</ol>
+      </div>
+      <div class="tech-block">
+        <h3>🎯 Schlüsselpunkte</h3>
+        <ul>${t.keys.map(s => `<li>${escape(s)}</li>`).join('')}</ul>
+      </div>
+      <div class="tech-block warn">
+        <h3>⚠️ Häufige Fehler</h3>
+        <ul>${t.mistakes.map(s => `<li>${escape(s)}</li>`).join('')}</ul>
+      </div>
+      <div class="tech-block">
+        <h3>💪 Übungsempfehlung</h3>
+        <p>${escape(t.drill)}</p>
+      </div>
+    </div>`;
+
+  mainEl.innerHTML = html;
+  $('backBtn').addEventListener('click', () => { state.currentTechId = null; render(); });
+  $('favTechBtn').addEventListener('click', () => {
+    if (state.favTechniques.includes(t.id)) state.favTechniques = state.favTechniques.filter(x => x !== t.id);
+    else state.favTechniques.push(t.id);
+    saveData();
+    renderTechDetail();
+  });
+}
+
+// =============================================================
+// RENDER: PLÄNE
+// =============================================================
+function renderPlans() {
+  if (state.currentPlanId) {
+    renderPlanDetail();
+    return;
+  }
+  let html = `<div class="section-title">Trainingspläne<span class="more">${PLANS.length}</span></div>
+    <div style="padding: 0 16px 16px">`;
+  PLANS.forEach(p => {
+    const t = TYPE_INFO[p.type] || TYPE_INFO.other;
+    html += `<div class="session-card" data-plan="${p.id}" style="margin-bottom:8px">
+      <div class="session-icon ${t.cls}">${p.icon}</div>
+      <div class="session-info">
+        <div class="name">${escape(p.name)}</div>
+        <div class="meta">${p.duration} Min · ${p.steps.length} Schritte</div>
+        <div class="notes">${escape(p.desc)}</div>
+      </div>
+      <div class="session-meta-right" style="font-size:18px">›</div>
+    </div>`;
+  });
+  html += `</div>`;
+  mainEl.innerHTML = html;
+  document.querySelectorAll('.session-card[data-plan]').forEach(el => {
+    el.addEventListener('click', () => { state.currentPlanId = el.dataset.plan; render(); });
+  });
+}
+
+function renderPlanDetail() {
+  const p = PLANS.find(x => x.id === state.currentPlanId);
+  if (!p) { state.currentPlanId = null; renderPlans(); return; }
+  const t = TYPE_INFO[p.type] || TYPE_INFO.other;
+  let html = `<button class="back-btn" id="backBtn">← Zurück</button>
+    <div class="plan-detail">
+      <div style="display:flex; gap:14px; align-items:center; margin-bottom:18px; padding:0 0 14px; border-bottom:1px solid var(--border)">
+        <div class="session-icon ${t.cls}" style="width:56px; height:56px; font-size:28px">${p.icon}</div>
+        <div style="flex:1">
+          <h2 style="font-size:20px; font-weight:800; letter-spacing:-0.02em">${escape(p.name)}</h2>
+          <div style="font-size:12px; color:var(--text-dim); margin-top:4px">${escape(p.desc)}</div>
+          <div style="font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--accent); margin-top:6px; font-weight:700">${p.duration} MIN · ${p.steps.length} SCHRITTE</div>
+        </div>
+      </div>`;
+  p.steps.forEach((s, i) => {
+    html += `<div class="plan-step">
+      <div class="head">
+        <div style="display:flex; gap:10px; align-items:center; flex:1">
+          <div class="num">${i + 1}</div>
+          <div style="flex:1">
+            <div class="name">${escape(s.name)}</div>
+            ${s.sets ? `<div class="meta">${escape(s.sets)}</div>` : ''}
+          </div>
+        </div>
+        ${s.dur ? `<div class="meta" style="font-weight:700; color:var(--accent)">${escape(s.dur)}</div>` : ''}
+      </div>
+      ${s.desc ? `<div class="desc">${escape(s.desc)}</div>` : ''}
+    </div>`;
+  });
+  html += `<button class="timer-start-btn" id="logPlanBtn" style="margin-top:16px">Training loggen</button>
+    </div>`;
+  mainEl.innerHTML = html;
+  $('backBtn').addEventListener('click', () => { state.currentPlanId = null; render(); });
+  $('logPlanBtn').addEventListener('click', () => {
+    openSession(null);
+    setTimeout(() => {
+      state.selectedType = p.type;
+      $('sDuration').value = p.duration;
+      $('sNotes').value = `Plan: ${p.name}`;
+      document.querySelectorAll('.type-pill').forEach(b => b.classList.toggle('active', b.dataset.type === p.type));
+    }, 100);
+  });
+}
+
+// =============================================================
+// RENDER: TIMER
+// =============================================================
+function renderTimer() {
+  let html = `<div class="section-title">Trainings-Timer</div>
+    <div class="timer-screen">
+      <div class="timer-presets">`;
+  TIMER_PRESETS.forEach(p => {
+    html += `<button class="timer-preset ${state.timerPreset === p.id ? 'active' : ''}" data-id="${p.id}">
+      <div class="name">${p.name}</div>
+      <div class="desc">${p.desc}</div>
+    </button>`;
+  });
+  html += `</div>
+      <div class="timer-config">
+        <div class="row">
+          <label>Runden</label>
+          <input type="number" id="cfgRounds" value="${state.timerConfig.rounds}" inputmode="numeric" min="1" max="99">
+          <span></span>
+        </div>
+        <div class="row">
+          <label>Arbeit (Sek)</label>
+          <input type="number" id="cfgWork" value="${state.timerConfig.work}" inputmode="numeric" min="1">
+          <span style="font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:12px">= ${fmtTime(state.timerConfig.work)}</span>
+        </div>
+        <div class="row">
+          <label>Pause (Sek)</label>
+          <input type="number" id="cfgRest" value="${state.timerConfig.rest}" inputmode="numeric" min="0">
+          <span style="font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:12px">= ${fmtTime(state.timerConfig.rest)}</span>
+        </div>
+        <div class="row">
+          <label>Vorbereitung</label>
+          <input type="number" id="cfgPrep" value="${state.timerConfig.prep}" inputmode="numeric" min="0">
+          <span style="font-family:'JetBrains Mono', monospace; color:var(--text-dim); font-size:12px">Sek</span>
+        </div>
+      </div>
+      <div style="margin-bottom: 14px; padding: 10px 14px; background:var(--surface); border-radius:10px; border:1px solid var(--border); font-size:12px; color:var(--text-dim); text-align:center; font-family:'JetBrains Mono', monospace">
+        Gesamt: ${fmtTime(state.timerConfig.prep + state.timerConfig.rounds * (state.timerConfig.work + state.timerConfig.rest) - state.timerConfig.rest)}
+      </div>
+      <button class="timer-start-btn" id="timerStartBtn">▶ Starten</button>
+    </div>`;
+  mainEl.innerHTML = html;
+
+  document.querySelectorAll('.timer-preset').forEach(b => {
+    b.addEventListener('click', () => {
+      const preset = TIMER_PRESETS.find(p => p.id === b.dataset.id);
+      if (!preset) return;
+      state.timerPreset = preset.id;
+      state.timerConfig = { rounds: preset.rounds, work: preset.work, rest: preset.rest, prep: preset.prep };
+      renderTimer();
+    });
+  });
+  ['cfgRounds','cfgWork','cfgRest','cfgPrep'].forEach(id => {
+    $(id).addEventListener('input', e => {
+      const v = parseInt(e.target.value) || 0;
+      const key = id === 'cfgRounds' ? 'rounds' : id === 'cfgWork' ? 'work' : id === 'cfgRest' ? 'rest' : 'prep';
+      state.timerConfig[key] = v;
+      state.timerPreset = 'custom';
+      renderTimer();
+    });
+  });
+  $('timerStartBtn').addEventListener('click', startTimer);
+}
+
+function startTimer() {
+  timerState = {
+    running: true,
+    phase: 'prep',
+    round: 1,
+    secLeft: state.timerConfig.prep || 1,
+    totalSec: state.timerConfig.prep || 1,
+    config: { ...state.timerConfig }
+  };
+  renderTimerRunning();
+  timerState.interval = setInterval(timerTick, 1000);
+}
+
+function timerTick() {
+  if (!timerState || !timerState.running) return;
+  timerState.secLeft--;
+  if (timerState.secLeft <= 0) {
+    nextPhase();
+  } else {
+    if (timerState.secLeft <= 3 && timerState.secLeft > 0) beep('short');
+  }
+  updateTimerDisplay();
+}
+
+function nextPhase() {
+  beep('long');
+  const c = timerState.config;
+  if (timerState.phase === 'prep') {
+    timerState.phase = 'work';
+    timerState.secLeft = c.work;
+    timerState.totalSec = c.work;
+  } else if (timerState.phase === 'work') {
+    if (timerState.round >= c.rounds) {
+      timerState.running = false;
+      clearInterval(timerState.interval);
+      finishTimer();
+      return;
+    }
+    if (c.rest > 0) {
+      timerState.phase = 'rest';
+      timerState.secLeft = c.rest;
+      timerState.totalSec = c.rest;
+    } else {
+      timerState.round++;
+      timerState.phase = 'work';
+      timerState.secLeft = c.work;
+      timerState.totalSec = c.work;
+    }
+  } else if (timerState.phase === 'rest') {
+    timerState.round++;
+    timerState.phase = 'work';
+    timerState.secLeft = c.work;
+    timerState.totalSec = c.work;
+  }
+  updateTimerDisplay();
+}
+
+function finishTimer() {
+  beep('finish');
+  document.body.removeChild($('timerRunning'));
+  alert('🎉 Workout fertig! Gut gemacht.');
+  // Frage ob loggen
+  if (confirm('Möchtest du das Training direkt loggen?')) {
+    openSession(null);
+    setTimeout(() => {
+      const totalMin = Math.round((state.timerConfig.prep + state.timerConfig.rounds * (state.timerConfig.work + state.timerConfig.rest)) / 60);
+      $('sDuration').value = Math.max(1, totalMin);
+      $('sNotes').value = `Timer: ${state.timerConfig.rounds}×${fmtTime(state.timerConfig.work)} Arbeit, ${fmtTime(state.timerConfig.rest)} Pause`;
+    }, 100);
+  }
+  timerState = null;
+}
+
+function renderTimerRunning() {
+  const node = document.createElement('div');
+  node.id = 'timerRunning';
+  node.className = 'timer-running-screen ' + timerState.phase;
+  node.innerHTML = `
+    <div style="text-align:center">
+      <div class="timer-phase ${timerState.phase}" id="trPhase">${getPhaseLabel(timerState.phase)}</div>
+      <div class="timer-bigtime" id="trTime">${fmtTime(timerState.secLeft)}</div>
+      <div class="timer-round" id="trRound">Runde ${timerState.round} / ${timerState.config.rounds}</div>
+    </div>
+    <div class="timer-progress"><div class="timer-progress-fill" id="trProgress" style="width:100%"></div></div>
+    <div class="timer-controls">
+      <button class="timer-ctrl-btn" id="trSkip">⏭</button>
+      <button class="timer-ctrl-btn primary" id="trPause">⏸</button>
+      <button class="timer-ctrl-btn" id="trStop">✕</button>
+    </div>
+  `;
+  document.body.appendChild(node);
+  $('trSkip').addEventListener('click', () => { nextPhase(); });
+  $('trPause').addEventListener('click', () => {
+    if (timerState.running) {
+      timerState.running = false;
+      clearInterval(timerState.interval);
+      $('trPause').textContent = '▶';
+    } else {
+      timerState.running = true;
+      timerState.interval = setInterval(timerTick, 1000);
+      $('trPause').textContent = '⏸';
+    }
+  });
+  $('trStop').addEventListener('click', () => {
+    if (confirm('Timer abbrechen?')) {
+      clearInterval(timerState.interval);
+      document.body.removeChild($('timerRunning'));
+      timerState = null;
+    }
+  });
+}
+
+function updateTimerDisplay() {
+  if (!$('timerRunning')) return;
+  $('timerRunning').className = 'timer-running-screen ' + timerState.phase;
+  $('trPhase').className = 'timer-phase ' + timerState.phase;
+  $('trPhase').textContent = getPhaseLabel(timerState.phase);
+  $('trTime').textContent = fmtTime(timerState.secLeft);
+  $('trRound').textContent = `Runde ${timerState.round} / ${timerState.config.rounds}`;
+  const pct = (timerState.secLeft / timerState.totalSec) * 100;
+  $('trProgress').style.width = pct + '%';
+}
+
+function getPhaseLabel(phase) {
+  return phase === 'prep' ? 'Bereit machen' : phase === 'work' ? 'GO!' : 'Pause';
+}
+
+// Beep mit Web Audio
+let audioCtx = null;
+function beep(type) {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.connect(g);
+    g.connect(audioCtx.destination);
+    if (type === 'short') {
+      o.frequency.value = 600;
+      g.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+      o.start();
+      o.stop(audioCtx.currentTime + 0.15);
+    } else if (type === 'long') {
+      o.frequency.value = 880;
+      g.gain.setValueAtTime(0.4, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+      o.start();
+      o.stop(audioCtx.currentTime + 0.4);
+    } else if (type === 'finish') {
+      [523, 659, 784, 1047].forEach((freq, i) => {
+        const o2 = audioCtx.createOscillator();
+        const g2 = audioCtx.createGain();
+        o2.connect(g2); g2.connect(audioCtx.destination);
+        o2.frequency.value = freq;
+        g2.gain.setValueAtTime(0.3, audioCtx.currentTime + i * 0.15);
+        g2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.15 + 0.3);
+        o2.start(audioCtx.currentTime + i * 0.15);
+        o2.stop(audioCtx.currentTime + i * 0.15 + 0.3);
+      });
+    }
+  } catch(e) {}
+}
+
+// =============================================================
+// RENDER: STATISTIK
+// =============================================================
+function renderStats() {
+  // 4 Wochen Statistik
+  const today = new Date();
+  const last30Days = [];
+  for (let i = 29; i >= 0; i--) last30Days.push(addDays(today, -i));
+  const dataMap = {};
+  last30Days.forEach(d => dataMap[fmtDate(d)] = 0);
+  let totalMin = 0, totalSessions = 0, kmSessions = 0;
+  state.sessions.forEach(s => {
+    if (dataMap[s.date] !== undefined) {
+      dataMap[s.date] += s.duration;
+      totalMin += s.duration;
+      totalSessions++;
+      if (s.type === 'km' || s.type === 'kmh') kmSessions++;
+    }
+  });
+
+  // Streak: aktuelle Serie an Tagen mit Training
+  let streak = 0;
+  for (let i = 0; i < 365; i++) {
+    const d = addDays(today, -i);
+    if (state.sessions.some(s => s.date === fmtDate(d))) streak++;
+    else if (i > 0) break;
+  }
+
+  const max = Math.max(60, ...Object.values(dataMap));
+  let html = `<div class="section-title">Statistik – Letzte 30 Tage</div>
+    <div class="stats-grid">
+      <div class="stat-tile"><div class="lbl">Sessions</div><div class="val accent">${totalSessions}</div><div class="sub">in 30 Tagen</div></div>
+      <div class="stat-tile"><div class="lbl">Trainingszeit</div><div class="val green">${Math.round(totalMin/60)}h ${totalMin%60}m</div><div class="sub">total</div></div>
+      <div class="stat-tile"><div class="lbl">Krav Maga</div><div class="val accent">${kmSessions}</div><div class="sub">Sessions</div></div>
+      <div class="stat-tile"><div class="lbl">Aktuelle Serie</div><div class="val orange">${streak} ${streak === 1 ? 'Tag' : 'Tage'}</div><div class="sub">in Folge</div></div>
+    </div>
+    <div style="padding: 0 16px; margin-bottom: 16px">
+      <div style="background: var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px">
+        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); font-weight: 700; margin-bottom: 10px">Verlauf (Min/Tag)</div>
+        <div style="height:100px; display:flex; align-items:flex-end; gap:1px">`;
+  last30Days.forEach(d => {
+    const min = dataMap[fmtDate(d)];
+    const h = min > 0 ? Math.max(4, (min / max) * 100) : 2;
+    const color = min > 0 ? 'var(--accent)' : 'var(--surface-2)';
+    html += `<div style="flex:1; height:${h}%; background:${color}; border-radius:2px 2px 0 0" title="${fmtDate(d)}: ${min} min"></div>`;
+  });
+  html += `</div>
+        <div style="display:flex; justify-content:space-between; font-size:9px; color:var(--text-faint); margin-top:6px; font-family:'JetBrains Mono', monospace">
+          <span>vor 30 Tagen</span><span>heute</span>
+        </div>
+      </div>
+    </div>`;
+
+  // Typen-Verteilung
+  const typeMap = {};
+  state.sessions.forEach(s => {
+    typeMap[s.type] = (typeMap[s.type] || 0) + 1;
+  });
+  if (Object.keys(typeMap).length > 0) {
+    html += `<div class="section-title">Trainingsarten</div>
+      <div style="padding:0 16px 16px">`;
+    const total = Object.values(typeMap).reduce((a,b)=>a+b, 0);
+    Object.entries(typeMap).sort((a,b)=>b[1]-a[1]).forEach(([type, count]) => {
+      const t = TYPE_INFO[type] || TYPE_INFO.other;
+      const pct = Math.round((count/total)*100);
+      html += `<div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin-bottom:6px; display:flex; align-items:center; gap:12px">
+        <div class="session-icon ${t.cls}" style="width:38px; height:38px; font-size:18px">${t.icon}</div>
+        <div style="flex:1">
+          <div style="font-weight:700; font-size:13px">${t.name}</div>
+          <div style="height:6px; background:var(--surface-2); border-radius:3px; margin-top:6px; overflow:hidden">
+            <div style="height:100%; width:${pct}%; background:var(--accent); border-radius:3px"></div>
+          </div>
+        </div>
+        <div style="font-family:'JetBrains Mono', monospace; font-weight:700; font-size:14px">${count}<span style="color:var(--text-faint); font-size:10px; margin-left:3px">${pct}%</span></div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  mainEl.innerHTML = html;
+}
+
+// =============================================================
+// SESSION-MODAL
+// =============================================================
+function openSession(id) {
+  state.editingSession = id;
+  if (id) {
+    const s = state.sessions.find(x => x.id === id);
+    if (!s) return;
+    $('sessionTitle').textContent = 'Training bearbeiten';
+    state.selectedType = s.type;
+    state.selectedIntensity = s.intensity;
+    $('sDate').value = s.date;
+    $('sDuration').value = s.duration;
+    $('sNotes').value = s.notes || '';
+    $('sDelete').style.display = 'block';
+  } else {
+    $('sessionTitle').textContent = 'Training loggen';
+    state.selectedType = 'km';
+    state.selectedIntensity = 3;
+    $('sDate').value = fmtDate(new Date());
+    $('sDuration').value = 60;
+    $('sNotes').value = '';
+    $('sDelete').style.display = 'none';
+  }
+  document.querySelectorAll('.type-pill').forEach(b => b.classList.toggle('active', b.dataset.type === state.selectedType));
+  document.querySelectorAll('.int-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.i) === state.selectedIntensity));
+  $('sessionBg').classList.add('show');
+}
+function closeSession() { $('sessionBg').classList.remove('show'); state.editingSession = null; }
+
+function saveSession() {
+  const date = $('sDate').value;
+  if (!date) { alert('Bitte Datum wählen'); return; }
+  const duration = parseInt($('sDuration').value);
+  if (!duration || duration < 1) { alert('Bitte Dauer eingeben'); return; }
+  const data = {
+    id: state.editingSession || ('s_' + Date.now()),
+    date,
+    type: state.selectedType,
+    duration,
+    intensity: state.selectedIntensity,
+    notes: $('sNotes').value.trim(),
+    created: Date.now()
+  };
+  if (state.editingSession) {
+    const idx = state.sessions.findIndex(s => s.id === state.editingSession);
+    state.sessions[idx] = { ...state.sessions[idx], ...data };
+  } else {
+    state.sessions.unshift(data);
+  }
+  saveData();
+  closeSession();
+  render();
+}
+
+function deleteSession() {
+  if (!state.editingSession) return;
+  if (!confirm('Diese Session löschen?')) return;
+  state.sessions = state.sessions.filter(s => s.id !== state.editingSession);
+  saveData();
+  closeSession();
+  render();
+}
+
+// =============================================================
+// RENDER ROUTER
+// =============================================================
+function render() {
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === state.tab));
+  if (state.tab === 'home') renderHome();
+  else if (state.tab === 'techniques') renderTechniques();
+  else if (state.tab === 'plans') renderPlans();
+  else if (state.tab === 'timer') renderTimer();
+  else if (state.tab === 'stats') renderStats();
+}
+
+// =============================================================
+// BINDINGS
+// =============================================================
+document.querySelectorAll('.nav-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    state.tab = b.dataset.tab;
+    if (state.tab !== 'techniques') state.currentTechId = null;
+    if (state.tab !== 'plans') state.currentPlanId = null;
+    render();
+  });
+});
+$('settingsBtn').addEventListener('click', openSettings);
+
+function openSettings() {
+  // Stats aktualisieren
+  $('settingsStats').textContent = `${state.sessions.length} Sessions · ${state.favTechniques.length} Favoriten-Techniken · ${state.customPlans.length} eigene Pläne`;
+  // Aktives Theme markieren
+  document.querySelectorAll('.theme-opt').forEach(b => b.classList.toggle('active', b.dataset.theme === (state.theme || 'auto')));
+  $('settingsBg').classList.add('show');
+}
+function closeSettings() { $('settingsBg').classList.remove('show'); }
+
+// Theme-Wechsel
+document.querySelectorAll('.theme-opt').forEach(b => {
+  b.addEventListener('click', () => {
+    state.theme = b.dataset.theme;
+    applyTheme();
+    saveData();
+    document.querySelectorAll('.theme-opt').forEach(x => x.classList.toggle('active', x === b));
+  });
+});
+
+// Settings-Modal close + Backup-Buttons
+$('settingsCloseBtn').addEventListener('click', closeSettings);
+$('settingsBg').addEventListener('click', e => { if (e.target === $('settingsBg')) closeSettings(); });
+$('settingsExportBtn').addEventListener('click', exportBackup);
+$('settingsImportBtn').addEventListener('click', importBackup);
+
+// Bei Theme "auto" auf Systemwechsel hören
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+  if ((state.theme || 'auto') === 'auto') applyTheme();
+});
+
+function exportBackup() {
+  const backup = {
+    app: 'train',
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    sessions: state.sessions,
+    customPlans: state.customPlans,
+    favTechniques: state.favTechniques
+  };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `train_backup_${fmtDate(new Date())}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importBackup() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'application/json,.json';
+  input.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (data.app && data.app !== 'train') {
+          alert('Diese Backup-Datei gehört zu einer anderen App ("' + data.app + '").');
+          return;
+        }
+        if (!Array.isArray(data.sessions)) {
+          alert('Die Datei sieht nicht wie ein Train-Backup aus.');
+          return;
+        }
+        const sCount = (data.sessions || []).length;
+        const fCount = (data.favTechniques || []).length;
+        const pCount = (data.customPlans || []).length;
+        const msg = `Backup enthält:\n• ${sCount} Training-Sessions\n• ${fCount} Favoriten-Techniken\n• ${pCount} eigene Pläne\n\nAktuell:\n• ${state.sessions.length} Sessions\n\nOK = Alles ÜBERSCHREIBEN\nAbbrechen = Nichts tun`;
+        if (!confirm(msg)) return;
+        state.sessions = data.sessions || [];
+        state.customPlans = data.customPlans || [];
+        state.favTechniques = data.favTechniques || [];
+        saveData();
+        render();
+        alert('✓ Backup erfolgreich geladen!');
+      } catch(err) {
+        alert('Fehler beim Laden: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+  });
+  input.click();
+}
+
+// Session-Modal
+document.querySelectorAll('.type-pill').forEach(b => {
+  b.addEventListener('click', () => {
+    state.selectedType = b.dataset.type;
+    document.querySelectorAll('.type-pill').forEach(x => x.classList.toggle('active', x === b));
+  });
+});
+document.querySelectorAll('.int-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    state.selectedIntensity = parseInt(b.dataset.i);
+    document.querySelectorAll('.int-btn').forEach(x => x.classList.toggle('active', x === b));
+  });
+});
+$('sCancel').addEventListener('click', closeSession);
+$('sSave').addEventListener('click', saveSession);
+$('sDelete').addEventListener('click', deleteSession);
+$('sessionBg').addEventListener('click', e => { if (e.target === $('sessionBg')) closeSession(); });
+
+// Init
+loadData();
+render();
+</script>
+</body>
+</html>

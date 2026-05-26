@@ -1,0 +1,1852 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Planer">
+<meta name="theme-color" content="#0f1419" id="themeColor">
+<title>Terminplaner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ============ THEMES ============ */
+  :root, :root[data-theme="dark"] {
+    --bg: #0f1419;
+    --surface: #1a2028;
+    --surface-2: #232b36;
+    --border: #2d3744;
+    --text: #e8ecf1;
+    --text-dim: #8a95a5;
+    --text-faint: #5a6573;
+    --accent: #ffb547;
+    --accent-text: #1a1410;
+  }
+  :root[data-theme="light"] {
+    --bg: #f7f8fa;
+    --surface: #ffffff;
+    --surface-2: #f0f2f5;
+    --border: #dfe3e8;
+    --text: #1a2028;
+    --text-dim: #5a6573;
+    --text-faint: #8a95a5;
+    --accent: #e89a2e;
+    --accent-text: #ffffff;
+  }
+  @media (prefers-color-scheme: light) {
+    :root[data-theme="auto"] {
+      --bg: #f7f8fa;
+      --surface: #ffffff;
+      --surface-2: #f0f2f5;
+      --border: #dfe3e8;
+      --text: #1a2028;
+      --text-dim: #5a6573;
+      --text-faint: #8a95a5;
+      --accent: #e89a2e;
+      --accent-text: #ffffff;
+    }
+  }
+  @media (prefers-color-scheme: dark) {
+    :root[data-theme="auto"] {
+      --bg: #0f1419;
+      --surface: #1a2028;
+      --surface-2: #232b36;
+      --border: #2d3744;
+      --text: #e8ecf1;
+      --text-dim: #8a95a5;
+      --text-faint: #5a6573;
+      --accent: #ffb547;
+      --accent-text: #1a1410;
+    }
+  }
+
+  :root {
+    --safe-top: env(safe-area-inset-top);
+    --safe-bot: env(safe-area-inset-bottom);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; overflow: hidden; }
+  body { font-family: 'Manrope', -apple-system, sans-serif; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.5; overscroll-behavior: none; transition: background 0.2s, color 0.2s; }
+  .app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; padding-top: var(--safe-top); padding-bottom: var(--safe-bot); }
+  header { padding: 16px 20px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-shrink: 0; }
+  .title { font-weight: 800; font-size: 22px; letter-spacing: -0.02em; }
+  .title .accent { color: var(--accent); }
+  .header-btn { background: var(--surface-2); border: 1px solid var(--border); color: var(--text); width: 38px; height: 38px; border-radius: 10px; font-size: 16px; cursor: pointer; display: grid; place-items: center; }
+  .header-btn:active { background: var(--border); }
+  .header-btn.syncing { animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .header-actions { display: flex; gap: 6px; }
+  .tabs { display: flex; gap: 4px; padding: 10px 16px; background: var(--bg); border-bottom: 1px solid var(--border); flex-shrink: 0; overflow-x: auto; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { background: transparent; border: 1px solid var(--border); color: var(--text-dim); padding: 8px 14px; border-radius: 8px; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  .tab.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .date-nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; gap: 8px; flex-shrink: 0; }
+  .date-nav-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text); width: 36px; height: 36px; border-radius: 8px; cursor: pointer; font-size: 16px; }
+  .date-label { font-weight: 700; font-size: 17px; letter-spacing: -0.01em; text-align: center; flex: 1; }
+  .date-label .sub { display: block; font-size: 11px; font-weight: 500; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
+  .today-btn { background: var(--accent); color: var(--accent-text); border: none; padding: 8px 12px; border-radius: 8px; font-family: inherit; font-weight: 700; font-size: 12px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.06em; }
+  main { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
+  /* =========== TAG-ANSICHT (NEU: Blöcke + Ganztägig-Spalte rechts) =========== */
+  .day-view { padding: 8px 16px 100px; }
+  .day-layout { display: grid; grid-template-columns: 1fr 110px; gap: 8px; align-items: start; }
+  @media (max-width: 480px) {
+    .day-layout { grid-template-columns: 1fr 90px; gap: 6px; }
+  }
+  /* Allday-Spalte rechts */
+  .allday-col { position: sticky; top: 0; }
+  .allday-col-header { font-size: 9px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; padding: 6px 0 6px 2px; border-bottom: 1px solid var(--border); margin-bottom: 6px; }
+  .allday-col .empty-msg { font-size: 11px; color: var(--text-faint); padding: 8px 4px; text-align: center; opacity: 0.6; }
+  .allday-item { background: var(--surface); border-left: 3px solid var(--text-dim); border-radius: 6px; padding: 6px 8px; margin-bottom: 4px; cursor: pointer; position: relative; }
+  .allday-item:active { opacity: 0.85; }
+  .allday-item .ev-title { font-weight: 700; font-size: 11px; line-height: 1.25; }
+  .allday-item .ev-time { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600; opacity: 0.8; margin-top: 2px; }
+  .allday-item .ev-note { font-size: 10px; opacity: 0.7; margin-top: 2px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .allday-item.from-apple::after { content: '⇄'; position: absolute; top: 4px; right: 5px; font-size: 9px; opacity: 0.5; }
+
+  .timeline-wrap { position: relative; }
+  .timeline-grid { position: relative; }
+  .hour-row { display: grid; grid-template-columns: 50px 1fr; height: 60px; border-top: 1px solid var(--border); }
+  .hour-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-faint); padding-top: 4px; font-weight: 500; }
+  .hour-slot { position: relative; }
+  /* Events werden absolut innerhalb der Slot-Area positioniert */
+  .events-layer { position: absolute; top: 0; left: 50px; right: 0; bottom: 0; pointer-events: none; }
+  .event-block { position: absolute; left: 4px; right: 4px; border-radius: 8px; padding: 6px 10px; cursor: pointer; pointer-events: auto; overflow: hidden; min-height: 24px; border-left: 3px solid var(--text-dim); }
+  .event-block:active { opacity: 0.85; }
+  .event-block .ev-time { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; opacity: 0.9; }
+  .event-block .ev-title { font-weight: 700; font-size: 13px; margin-top: 1px; }
+  .event-block .ev-note { font-size: 11px; margin-top: 2px; opacity: 0.85; }
+  .event-block.from-apple::after { content: '⇄'; position: absolute; top: 6px; right: 8px; font-size: 11px; opacity: 0.5; }
+  .event-block .continuation { font-size: 9px; opacity: 0.7; font-style: italic; font-weight: 500; }
+  .now-line { position: absolute; left: 50px; right: 16px; height: 2px; background: #ef4444; z-index: 10; pointer-events: none; }
+  .now-line::before { content: ''; position: absolute; left: -6px; top: -4px; width: 10px; height: 10px; background: #ef4444; border-radius: 50%; }
+
+  /* =========== WOCHE / MONAT / SCHICHT (wie zuvor) =========== */
+  .week-view { padding: 8px 12px 100px; }
+  .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 12px; }
+  .week-day { background: var(--surface); border-radius: 8px; padding: 8px 4px; text-align: center; cursor: pointer; min-height: 64px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .week-day.today { background: var(--surface-2); border: 1px solid var(--accent); }
+  .week-day .wd { font-size: 10px; color: var(--text-dim); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; }
+  .week-day .num { font-weight: 700; font-size: 18px; font-family: 'JetBrains Mono', monospace; }
+  .week-day .dots { display: flex; gap: 2px; flex-wrap: wrap; justify-content: center; min-height: 6px; }
+  .cat-dot { width: 5px; height: 5px; border-radius: 50%; display: inline-block; }
+  .week-list { display: flex; flex-direction: column; gap: 14px; }
+  .week-section h3 { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; font-weight: 700; }
+  .week-section h3 .num { color: var(--accent); margin-left: 6px; font-family: 'JetBrains Mono', monospace; }
+  .week-section .event-list-item { background: var(--surface); border-left: 3px solid var(--text-dim); border-radius: 8px; padding: 8px 12px; margin-bottom: 4px; cursor: pointer; position: relative; }
+  .week-section .event-list-item .ev-time { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-dim); font-weight: 600; letter-spacing: 0.04em; }
+  .week-section .event-list-item .ev-title { font-weight: 600; font-size: 14px; margin-top: 2px; }
+  .week-section .event-list-item .ev-note { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+  .week-section .event-list-item.from-apple::after { content: '⇄'; position: absolute; top: 8px; right: 10px; font-size: 11px; color: var(--text-faint); }
+
+  .month-view { padding: 8px 12px 100px; }
+  .month-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .month-header { font-size: 10px; color: var(--text-faint); text-transform: uppercase; text-align: center; font-weight: 600; padding: 6px 0; letter-spacing: 0.05em; }
+  .month-cell { aspect-ratio: 1; background: var(--surface); border-radius: 6px; padding: 4px; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
+  .month-cell.other-month { opacity: 0.3; }
+  .month-cell.today { border: 1.5px solid var(--accent); }
+  .month-cell .num { font-size: 13px; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+  .month-cell .mini-dots { display: flex; gap: 2px; margin-top: 2px; flex-wrap: wrap; justify-content: center; }
+  .month-cell .mini-dots .cat-dot { width: 4px; height: 4px; }
+
+  .shift-view { padding: 16px 16px 100px; }
+  .shift-week { background: var(--surface); border-radius: 12px; overflow: hidden; margin-bottom: 16px; border: 1px solid var(--border); }
+  .shift-week-header { padding: 12px 16px; background: var(--surface-2); font-weight: 700; font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; display: flex; justify-content: space-between; align-items: center; }
+  .shift-week-header .hours { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-size: 14px; }
+  .shift-row { display: grid; grid-template-columns: 80px 1fr 60px; padding: 10px 16px; border-top: 1px solid var(--border); align-items: center; gap: 12px; cursor: pointer; }
+  .shift-row .day-info { font-size: 12px; }
+  .shift-row .day-info .wd { color: var(--text-dim); text-transform: uppercase; font-size: 10px; font-weight: 600; }
+  .shift-row .day-info .date { font-weight: 700; font-family: 'JetBrains Mono', monospace; font-size: 14px; }
+  .shift-pill { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+  .shift-pill.fruh { background: rgba(255,181,71,0.15); color: #ffb547; }
+  .shift-pill.spaet { background: rgba(168,85,247,0.15); color: #c084fc; }
+  .shift-pill.nacht { background: rgba(59,130,246,0.15); color: #60a5fa; }
+  .shift-row .hours-cell { text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--text-dim); font-size: 12px; }
+
+  .fab { position: fixed; bottom: calc(20px + var(--safe-bot)); right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--accent); color: var(--accent-text); border: none; font-size: 28px; font-weight: 300; cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,0.4); z-index: 100; display: grid; place-items: center; }
+  .fab:active { transform: scale(0.92); }
+
+  /* =========== MODALS =========== */
+  .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 200; display: none; align-items: flex-end; justify-content: center; }
+  .modal-bg.show { display: flex; }
+  .modal { background: var(--surface); width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 20px 20px calc(20px + var(--safe-bot)); max-height: 90vh; overflow-y: auto; border-top: 1px solid var(--border); }
+  @media (min-width: 600px) { .modal-bg { align-items: center; } .modal { border-radius: 16px; } }
+  .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; }
+  .modal-title { font-weight: 800; font-size: 20px; margin-bottom: 16px; letter-spacing: -0.01em; }
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; font-weight: 600; }
+  .form-group input, .form-group textarea, .form-group select { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 12px 14px; border-radius: 10px; font-family: inherit; font-size: 15px; }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--accent); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .cat-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+  .cat-pill { flex: 1; min-width: 70px; background: var(--bg); border: 1px solid var(--border); color: var(--text-dim); padding: 8px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; font-family: inherit; text-align: center; }
+  .cat-pill.active { color: var(--text); border-width: 2px; }
+  .shift-quick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px; }
+  .shift-quick button { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 8px 4px; border-radius: 8px; font-family: inherit; font-size: 11px; font-weight: 600; cursor: pointer; text-transform: uppercase; letter-spacing: 0.04em; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+  .modal-actions button { flex: 1; padding: 14px; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: 15px; cursor: pointer; border: none; }
+  .btn-cancel { background: var(--surface-2); color: var(--text); }
+  .btn-save { background: var(--accent); color: var(--accent-text); }
+  .btn-delete { background: rgba(239,68,68,0.15); color: #ef4444; margin-top: 8px; width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(239,68,68,0.3); font-family: inherit; font-weight: 600; font-size: 13px; cursor: pointer; }
+  .empty { text-align: center; padding: 60px 20px; color: var(--text-faint); }
+  .empty .icon { font-size: 36px; margin-bottom: 8px; opacity: 0.4; }
+  .empty .text { font-size: 14px; }
+
+  .filters { display: flex; gap: 6px; padding: 8px 16px 12px; overflow-x: auto; scrollbar-width: none; flex-shrink: 0; border-bottom: 1px solid var(--border); }
+  .filters::-webkit-scrollbar { display: none; }
+  .filter-chip { background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); padding: 6px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap; font-family: inherit; display: flex; align-items: center; gap: 6px; }
+  .filter-chip .cat-dot { width: 6px; height: 6px; }
+  .filter-chip.active { color: var(--text); background: var(--surface-2); }
+  .filter-chip.muted { opacity: 0.4; }
+
+  .sync-status { padding: 6px 16px; font-size: 11px; color: var(--text-dim); display: flex; justify-content: space-between; align-items: center; background: var(--surface); border-bottom: 1px solid var(--border); }
+  .sync-status.error { color: #ef4444; background: rgba(239,68,68,0.05); }
+  .sync-status .refresh-btn { background: transparent; border: 1px solid var(--border); color: var(--text-dim); padding: 4px 10px; border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 11px; }
+
+  /* Kalender-Manager */
+  .cal-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+  .cal-item { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
+  .cal-item .cal-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .cal-item .cal-name { font-weight: 700; font-size: 14px; }
+  .cal-item .cal-url { font-size: 11px; color: var(--text-faint); font-family: 'JetBrains Mono', monospace; word-break: break-all; margin-top: 4px; }
+  .cal-item .cal-meta { display: flex; gap: 10px; align-items: center; margin-top: 8px; font-size: 11px; color: var(--text-dim); }
+  .cal-cat-badge { padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+  .cal-actions { display: flex; gap: 6px; margin-top: 10px; }
+  .cal-actions button { flex: 1; background: var(--surface-2); border: 1px solid var(--border); color: var(--text); padding: 6px; border-radius: 6px; font-family: inherit; font-size: 11px; font-weight: 600; cursor: pointer; }
+  .cal-actions button.danger { color: #ef4444; border-color: rgba(239,68,68,0.3); }
+  .add-cal-btn { width: 100%; background: var(--bg); border: 1.5px dashed var(--border); color: var(--text-dim); padding: 14px; border-radius: 10px; font-family: inherit; font-weight: 600; font-size: 13px; cursor: pointer; }
+  .info-box { background: rgba(255,181,71,0.08); border: 1px solid rgba(255,181,71,0.2); border-radius: 10px; padding: 12px; font-size: 12px; color: var(--text-dim); line-height: 1.6; margin-bottom: 14px; }
+  .info-box strong { color: var(--accent); }
+
+  /* Settings-Modal */
+  .settings-section { margin-bottom: 18px; }
+  .settings-section h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); font-weight: 700; margin-bottom: 10px; }
+  .theme-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .theme-opt { background: var(--bg); border: 1px solid var(--border); color: var(--text-dim); padding: 12px 4px; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: 12px; cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .theme-opt .ic { font-size: 20px; }
+  .theme-opt.active { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+
+  /* Kategorie-Editor */
+  .cat-editor-list { display: flex; flex-direction: column; gap: 6px; }
+  .cat-editor-item { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px; display: grid; grid-template-columns: 36px 1fr auto; gap: 10px; align-items: center; }
+  .color-swatch { width: 32px; height: 32px; border-radius: 8px; cursor: pointer; border: 2px solid var(--border); position: relative; }
+  .cat-editor-item input[type="text"] { background: transparent; border: none; color: var(--text); font-family: inherit; font-size: 14px; font-weight: 600; padding: 0; }
+  .cat-editor-item input[type="text"]:focus { outline: none; }
+  .cat-editor-actions { display: flex; gap: 4px; }
+  .cat-editor-actions button { background: var(--surface-2); border: 1px solid var(--border); color: var(--text-dim); width: 32px; height: 32px; border-radius: 6px; font-size: 13px; cursor: pointer; display: grid; place-items: center; }
+  .cat-editor-actions button.danger { color: #ef4444; }
+  .add-cat-btn { width: 100%; background: transparent; border: 1.5px dashed var(--border); color: var(--text-dim); padding: 10px; border-radius: 10px; font-family: inherit; font-weight: 600; font-size: 12px; cursor: pointer; margin-top: 8px; }
+
+  /* Color-Picker-Popup */
+  .color-popup { display: none; position: absolute; top: 38px; left: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 8px; z-index: 300; box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+  .color-popup.show { display: grid; }
+  .color-popup { grid-template-columns: repeat(6, 28px); gap: 4px; }
+  .color-popup .c { width: 28px; height: 28px; border-radius: 6px; cursor: pointer; border: 2px solid transparent; }
+  .color-popup .c:hover { border-color: var(--text); }
+
+  /* Sync-Range im Settings */
+  .range-info { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); border-radius: 10px; padding: 10px 12px; font-size: 11px; color: var(--text-dim); line-height: 1.5; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="title">Plan<span class="accent">.</span></div>
+    <div class="header-actions">
+      <button class="header-btn" id="syncBtn" title="Apple-Kalender synchronisieren">↻</button>
+      <button class="header-btn" id="calBtn" title="Kalender verwalten">📅</button>
+      <button class="header-btn" id="settingsBtn" title="Einstellungen">⚙</button>
+    </div>
+  </header>
+  <div class="sync-status" id="syncStatus" style="display:none">
+    <span id="syncMsg">Noch nicht synchronisiert</span>
+    <button class="refresh-btn" id="refreshBtn">Aktualisieren</button>
+  </div>
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-view="day">Tag</button>
+    <button class="tab" data-view="week">Woche</button>
+    <button class="tab" data-view="month">Monat</button>
+    <button class="tab" data-view="shift">Schichten</button>
+  </div>
+  <div class="filters" id="filters"></div>
+  <div class="date-nav">
+    <button class="date-nav-btn" id="prevBtn">‹</button>
+    <div class="date-label" id="dateLabel">Heute<span class="sub" id="dateSub">Mo. 1. Jan</span></div>
+    <button class="date-nav-btn" id="nextBtn">›</button>
+    <button class="today-btn" id="todayBtn">Heute</button>
+  </div>
+  <main id="mainContent"></main>
+  <button class="fab" id="fabAdd">+</button>
+</div>
+
+<!-- Modal: Termin -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modalTitle">Neuer Termin</div>
+    <div class="form-group">
+      <label>Titel</label>
+      <input type="text" id="fTitle" placeholder="z.B. Dienst RTW 12-2" autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label>Kategorie</label>
+      <div class="cat-pills" id="catPills"></div>
+    </div>
+    <div class="form-group" id="shiftQuickGroup" style="display:none">
+      <label>Schnellauswahl Schicht</label>
+      <div class="shift-quick">
+        <button data-shift="fruh">Früh 6-14</button>
+        <button data-shift="spaet">Spät 14-22</button>
+        <button data-shift="nacht">Nacht 22-6</button>
+        <button data-shift="custom">12h</button>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Datum</label><input type="date" id="fDate"></div>
+      <div class="form-group"><label>Von</label><input type="time" id="fStart"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Bis</label><input type="time" id="fEnd"></div>
+      <div class="form-group">
+        <label>Erinnerung</label>
+        <select id="fRemind">
+          <option value="0">Keine</option>
+          <option value="5">5 Min vorher</option>
+          <option value="15">15 Min vorher</option>
+          <option value="30">30 Min vorher</option>
+          <option value="60">1 Std vorher</option>
+          <option value="120">2 Std vorher</option>
+          <option value="1440">1 Tag vorher</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Notizen (optional)</label>
+      <textarea id="fNote" rows="2" placeholder="z.B. Wache 12, mit Mike"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Wiederholung</label>
+      <select id="fRepeat">
+        <option value="none">Keine Wiederholung</option>
+        <option value="daily">Täglich</option>
+        <option value="weekly">Wöchentlich</option>
+        <option value="biweekly">Alle 2 Wochen</option>
+        <option value="monthly">Monatlich</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" id="btnCancel">Abbrechen</button>
+      <button class="btn-save" id="btnSave">Speichern</button>
+    </div>
+    <button class="btn-delete" id="btnDelete" style="display:none">Termin löschen</button>
+  </div>
+</div>
+
+<!-- Modal: Kalender verwalten -->
+<div class="modal-bg" id="calModalBg">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Apple-Kalender</div>
+    <div class="info-box">
+      <strong>So bekommst du den Link:</strong><br>
+      📱 <strong>iPhone</strong>: Kalender → "Kalender" → ⓘ → "Öffentlicher Kalender" → Link teilen<br>
+      💻 <strong>Mac</strong>: Rechtsklick auf Kalender → "Person freigeben" → "Öffentlicher Kalender" → Link kopieren
+    </div>
+    <div class="cal-list" id="calList"></div>
+    <button class="add-cal-btn" id="addCalBtn">+ Neuen Kalender hinzufügen</button>
+    <div class="modal-actions">
+      <button class="btn-cancel" id="btnCalClose" style="flex:1">Fertig</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Kalender hinzufügen/bearbeiten -->
+<div class="modal-bg" id="calEditBg">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="calEditTitle">Kalender hinzufügen</div>
+    <div class="form-group">
+      <label>Name (frei wählbar)</label>
+      <input type="text" id="cfName" placeholder="z.B. Dienstplan RD" autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label>Abo-Link (webcal:// oder https://)</label>
+      <textarea id="cfUrl" rows="3" placeholder="webcal://p01-caldav.icloud.com/published/..." autocomplete="off"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Standard-Kategorie für diese Termine</label>
+      <div class="cat-pills" id="cfCatPills"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" id="btnCalEditCancel">Abbrechen</button>
+      <button class="btn-save" id="btnCalEditSave">Speichern & Sync</button>
+    </div>
+    <button class="btn-delete" id="btnCalEditDelete" style="display:none">Kalender entfernen</button>
+  </div>
+</div>
+
+<!-- Modal: Einstellungen -->
+<div class="modal-bg" id="settingsBg">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Einstellungen</div>
+
+    <div class="settings-section">
+      <h3>🎨 Erscheinungsbild</h3>
+      <div class="theme-options">
+        <button class="theme-opt" data-theme="auto"><span class="ic">⚙️</span>Automatisch</button>
+        <button class="theme-opt" data-theme="light"><span class="ic">☀️</span>Hell</button>
+        <button class="theme-opt" data-theme="dark"><span class="ic">🌙</span>Dunkel</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>🏷️ Kategorien</h3>
+      <div class="cat-editor-list" id="catEditor"></div>
+      <button class="add-cat-btn" id="addCatBtn">+ Neue Kategorie</button>
+    </div>
+
+    <div class="settings-section">
+      <h3>📅 Apple-Kalender-Sync</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Vergangenheit (Monate)</label>
+          <input type="number" id="syncPast" value="6" min="1" max="36" inputmode="numeric">
+        </div>
+        <div class="form-group">
+          <label>Zukunft (Monate)</label>
+          <input type="number" id="syncFuture" value="12" min="1" max="36" inputmode="numeric">
+        </div>
+      </div>
+      <div class="range-info">
+        💡 Größere Bereiche = mehr Termine, aber langsamerer Sync. Standard: 6 Monate zurück, 12 Monate vor.
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h3>💾 Daten</h3>
+      <div class="form-row">
+        <button class="add-cal-btn" id="exportDataBtn">📤 Export</button>
+        <button class="add-cal-btn" id="importDataBtn">📥 Import</button>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" id="settingsCancel">Abbrechen</button>
+      <button class="btn-save" id="settingsSave">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============= STORAGE & THEME =============
+const STORAGE_KEY = 'planer_v3';
+const PROXIES = [
+  url => 'https://corsproxy.io/?' + encodeURIComponent(url),
+  url => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
+  url => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(url)
+];
+
+// Verfügbare Farben für Kategorien
+const COLOR_PALETTE = [
+  '#ef4444', '#f97316', '#f59e0b', '#eab308',
+  '#84cc16', '#22c55e', '#10b981', '#14b8a6',
+  '#06b6d4', '#0ea5e9', '#3b82f6', '#6366f1',
+  '#8b5cf6', '#a855f7', '#d946ef', '#ec4899',
+  '#f43f5e', '#78716c', '#64748b', '#475569',
+  '#0f766e', '#155e75', '#1e3a8a', '#581c87'
+];
+
+// Default-Kategorien (User kann ändern/erweitern)
+const DEFAULT_CATEGORIES = [
+  { id: 'rd',    name: 'Rettungsdienst', color: '#ef4444', isShift: true  },
+  { id: 'brk',   name: 'BRK Ehrenamt',   color: '#f97316', isShift: false },
+  { id: 'sport', name: 'Sport',          color: '#22c55e', isShift: false },
+  { id: 'haus',  name: 'Haushalt',       color: '#3b82f6', isShift: false },
+  { id: 'pers',  name: 'Persönlich',     color: '#a855f7', isShift: false }
+];
+
+let state = {
+  events: [],
+  appleEvents: [],
+  calendars: [],
+  categories: JSON.parse(JSON.stringify(DEFAULT_CATEGORIES)),
+  filters: {},
+  view: 'day',
+  cursor: new Date(),
+  editingId: null,
+  editingCalId: null,
+  selectedCat: 'pers',
+  selectedCalCat: 'pers',
+  scheduledNotifs: {},
+  settings: {
+    theme: 'auto',
+    syncPastMonths: 6,
+    syncFutureMonths: 12
+  }
+};
+
+function loadData() {
+  try {
+    // Migration vom alten v2-Key falls vorhanden
+    const oldRaw = localStorage.getItem('planer_v2');
+    const newRaw = localStorage.getItem(STORAGE_KEY);
+    if (newRaw) {
+      const data = JSON.parse(newRaw);
+      state.events = data.events || [];
+      state.calendars = data.calendars || [];
+      state.appleEvents = data.appleEvents || [];
+      state.categories = data.categories || JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+      state.settings = { ...state.settings, ...(data.settings || {}) };
+    } else if (oldRaw) {
+      // Migration aus v2
+      const old = JSON.parse(oldRaw);
+      state.events = old.events || [];
+      state.calendars = old.calendars || [];
+      state.appleEvents = old.appleEvents || [];
+      // Standardkategorien beibehalten
+      saveData();
+    }
+    // Filter initialisieren
+    state.categories.forEach(c => {
+      if (state.filters[c.id] === undefined) state.filters[c.id] = true;
+    });
+  } catch(e) { console.warn('Load failed:', e); }
+}
+function saveData() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      events: state.events,
+      calendars: state.calendars,
+      appleEvents: state.appleEvents,
+      categories: state.categories,
+      settings: state.settings
+    }));
+  } catch(e) { console.warn('Save failed:', e); }
+}
+
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', state.settings.theme);
+  // Theme-Color Meta-Tag aktualisieren
+  const isDark = state.settings.theme === 'dark' ||
+                 (state.settings.theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const tc = document.getElementById('themeColor');
+  if (tc) tc.setAttribute('content', isDark ? '#0f1419' : '#f7f8fa');
+}
+
+// ============= HELPERS =============
+const DAYS_DE = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+const MONTHS_DE = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+const MONTHS_SHORT = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+
+function fmtDate(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function parseDate(s) { return new Date(s + 'T00:00:00'); }
+function sameDay(a, b) { return fmtDate(a) === fmtDate(b); }
+function isToday(d) { return sameDay(d, new Date()); }
+function addDays(d, n) { const x = new Date(d); x.setDate(x.getDate() + n); return x; }
+function addMonths(d, n) { const x = new Date(d); x.setMonth(x.getMonth() + n); return x; }
+function startOfWeek(d) {
+  const x = new Date(d);
+  const dow = x.getDay();
+  const diff = dow === 0 ? -6 : 1 - dow;
+  x.setDate(x.getDate() + diff);
+  x.setHours(0,0,0,0);
+  return x;
+}
+function startOfMonth(d) { return new Date(d.getFullYear(), d.getMonth(), 1); }
+function escape(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function calcHours(start, end) {
+  const [sh, sm] = start.split(':').map(Number);
+  const [eh, em] = end.split(':').map(Number);
+  let mins = (eh * 60 + em) - (sh * 60 + sm);
+  if (mins < 0) mins += 24 * 60;
+  return mins / 60;
+}
+function detectShiftType(start) {
+  const h = parseInt(start.split(':')[0]);
+  if (h >= 4 && h < 11) return 'fruh';
+  if (h >= 11 && h < 18) return 'spaet';
+  return 'nacht';
+}
+function weekNumber(d) {
+  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7));
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  return Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+}
+
+function getCategory(id) {
+  return state.categories.find(c => c.id === id) || { id, name: id, color: '#94a3b8', isShift: false };
+}
+function getCategoryColor(id) { return getCategory(id).color; }
+
+// Helle Variante (für Background) aus Hex erzeugen
+function colorAlpha(hex, alpha) {
+  const h = hex.replace('#', '');
+  const r = parseInt(h.slice(0,2), 16);
+  const g = parseInt(h.slice(2,4), 16);
+  const b = parseInt(h.slice(4,6), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+// Bestimmt schwarz oder weiß für Text auf farbigem Hintergrund
+function textOn(hex) {
+  const h = hex.replace('#', '');
+  const r = parseInt(h.slice(0,2), 16);
+  const g = parseInt(h.slice(2,4), 16);
+  const b = parseInt(h.slice(4,6), 16);
+  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+  return yiq >= 160 ? '#1a1a1a' : '#ffffff';
+}
+
+// ============= ICS-PARSER (verbessert) =============
+function unescapeICS(s) {
+  return (s || '').replace(/\\n/gi, '\n').replace(/\\,/g, ',').replace(/\\;/g, ';').replace(/\\\\/g, '\\');
+}
+
+function parseICSDate(raw, params) {
+  if (!raw) return null;
+  params = params || {};
+  let str = raw;
+  // VALUE=DATE explicit
+  if (params.VALUE === 'DATE' || str.length === 8) {
+    if (str.length === 8) {
+      const y = parseInt(str.slice(0,4));
+      const m = parseInt(str.slice(4,6)) - 1;
+      const d = parseInt(str.slice(6,8));
+      return { date: new Date(y, m, d, 0, 0), allDay: true };
+    }
+  }
+  const m = str.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})(Z?)$/);
+  if (m) {
+    const [, y, mo, d, h, mi, s, z] = m;
+    if (z === 'Z') {
+      // UTC → in lokale Zeit umrechnen (Browser macht das automatisch)
+      return { date: new Date(Date.UTC(+y, +mo-1, +d, +h, +mi, +s)), allDay: false };
+    } else {
+      // TZID oder floating: als lokale Zeit interpretieren
+      // (Vereinfachung: wir behandeln alle Nicht-UTC als lokal,
+      // das funktioniert für Europe/Berlin in DE perfekt)
+      return { date: new Date(+y, +mo-1, +d, +h, +mi, +s), allDay: false };
+    }
+  }
+  return null;
+}
+
+function parseICS(text) {
+  const unfolded = text.replace(/\r?\n[ \t]/g, '');
+  const lines = unfolded.split(/\r?\n/);
+  const events = [];
+  let current = null;
+  for (const line of lines) {
+    if (line === 'BEGIN:VEVENT') {
+      current = {};
+    } else if (line === 'END:VEVENT') {
+      if (current && current.dtstart) events.push(current);
+      current = null;
+    } else if (current) {
+      const idx = line.indexOf(':');
+      if (idx === -1) continue;
+      const head = line.slice(0, idx);
+      const val = line.slice(idx + 1);
+      const headParts = head.split(';');
+      const propName = headParts[0];
+      const params = {};
+      headParts.slice(1).forEach(p => {
+        const [pk, pv] = p.split('=');
+        params[pk] = pv;
+      });
+      if (propName === 'SUMMARY') current.summary = unescapeICS(val);
+      else if (propName === 'DESCRIPTION') current.description = unescapeICS(val);
+      else if (propName === 'LOCATION') current.location = unescapeICS(val);
+      else if (propName === 'UID') current.uid = val;
+      else if (propName === 'DTSTART') current.dtstart = parseICSDate(val, params);
+      else if (propName === 'DTEND') current.dtend = parseICSDate(val, params);
+      else if (propName === 'RRULE') current.rrule = val;
+      else if (propName === 'EXDATE') {
+        current.exdates = current.exdates || [];
+        const d = parseICSDate(val, params);
+        if (d) current.exdates.push(fmtDate(d.date));
+      }
+    }
+  }
+  return events;
+}
+
+// RRULE-Expansion (verbessert: bessere BYDAY, BYMONTHDAY, COUNT, UNTIL)
+function expandICSRecurrence(ev, rangeStart, rangeEnd) {
+  const occurrences = [];
+  const baseStart = ev.dtstart.date;
+  const baseEnd = ev.dtend ? ev.dtend.date : new Date(baseStart.getTime() + 60*60*1000);
+  const duration = baseEnd - baseStart;
+  const exdates = ev.exdates || [];
+
+  if (!ev.rrule) {
+    if (baseEnd >= rangeStart && baseStart <= rangeEnd) {
+      occurrences.push({ start: baseStart, end: baseEnd });
+    }
+    return occurrences;
+  }
+
+  const parts = {};
+  ev.rrule.split(';').forEach(p => {
+    const [k, v] = p.split('=');
+    parts[k] = v;
+  });
+  const freq = parts.FREQ;
+  const interval = parseInt(parts.INTERVAL || '1');
+  const count = parts.COUNT ? parseInt(parts.COUNT) : null;
+  let until = null;
+  if (parts.UNTIL) {
+    const u = parseICSDate(parts.UNTIL);
+    if (u) until = u.date;
+  }
+  const byDay = parts.BYDAY ? parts.BYDAY.split(',') : null;
+  const byMonthDay = parts.BYMONTHDAY ? parts.BYMONTHDAY.split(',').map(Number) : null;
+  const dayMap = { SU:0, MO:1, TU:2, WE:3, TH:4, FR:5, SA:6 };
+
+  let occurrenceCount = 0;
+  const hardEnd = until && until < rangeEnd ? until : rangeEnd;
+  const lookAheadEnd = addDays(hardEnd, 1);
+
+  if (freq === 'WEEKLY') {
+    // Bei WEEKLY mit BYDAY: alle ausgewählten Wochentage in jeder Iteration generieren
+    // Bei WEEKLY ohne BYDAY: einfach alle 7*interval Tage vom baseStart aus
+    if (byDay) {
+      const targetDows = byDay.map(d => dayMap[d.slice(-2)]).filter(x => x !== undefined).sort();
+      // Starte bei der Woche von baseStart (Wochenstart Montag)
+      let weekCursor = startOfWeek(baseStart);
+      let safety = 0;
+      let stopped = false;
+      while (weekCursor <= lookAheadEnd && safety < 730 && !stopped) {
+        for (const targetDow of targetDows) {
+          // Datum dieser Woche an gewünschtem Wochentag
+          // weekCursor ist Montag. targetDow: 0=So, 1=Mo, ..., 6=Sa
+          const dayOffset = targetDow === 0 ? 6 : targetDow - 1;
+          const occ = new Date(weekCursor);
+          occ.setDate(occ.getDate() + dayOffset);
+          occ.setHours(baseStart.getHours(), baseStart.getMinutes(), baseStart.getSeconds(), 0);
+
+          // Vor baseStart? Überspringen (nicht zählen)
+          if (occ < baseStart) continue;
+          // Nach UNTIL? Stop
+          if (until && occ > until) { stopped = true; break; }
+          // COUNT erreicht? Stop
+          if (count && occurrenceCount >= count) { stopped = true; break; }
+
+          // Im Anzeigebereich?
+          if (occ >= rangeStart && occ <= rangeEnd) {
+            if (!exdates.includes(fmtDate(occ))) {
+              occurrences.push({ start: new Date(occ), end: new Date(occ.getTime() + duration) });
+            }
+          }
+          occurrenceCount++;
+        }
+        weekCursor = addDays(weekCursor, 7 * interval);
+        safety++;
+      }
+    } else {
+      // Kein BYDAY: einfach vom baseStart aus alle 7*interval Tage
+      let cursor = new Date(baseStart);
+      let safety = 0;
+      while (cursor <= lookAheadEnd && safety < 730) {
+        if (until && cursor > until) break;
+        if (count && occurrenceCount >= count) break;
+        if (cursor >= rangeStart && cursor <= rangeEnd) {
+          if (!exdates.includes(fmtDate(cursor))) {
+            occurrences.push({ start: new Date(cursor), end: new Date(cursor.getTime() + duration) });
+          }
+        }
+        occurrenceCount++;
+        cursor = addDays(cursor, 7 * interval);
+        safety++;
+      }
+    }
+  } else if (freq === 'DAILY') {
+    let cursor = new Date(baseStart);
+    let safety = 0;
+    while (cursor <= lookAheadEnd && safety < 1500) {
+      if (cursor >= rangeStart && cursor <= hardEnd) {
+        if (count && occurrenceCount >= count) break;
+        if (!exdates.includes(fmtDate(cursor))) {
+          occurrences.push({ start: new Date(cursor), end: new Date(cursor.getTime() + duration) });
+        }
+      }
+      occurrenceCount++;
+      if (count && occurrenceCount >= count) break;
+      cursor = addDays(cursor, interval);
+      safety++;
+    }
+  } else if (freq === 'MONTHLY') {
+    let cursor = new Date(baseStart);
+    let safety = 0;
+    while (cursor <= lookAheadEnd && safety < 200) {
+      if (byMonthDay) {
+        for (const md of byMonthDay) {
+          const occ = new Date(cursor.getFullYear(), cursor.getMonth(), md, baseStart.getHours(), baseStart.getMinutes());
+          if (occ >= baseStart && occ <= hardEnd && occ >= rangeStart) {
+            if (count && occurrenceCount >= count) break;
+            if (!exdates.includes(fmtDate(occ))) {
+              occurrences.push({ start: new Date(occ), end: new Date(occ.getTime() + duration) });
+            }
+            occurrenceCount++;
+          }
+        }
+      } else {
+        if (cursor >= rangeStart && cursor <= hardEnd) {
+          if (count && occurrenceCount >= count) break;
+          if (!exdates.includes(fmtDate(cursor))) {
+            occurrences.push({ start: new Date(cursor), end: new Date(cursor.getTime() + duration) });
+          }
+        }
+        occurrenceCount++;
+      }
+      if (count && occurrenceCount >= count) break;
+      cursor = addMonths(cursor, interval);
+      safety++;
+    }
+  } else if (freq === 'YEARLY') {
+    let cursor = new Date(baseStart);
+    let safety = 0;
+    while (cursor <= lookAheadEnd && safety < 50) {
+      if (cursor >= rangeStart && cursor <= hardEnd) {
+        if (count && occurrenceCount >= count) break;
+        if (!exdates.includes(fmtDate(cursor))) {
+          occurrences.push({ start: new Date(cursor), end: new Date(cursor.getTime() + duration) });
+        }
+      }
+      occurrenceCount++;
+      if (count && occurrenceCount >= count) break;
+      cursor = new Date(cursor.setFullYear(cursor.getFullYear() + interval));
+      safety++;
+    }
+  }
+  return occurrences;
+}
+
+function icsEventsToAppEvents(icsEvents, calendar) {
+  const today = new Date();
+  const rangeStart = addMonths(today, -state.settings.syncPastMonths);
+  const rangeEnd = addMonths(today, state.settings.syncFutureMonths);
+  const result = [];
+
+  for (const ev of icsEvents) {
+    if (!ev.dtstart) continue;
+    const occurrences = expandICSRecurrence(ev, rangeStart, rangeEnd);
+    for (const occ of occurrences) {
+      const d = occ.start;
+      const dateStr = fmtDate(d);
+      let start = '', end = '', endDate = dateStr;
+      if (!ev.dtstart.allDay) {
+        start = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+        const e = occ.end;
+        end = String(e.getHours()).padStart(2,'0') + ':' + String(e.getMinutes()).padStart(2,'0');
+        endDate = fmtDate(e);
+      } else {
+        // All-day: endDate ist evtl. nicht am gleichen Tag (mehrtägige all-day)
+        const e = occ.end;
+        // ICS DTEND ist bei all-day exklusiv (Tag NACH dem Ende), also -1 Tag
+        const endActual = new Date(e.getTime() - 24*60*60*1000);
+        if (endActual > d) endDate = fmtDate(endActual);
+      }
+      result.push({
+        id: 'apple_' + calendar.id + '_' + (ev.uid || Math.random().toString(36).slice(2)) + '_' + dateStr + (start ? '_' + start : ''),
+        title: ev.summary || '(ohne Titel)',
+        date: dateStr,
+        endDate,
+        cat: calendar.cat,
+        start,
+        end,
+        allDay: ev.dtstart.allDay,
+        note: [ev.location, ev.description].filter(Boolean).join(' · ').slice(0, 200),
+        remind: 0,
+        repeat: 'none',
+        fromCalendarId: calendar.id,
+        fromCalendarName: calendar.name,
+        isApple: true,
+        isShift: getCategory(calendar.cat).isShift,
+        shiftType: getCategory(calendar.cat).isShift && start ? detectShiftType(start) : null
+      });
+    }
+  }
+  return result;
+}
+
+// ============= SYNC =============
+async function fetchICS(url) {
+  const errors = [];
+  for (let i = 0; i < PROXIES.length; i++) {
+    const proxyUrl = PROXIES[i](url);
+    try {
+      const res = await fetch(proxyUrl, { method: 'GET' });
+      if (!res.ok) { errors.push(`Proxy ${i+1}: HTTP ${res.status}`); continue; }
+      const text = await res.text();
+      if (!text || text.length < 20) { errors.push(`Proxy ${i+1}: leere Antwort`); continue; }
+      if (!text.includes('BEGIN:VCALENDAR')) {
+        if (text.includes('<html') || text.includes('<!DOCTYPE')) {
+          throw new Error('Kalender ist NICHT öffentlich freigegeben!');
+        }
+        errors.push(`Proxy ${i+1}: keine ICS-Daten`); continue;
+      }
+      return text;
+    } catch (e) {
+      if (e.message.includes('NICHT öffentlich')) throw e;
+      errors.push(`Proxy ${i+1}: ${e.message}`);
+    }
+  }
+  throw new Error('Alle Proxies fehlgeschlagen: ' + errors.join(' | '));
+}
+
+async function syncCalendar(cal) {
+  let url = cal.url.trim().replace(/^["'<\s]+|["'>\s]+$/g, '');
+  if (url.startsWith('webcal://')) url = 'https://' + url.slice(9);
+  if (!url.startsWith('http')) throw new Error('Ungültige URL');
+  const text = await fetchICS(url);
+  const icsEvents = parseICS(text);
+  if (icsEvents.length === 0) throw new Error('Keine Termine in der Datei');
+  return icsEventsToAppEvents(icsEvents, cal);
+}
+
+async function syncAllCalendars() {
+  if (state.calendars.length === 0) { $('syncStatus').style.display = 'none'; return; }
+  const btn = $('syncBtn');
+  btn.classList.add('syncing');
+  $('syncStatus').style.display = 'flex';
+  $('syncStatus').classList.remove('error');
+  $('syncMsg').textContent = 'Synchronisiere…';
+
+  let allEvents = [], errors = [];
+  const perCalCount = [];
+  for (const cal of state.calendars) {
+    try {
+      const events = await syncCalendar(cal);
+      allEvents = allEvents.concat(events);
+      perCalCount.push(`${cal.name}: ${events.length}`);
+      cal.lastSync = new Date().toISOString();
+      cal.lastError = null;
+      cal.lastCount = events.length;
+    } catch(e) {
+      cal.lastError = e.message;
+      errors.push(`${cal.name}: ${e.message}`);
+    }
+  }
+  state.appleEvents = allEvents;
+  saveData();
+  btn.classList.remove('syncing');
+  if (errors.length > 0) {
+    $('syncStatus').classList.add('error');
+    $('syncMsg').textContent = '⚠ ' + errors[0];
+  } else {
+    const now = new Date();
+    const detail = perCalCount.length > 1 ? ' · ' + perCalCount.join(', ') : '';
+    $('syncMsg').textContent = `✓ ${allEvents.length} Termine (${state.settings.syncPastMonths}M↩/${state.settings.syncFutureMonths}M↪)${detail} · ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    $('syncMsg').title = perCalCount.join('\n');
+  }
+  render();
+}
+
+// ============= EVENTS-ABRUF =============
+function expandOwnRecurring(ev, rangeStart, rangeEnd) {
+  if (!ev.repeat || ev.repeat === 'none') {
+    const d = parseDate(ev.date);
+    return (d >= rangeStart && d <= rangeEnd) ? [ev.date] : [];
+  }
+  const orig = parseDate(ev.date);
+  if (orig > rangeEnd) return [];
+  const results = [];
+  let cursor = new Date(orig);
+  let safety = 0;
+  while (cursor <= rangeEnd && safety < 600) {
+    if (cursor >= rangeStart) results.push(fmtDate(cursor));
+    if (ev.repeat === 'daily') cursor = addDays(cursor, 1);
+    else if (ev.repeat === 'weekly') cursor = addDays(cursor, 7);
+    else if (ev.repeat === 'biweekly') cursor = addDays(cursor, 14);
+    else if (ev.repeat === 'monthly') cursor = addMonths(cursor, 1);
+    else break;
+    safety++;
+  }
+  return results;
+}
+
+function allEventsForRange(rangeStart, rangeEnd) {
+  const map = {};
+  let d = new Date(rangeStart);
+  while (d <= rangeEnd) { map[fmtDate(d)] = []; d = addDays(d, 1); }
+
+  state.events.forEach(ev => {
+    if (!state.filters[ev.cat]) return;
+    const dates = expandOwnRecurring(ev, rangeStart, rangeEnd);
+    dates.forEach(ds => { if (map[ds]) map[ds].push({ ...ev }); });
+  });
+  state.appleEvents.forEach(ev => {
+    if (!state.filters[ev.cat]) return;
+    // Mehrtägige Apple-Events auf alle betroffenen Tage verteilen
+    if (ev.endDate && ev.endDate !== ev.date && ev.allDay) {
+      let cur = parseDate(ev.date);
+      const end = parseDate(ev.endDate);
+      while (cur <= end) {
+        const ds = fmtDate(cur);
+        if (map[ds]) map[ds].push({ ...ev });
+        cur = addDays(cur, 1);
+      }
+    } else {
+      if (map[ev.date]) map[ev.date].push({ ...ev });
+    }
+  });
+  return map;
+}
+
+// Prüft ob ein Termin über Mitternacht geht (Nachtschicht etc.)
+function isOvernight(ev) {
+  if (!ev.start || !ev.end || ev.allDay) return false;
+  const [sh, sm] = ev.start.split(':').map(Number);
+  const [eh, em] = ev.end.split(':').map(Number);
+  const startMin = sh * 60 + sm;
+  const endMin = eh * 60 + em;
+  return endMin <= startMin && endMin > 0; // 22:00-06:00 → end < start
+}
+
+function getEventsOn(dateStr) {
+  const d = parseDate(dateStr);
+  const map = allEventsForRange(d, d);
+  let list = (map[dateStr] || []).map(ev => ({ ...ev, _continuation: false }));
+
+  // Termine vom VORTAG, die über Mitternacht gehen → als Fortsetzung anzeigen
+  const yesterday = addDays(d, -1);
+  const yesterdayStr = fmtDate(yesterday);
+  const yesterdayMap = allEventsForRange(yesterday, yesterday);
+  const overnight = (yesterdayMap[yesterdayStr] || []).filter(isOvernight);
+  overnight.forEach(ev => {
+    // Schon als gleicher Termin im list? (eigene Wiederholungen) – dedupe per id+start
+    if (!list.some(x => x.id === ev.id && x.date === ev.date)) {
+      list.push({ ...ev, _continuation: true });
+    }
+  });
+
+  list.sort((a, b) => {
+    // Fortsetzungen zuerst (sie starten konzeptionell um 00:00)
+    if (a._continuation && !b._continuation) return -1;
+    if (!a._continuation && b._continuation) return 1;
+    return (a.start || '00:00').localeCompare(b.start || '00:00');
+  });
+  return list;
+}
+
+// ============= RENDER =============
+const $ = id => document.getElementById(id);
+const mainEl = $('mainContent');
+
+function renderFilters() {
+  $('filters').innerHTML = state.categories.map(c => `
+    <button class="filter-chip ${state.filters[c.id] ? 'active' : 'muted'}" data-cat="${c.id}">
+      <span class="cat-dot" style="background:${c.color}"></span>${escape(c.name)}
+    </button>
+  `).join('');
+  document.querySelectorAll('.filter-chip').forEach(c => {
+    c.addEventListener('click', () => {
+      const cat = c.dataset.cat;
+      state.filters[cat] = !state.filters[cat];
+      c.classList.toggle('muted', !state.filters[cat]);
+      c.classList.toggle('active', state.filters[cat]);
+      render();
+    });
+  });
+}
+
+function updateDateLabel() {
+  const c = state.cursor;
+  const wd = DAYS_DE[c.getDay()];
+  if (state.view === 'day') {
+    $('dateLabel').firstChild.textContent = isToday(c) ? 'Heute' : `${wd}, ${c.getDate()}. ${MONTHS_SHORT[c.getMonth()]}`;
+    $('dateSub').textContent = `${c.getDate()}. ${MONTHS_DE[c.getMonth()]} ${c.getFullYear()}`;
+  } else if (state.view === 'week') {
+    const ws = startOfWeek(c);
+    const we = addDays(ws, 6);
+    $('dateLabel').firstChild.textContent = `KW ${weekNumber(c)}`;
+    $('dateSub').textContent = `${ws.getDate()}. ${MONTHS_SHORT[ws.getMonth()]} – ${we.getDate()}. ${MONTHS_SHORT[we.getMonth()]}`;
+  } else if (state.view === 'month') {
+    $('dateLabel').firstChild.textContent = MONTHS_DE[c.getMonth()];
+    $('dateSub').textContent = c.getFullYear();
+  } else {
+    $('dateLabel').firstChild.textContent = 'Schichten';
+    $('dateSub').textContent = `ab ${startOfWeek(c).getDate()}. ${MONTHS_SHORT[startOfWeek(c).getMonth()]}`;
+  }
+}
+
+function render() {
+  updateDateLabel();
+  if (state.view === 'day') renderDay();
+  else if (state.view === 'week') renderWeek();
+  else if (state.view === 'month') renderMonth();
+  else renderShift();
+}
+
+// === TAG-ANSICHT mit Blöcken + rechter Spalte für Ganztägig ===
+function renderDay() {
+  const dateStr = fmtDate(state.cursor);
+  const evs = getEventsOn(dateStr);
+  const HOUR_HEIGHT = 60;
+
+  // 3 Kategorien: All-Day (oder 00:00-00:00), Timed, Übernacht-Fortsetzungen
+  const isFullDayTimed = ev => ev.start === '00:00' && ev.end === '00:00';
+  const isAllDayLike = ev => ev.allDay || !ev.start || isFullDayTimed(ev);
+
+  const alldayEvs = evs.filter(isAllDayLike);
+  const timedEvs = evs.filter(ev => !isAllDayLike(ev));
+
+  // Layout-Konvertierung: jedes Timed-Event in {ev, startMin, endMin, isContinuation, goesOvernight}
+  const layoutEvs = timedEvs.map(ev => {
+    const [sh, sm] = ev.start.split(':').map(Number);
+    const [eh, em] = (ev.end || ev.start).split(':').map(Number);
+    let startMin, endMin;
+    const goesOvernight = isOvernight(ev);
+
+    if (ev._continuation) {
+      // Termin vom Vortag, der über Mitternacht ging
+      // Wird heute von 00:00 bis zur tatsächlichen End-Uhrzeit angezeigt
+      startMin = 0;
+      endMin = eh * 60 + em;
+      if (endMin <= 0) endMin = 60; // Sicherheit
+    } else if (goesOvernight) {
+      // Termin geht über Mitternacht – heute nur bis 24:00 anzeigen
+      startMin = sh * 60 + sm;
+      endMin = 24 * 60; // bis Mitternacht
+    } else {
+      startMin = sh * 60 + sm;
+      endMin = eh * 60 + em;
+      if (endMin <= startMin) endMin = startMin + 30; // mindestens 30 Min
+    }
+    return { ev, startMin, endMin, goesOvernight, isContinuation: !!ev._continuation };
+  }).sort((a, b) => a.startMin - b.startMin);
+
+  // Overlap-Spalten zuweisen
+  const groups = [];
+  for (const item of layoutEvs) {
+    let placed = false;
+    for (const g of groups) {
+      let col = 0;
+      while (true) {
+        const conflict = g.items.some(it => it.col === col && !(it.endMin <= item.startMin || it.startMin >= item.endMin));
+        if (!conflict) { item.col = col; break; }
+        col++;
+      }
+      const overlapsGroup = g.items.some(it => !(it.endMin <= item.startMin || it.startMin >= item.endMin));
+      if (overlapsGroup) {
+        g.items.push(item);
+        g.maxCol = Math.max(g.maxCol, item.col);
+        g.minStart = Math.min(g.minStart, item.startMin);
+        g.maxEnd = Math.max(g.maxEnd, item.endMin);
+        placed = true;
+        break;
+      }
+    }
+    if (!placed) {
+      item.col = 0;
+      groups.push({ items: [item], maxCol: 0, minStart: item.startMin, maxEnd: item.endMin });
+    }
+  }
+
+  // === HTML zusammenbauen ===
+  let html = '<div class="day-view"><div class="day-layout">';
+
+  // LINKS: Zeitleiste
+  html += '<div class="day-main"><div class="timeline-wrap"><div class="timeline-grid">';
+  for (let h = 0; h < 24; h++) {
+    html += `<div class="hour-row"><div class="hour-label">${String(h).padStart(2,'0')}:00</div><div class="hour-slot"></div></div>`;
+  }
+  html += `<div class="events-layer">`;
+
+  layoutEvs.forEach(item => {
+    const ev = item.ev;
+    const top = (item.startMin / 60) * HOUR_HEIGHT;
+    const height = Math.max(22, ((item.endMin - item.startMin) / 60) * HOUR_HEIGHT - 2);
+    const group = groups.find(g => g.items.includes(item));
+    const colCount = group ? group.maxCol + 1 : 1;
+    const widthPct = 100 / colCount;
+    const leftPct = (item.col || 0) * widthPct;
+    const color = getCategoryColor(ev.cat);
+    const bg = colorAlpha(color, 0.18);
+    const appleCls = ev.isApple ? 'from-apple' : '';
+
+    // Zeit-Label
+    let timeLabel = `${ev.start}${ev.end ? '–' + ev.end : ''}`;
+    let titleSuffix = '';
+    if (item.isContinuation) {
+      timeLabel = `↳ ${ev.end} (vom Vortag)`;
+      titleSuffix = ' <span class="overnight-mark">↪ FORTS.</span>';
+    } else if (item.goesOvernight) {
+      titleSuffix = ' <span class="overnight-mark">↪ ÜBERNACHT</span>';
+    }
+
+    html += `<div class="event-block ${appleCls}" data-id="${ev.id}" style="top:${top}px; height:${height}px; left:calc(${leftPct}% + 4px); width:calc(${widthPct}% - 8px); background:${bg}; border-left-color:${color}">
+      <div class="ev-time">${timeLabel}</div>
+      <div class="ev-title">${escape(ev.title)}${titleSuffix}</div>
+      ${ev.note && height > 50 ? `<div class="ev-note">${escape(ev.note)}</div>` : ''}
+    </div>`;
+  });
+
+  html += `</div>`; // events-layer
+
+  if (isToday(state.cursor)) {
+    const now = new Date();
+    const minutes = now.getHours() * 60 + now.getMinutes();
+    const top = (minutes / 60) * HOUR_HEIGHT;
+    html += `<div class="now-line" style="top:${top}px"></div>`;
+  }
+
+  html += `</div></div></div>`; // timeline-grid, timeline-wrap, day-main
+
+  // RECHTS: Ganztägig-Spalte
+  html += '<div class="allday-col">';
+  html += '<div class="allday-col-header">Ganztägig</div>';
+  if (alldayEvs.length === 0) {
+    html += '<div class="empty-msg">Nichts</div>';
+  } else {
+    alldayEvs.forEach(ev => {
+      const color = getCategoryColor(ev.cat);
+      const appleCls = ev.isApple ? 'from-apple' : '';
+      const bg = colorAlpha(color, 0.10);
+      // Zeit-Info für 00:00-00:00-Termine
+      const timeInfo = (ev.start === '00:00' && ev.end === '00:00')
+        ? '00:00 – 00:00'
+        : (ev.allDay ? 'ganzer Tag' : '');
+      html += `<div class="allday-item ${appleCls}" data-id="${ev.id}" style="background:${bg}; border-left-color:${color}">
+        <div class="ev-title">${escape(ev.title)}</div>
+        ${timeInfo ? `<div class="ev-time">${timeInfo}</div>` : ''}
+        ${ev.note ? `<div class="ev-note">${escape(ev.note)}</div>` : ''}
+      </div>`;
+    });
+  }
+  html += '</div>'; // allday-col
+
+  html += '</div></div>'; // day-layout, day-view
+  mainEl.innerHTML = html;
+
+  // Scroll
+  if (isToday(state.cursor)) {
+    const now = new Date();
+    const minutes = now.getHours() * 60 + now.getMinutes();
+    setTimeout(() => mainEl.scrollTop = Math.max(0, (minutes / 60) * HOUR_HEIGHT - 200), 0);
+  } else if (layoutEvs.length > 0) {
+    const firstMin = Math.min(...layoutEvs.filter(i => !i.isContinuation).map(i => i.startMin).concat([24*60]));
+    if (firstMin < 24 * 60) {
+      setTimeout(() => mainEl.scrollTop = Math.max(0, (firstMin / 60) * HOUR_HEIGHT - 100), 0);
+    } else {
+      setTimeout(() => mainEl.scrollTop = 6 * HOUR_HEIGHT, 0);
+    }
+  } else {
+    setTimeout(() => mainEl.scrollTop = 6 * HOUR_HEIGHT, 0);
+  }
+
+  mainEl.querySelectorAll('.event-block, .allday-item').forEach(el => {
+    el.addEventListener('click', () => openModal(el.dataset.id));
+  });
+}
+
+function renderWeek() {
+  const ws = startOfWeek(state.cursor);
+  const days = [];
+  for (let i = 0; i < 7; i++) days.push(addDays(ws, i));
+  const rangeMap = allEventsForRange(ws, addDays(ws, 6));
+  let html = '<div class="week-view"><div class="week-grid">';
+  days.forEach(d => {
+    const ds = fmtDate(d);
+    const evs = rangeMap[ds] || [];
+    const cats = [...new Set(evs.map(e => e.cat))];
+    html += `<div class="week-day ${isToday(d) ? 'today' : ''}" data-date="${ds}">
+      <div class="wd">${DAYS_DE[d.getDay()]}</div>
+      <div class="num">${d.getDate()}</div>
+      <div class="dots">${cats.map(c => `<span class="cat-dot" style="background:${getCategoryColor(c)}"></span>`).join('')}</div>
+    </div>`;
+  });
+  html += '</div><div class="week-list">';
+  let hasAny = false;
+  days.forEach(d => {
+    const ds = fmtDate(d);
+    const evs = (rangeMap[ds] || []).sort((a,b)=>(a.start||'').localeCompare(b.start||''));
+    if (evs.length === 0) return;
+    hasAny = true;
+    html += `<div class="week-section"><h3>${DAYS_DE[d.getDay()]}, ${d.getDate()}. ${MONTHS_SHORT[d.getMonth()]}<span class="num">${evs.length}</span></h3>`;
+    evs.forEach(ev => {
+      const color = getCategoryColor(ev.cat);
+      const appleCls = ev.isApple ? 'from-apple' : '';
+      html += `<div class="event-list-item ${appleCls}" data-id="${ev.id}" style="border-left-color:${color}; background:${colorAlpha(color, 0.07)}">
+        <div class="ev-time">${ev.start ? ev.start + (ev.end ? ' – ' + ev.end : '') : 'Ganztägig'}</div>
+        <div class="ev-title">${escape(ev.title)}</div>
+        ${ev.note ? `<div class="ev-note">${escape(ev.note)}</div>` : ''}
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  if (!hasAny) html += '<div class="empty"><div class="icon">📅</div><div class="text">Keine Termine diese Woche</div></div>';
+  html += '</div></div>';
+  mainEl.innerHTML = html;
+  mainEl.querySelectorAll('.week-day').forEach(el => {
+    el.addEventListener('click', () => { state.cursor = parseDate(el.dataset.date); state.view = 'day'; updateTabs(); render(); });
+  });
+  mainEl.querySelectorAll('.event-list-item').forEach(el => {
+    el.addEventListener('click', () => openModal(el.dataset.id));
+  });
+}
+
+function renderMonth() {
+  const monthStart = startOfMonth(state.cursor);
+  const gridStart = startOfWeek(monthStart);
+  const days = [];
+  for (let i = 0; i < 42; i++) days.push(addDays(gridStart, i));
+  const rangeMap = allEventsForRange(gridStart, days[41]);
+  let html = '<div class="month-view"><div class="month-grid">';
+  DAYS_DE.slice(1).concat(DAYS_DE[0]).forEach(d => { html += `<div class="month-header">${d}</div>`; });
+  days.forEach(d => {
+    const ds = fmtDate(d);
+    const inMonth = d.getMonth() === state.cursor.getMonth();
+    const evs = rangeMap[ds] || [];
+    const cats = [...new Set(evs.map(e => e.cat))];
+    html += `<div class="month-cell ${!inMonth ? 'other-month' : ''} ${isToday(d) ? 'today' : ''}" data-date="${ds}">
+      <div class="num">${d.getDate()}</div>
+      <div class="mini-dots">${cats.slice(0,5).map(c => `<span class="cat-dot" style="background:${getCategoryColor(c)}"></span>`).join('')}</div>
+    </div>`;
+  });
+  html += '</div></div>';
+  mainEl.innerHTML = html;
+  mainEl.querySelectorAll('.month-cell').forEach(el => {
+    el.addEventListener('click', () => { state.cursor = parseDate(el.dataset.date); state.view = 'day'; updateTabs(); render(); });
+  });
+}
+
+function renderShift() {
+  const ws = startOfWeek(state.cursor);
+  let html = '<div class="shift-view">';
+  const shiftCats = state.categories.filter(c => c.isShift).map(c => c.id);
+  for (let w = 0; w < 4; w++) {
+    const weekStart = addDays(ws, w * 7);
+    const weekEnd = addDays(weekStart, 6);
+    const rangeMap = allEventsForRange(weekStart, weekEnd);
+    let totalHours = 0;
+    let rowsHtml = '';
+    for (let i = 0; i < 7; i++) {
+      const d = addDays(weekStart, i);
+      const ds = fmtDate(d);
+      const shifts = (rangeMap[ds] || []).filter(e => shiftCats.includes(e.cat) && e.start && e.end);
+      let shiftHtml = '<span style="color:var(--text-faint); font-size:12px">frei</span>';
+      let dayHours = 0;
+      if (shifts.length > 0) {
+        shiftHtml = shifts.map(s => {
+          const h = calcHours(s.start, s.end);
+          dayHours += h;
+          const type = s.shiftType || detectShiftType(s.start);
+          return `<span class="shift-pill ${type}">${type}</span> <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-dim); margin-left:6px">${s.start}–${s.end}</span>`;
+        }).join('<br>');
+      }
+      totalHours += dayHours;
+      rowsHtml += `<div class="shift-row" data-date="${ds}">
+        <div class="day-info">
+          <div class="wd">${DAYS_DE[d.getDay()]}</div>
+          <div class="date">${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}</div>
+        </div>
+        <div>${shiftHtml}</div>
+        <div class="hours-cell">${dayHours > 0 ? dayHours.toFixed(1) + 'h' : ''}</div>
+      </div>`;
+    }
+    html += `<div class="shift-week">
+      <div class="shift-week-header">
+        <span>KW ${weekNumber(weekStart)} · ${weekStart.getDate()}.${String(weekStart.getMonth()+1).padStart(2,'0')} – ${weekEnd.getDate()}.${String(weekEnd.getMonth()+1).padStart(2,'0')}</span>
+        <span class="hours">${totalHours.toFixed(1)}h</span>
+      </div>
+      ${rowsHtml}
+    </div>`;
+  }
+  html += '</div>';
+  mainEl.innerHTML = html;
+  mainEl.querySelectorAll('.shift-row').forEach(el => {
+    el.addEventListener('click', () => { state.cursor = parseDate(el.dataset.date); state.view = 'day'; updateTabs(); render(); });
+  });
+}
+
+// ============= TERMIN-MODAL =============
+function renderCatPills(container, selected, onSelect) {
+  container.innerHTML = state.categories.map(c => {
+    const active = c.id === selected;
+    return `<button class="cat-pill ${active ? 'active' : ''}" data-cat="${c.id}" style="${active ? `background:${colorAlpha(c.color, 0.15)}; border-color:${c.color}` : ''}">${escape(c.name)}</button>`;
+  }).join('');
+  container.querySelectorAll('.cat-pill').forEach(b => {
+    b.addEventListener('click', () => {
+      onSelect(b.dataset.cat);
+      renderCatPills(container, b.dataset.cat, onSelect);
+    });
+  });
+}
+
+function openModal(id) {
+  state.editingId = id || null;
+  if (id && id.startsWith('apple_')) {
+    const ev = state.appleEvents.find(e => e.id === id);
+    if (ev) {
+      alert(`📅 ${ev.title}\n\nAus: ${ev.fromCalendarName}\n${ev.date}${ev.start ? ' ' + ev.start + (ev.end ? '–' + ev.end : '') : ''}\n\n${ev.note || ''}\n\n(Apple-Termine werden im Apple-Kalender geändert)`);
+    }
+    state.editingId = null;
+    return;
+  }
+  $('modalTitle').textContent = id ? 'Termin bearbeiten' : 'Neuer Termin';
+  $('btnDelete').style.display = id ? 'block' : 'none';
+  if (id) {
+    const ev = state.events.find(e => e.id === id);
+    if (!ev) return;
+    $('fTitle').value = ev.title;
+    $('fDate').value = ev.date;
+    $('fStart').value = ev.start || '';
+    $('fEnd').value = ev.end || '';
+    $('fNote').value = ev.note || '';
+    $('fRemind').value = ev.remind || 0;
+    $('fRepeat').value = ev.repeat || 'none';
+    state.selectedCat = ev.cat;
+  } else {
+    $('fTitle').value = '';
+    $('fDate').value = fmtDate(state.cursor);
+    $('fStart').value = '';
+    $('fEnd').value = '';
+    $('fNote').value = '';
+    $('fRemind').value = '15';
+    $('fRepeat').value = 'none';
+    if (!state.categories.find(c => c.id === state.selectedCat)) {
+      state.selectedCat = state.categories[0]?.id || 'pers';
+    }
+  }
+  renderCatPills($('catPills'), state.selectedCat, cat => {
+    state.selectedCat = cat;
+    $('shiftQuickGroup').style.display = getCategory(cat).isShift ? 'block' : 'none';
+  });
+  $('shiftQuickGroup').style.display = getCategory(state.selectedCat).isShift ? 'block' : 'none';
+  $('modalBg').classList.add('show');
+}
+function closeModal() { $('modalBg').classList.remove('show'); state.editingId = null; }
+
+function saveEvent() {
+  const title = $('fTitle').value.trim();
+  if (!title) { alert('Bitte Titel eingeben'); return; }
+  const date = $('fDate').value;
+  if (!date) { alert('Bitte Datum wählen'); return; }
+  const cat = state.selectedCat;
+  const start = $('fStart').value;
+  const data = {
+    id: state.editingId || ('ev_' + Date.now() + '_' + Math.random().toString(36).slice(2,7)),
+    title, date, cat,
+    start, end: $('fEnd').value,
+    note: $('fNote').value.trim(),
+    remind: parseInt($('fRemind').value),
+    repeat: $('fRepeat').value,
+    isShift: getCategory(cat).isShift,
+    shiftType: getCategory(cat).isShift && start ? detectShiftType(start) : null
+  };
+  if (state.editingId) {
+    const idx = state.events.findIndex(e => e.id === state.editingId);
+    state.events[idx] = data;
+  } else {
+    state.events.push(data);
+  }
+  saveData();
+  scheduleNotificationsFor(data);
+  closeModal();
+  render();
+}
+function deleteEvent() {
+  if (!state.editingId) return;
+  if (!confirm('Diesen Termin wirklich löschen?')) return;
+  state.events = state.events.filter(e => e.id !== state.editingId);
+  saveData();
+  closeModal();
+  render();
+}
+
+// ============= KALENDER-MANAGER =============
+function openCalManager() { renderCalList(); $('calModalBg').classList.add('show'); }
+function closeCalManager() { $('calModalBg').classList.remove('show'); }
+
+function renderCalList() {
+  const el = $('calList');
+  if (state.calendars.length === 0) {
+    el.innerHTML = '<div class="empty" style="padding:20px"><div class="text">Noch keine Kalender abonniert</div></div>';
+    return;
+  }
+  el.innerHTML = state.calendars.map(c => {
+    const lastSync = c.lastSync ? new Date(c.lastSync) : null;
+    const lastSyncStr = lastSync ? `Sync: ${lastSync.toLocaleString('de-DE', {dateStyle:'short', timeStyle:'short'})}` : 'Noch nicht synchronisiert';
+    const errStr = c.lastError ? `<div style="color:#ef4444; font-size:11px; margin-top:4px">⚠ ${escape(c.lastError)}</div>` : '';
+    const cat = getCategory(c.cat);
+    return `<div class="cal-item" data-id="${c.id}">
+      <div class="cal-header">
+        <div style="flex:1; min-width:0">
+          <div class="cal-name">${escape(c.name)}</div>
+          <div class="cal-url">${escape(c.url.length > 60 ? c.url.slice(0, 60) + '…' : c.url)}</div>
+        </div>
+        <span class="cal-cat-badge" style="background:${colorAlpha(cat.color, 0.15)}; color:${cat.color}; border:1px solid ${colorAlpha(cat.color, 0.4)}">${escape(cat.name)}</span>
+      </div>
+      <div class="cal-meta">${lastSyncStr}</div>
+      ${errStr}
+      <div class="cal-actions">
+        <button class="edit-cal" data-id="${c.id}">Bearbeiten</button>
+        <button class="sync-cal" data-id="${c.id}">Sync</button>
+        <button class="danger remove-cal" data-id="${c.id}">Entfernen</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  el.querySelectorAll('.edit-cal').forEach(b => b.addEventListener('click', () => openCalEdit(b.dataset.id)));
+  el.querySelectorAll('.sync-cal').forEach(b => b.addEventListener('click', async () => {
+    const cal = state.calendars.find(c => c.id === b.dataset.id);
+    if (!cal) return;
+    b.textContent = '...';
+    try {
+      const events = await syncCalendar(cal);
+      state.appleEvents = state.appleEvents.filter(e => e.fromCalendarId !== cal.id).concat(events);
+      cal.lastSync = new Date().toISOString();
+      cal.lastError = null;
+      saveData();
+      renderCalList(); render();
+    } catch(e) {
+      cal.lastError = e.message;
+      saveData();
+      renderCalList();
+    }
+  }));
+  el.querySelectorAll('.remove-cal').forEach(b => b.addEventListener('click', () => {
+    if (!confirm('Kalender entfernen?')) return;
+    state.calendars = state.calendars.filter(c => c.id !== b.dataset.id);
+    state.appleEvents = state.appleEvents.filter(e => e.fromCalendarId !== b.dataset.id);
+    saveData();
+    renderCalList(); render();
+  }));
+}
+
+function openCalEdit(id) {
+  state.editingCalId = id || null;
+  if (id) {
+    const cal = state.calendars.find(c => c.id === id);
+    if (!cal) return;
+    $('calEditTitle').textContent = 'Kalender bearbeiten';
+    $('cfName').value = cal.name;
+    $('cfUrl').value = cal.url;
+    state.selectedCalCat = cal.cat;
+    $('btnCalEditDelete').style.display = 'block';
+  } else {
+    $('calEditTitle').textContent = 'Kalender hinzufügen';
+    $('cfName').value = '';
+    $('cfUrl').value = '';
+    state.selectedCalCat = state.categories[0]?.id || 'pers';
+    $('btnCalEditDelete').style.display = 'none';
+  }
+  renderCatPills($('cfCatPills'), state.selectedCalCat, cat => { state.selectedCalCat = cat; });
+  $('calEditBg').classList.add('show');
+}
+function closeCalEdit() { $('calEditBg').classList.remove('show'); state.editingCalId = null; }
+
+async function saveCalEdit() {
+  const name = $('cfName').value.trim();
+  const url = $('cfUrl').value.trim();
+  if (!name) { alert('Bitte Name eingeben'); return; }
+  if (!url) { alert('Bitte Abo-Link eingeben'); return; }
+  if (!/^(webcal|https?):\/\//.test(url)) { alert('Link muss mit webcal:// oder https:// beginnen'); return; }
+
+  const cal = {
+    id: state.editingCalId || ('cal_' + Date.now()),
+    name, url,
+    cat: state.selectedCalCat,
+    lastSync: null, lastError: null
+  };
+  if (state.editingCalId) {
+    const idx = state.calendars.findIndex(c => c.id === state.editingCalId);
+    state.calendars[idx] = cal;
+    state.appleEvents = state.appleEvents.filter(e => e.fromCalendarId !== cal.id);
+  } else {
+    state.calendars.push(cal);
+  }
+  saveData();
+  closeCalEdit();
+  renderCalList();
+  try {
+    const events = await syncCalendar(cal);
+    state.appleEvents = state.appleEvents.filter(e => e.fromCalendarId !== cal.id).concat(events);
+    cal.lastSync = new Date().toISOString();
+    cal.lastError = null;
+    saveData();
+    renderCalList(); render();
+  } catch(e) {
+    cal.lastError = e.message;
+    saveData();
+    renderCalList();
+    alert('Sync-Fehler: ' + e.message);
+  }
+}
+function deleteCalEdit() {
+  if (!state.editingCalId) return;
+  if (!confirm('Kalender entfernen?')) return;
+  state.calendars = state.calendars.filter(c => c.id !== state.editingCalId);
+  state.appleEvents = state.appleEvents.filter(e => e.fromCalendarId !== state.editingCalId);
+  saveData();
+  closeCalEdit();
+  renderCalList(); render();
+}
+
+// ============= EINSTELLUNGEN =============
+function openSettings() {
+  // Theme
+  document.querySelectorAll('.theme-opt').forEach(b => b.classList.toggle('active', b.dataset.theme === state.settings.theme));
+  $('syncPast').value = state.settings.syncPastMonths;
+  $('syncFuture').value = state.settings.syncFutureMonths;
+  renderCatEditor();
+  $('settingsBg').classList.add('show');
+}
+function closeSettings() { $('settingsBg').classList.remove('show'); }
+
+function renderCatEditor() {
+  $('catEditor').innerHTML = state.categories.map((c, i) => `
+    <div class="cat-editor-item" data-id="${c.id}">
+      <div style="position:relative">
+        <div class="color-swatch" data-i="${i}" style="background:${c.color}; border-color:${c.color}"></div>
+        <div class="color-popup" data-popup="${i}">
+          ${COLOR_PALETTE.map(col => `<div class="c" data-color="${col}" data-i="${i}" style="background:${col}"></div>`).join('')}
+        </div>
+      </div>
+      <input type="text" value="${escape(c.name)}" data-i="${i}" placeholder="Name">
+      <div class="cat-editor-actions">
+        <button class="toggle-shift" data-i="${i}" title="Schichtdienst-Kategorie?">${c.isShift ? '⏰' : '○'}</button>
+        ${state.categories.length > 1 ? `<button class="danger del-cat" data-i="${i}">×</button>` : ''}
+      </div>
+    </div>
+  `).join('');
+
+  $('catEditor').querySelectorAll('.color-swatch').forEach(s => {
+    s.addEventListener('click', e => {
+      e.stopPropagation();
+      const i = s.dataset.i;
+      document.querySelectorAll('.color-popup').forEach(p => p.classList.remove('show'));
+      $('catEditor').querySelector(`[data-popup="${i}"]`).classList.add('show');
+    });
+  });
+  $('catEditor').querySelectorAll('.color-popup .c').forEach(c => {
+    c.addEventListener('click', e => {
+      e.stopPropagation();
+      const i = parseInt(c.dataset.i);
+      state.categories[i].color = c.dataset.color;
+      renderCatEditor();
+    });
+  });
+  $('catEditor').querySelectorAll('input[type="text"]').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const i = parseInt(inp.dataset.i);
+      state.categories[i].name = inp.value;
+    });
+  });
+  $('catEditor').querySelectorAll('.toggle-shift').forEach(b => {
+    b.addEventListener('click', () => {
+      const i = parseInt(b.dataset.i);
+      state.categories[i].isShift = !state.categories[i].isShift;
+      renderCatEditor();
+    });
+  });
+  $('catEditor').querySelectorAll('.del-cat').forEach(b => {
+    b.addEventListener('click', () => {
+      const i = parseInt(b.dataset.i);
+      const cat = state.categories[i];
+      const usedCount = state.events.filter(e => e.cat === cat.id).length + state.calendars.filter(c => c.cat === cat.id).length;
+      if (usedCount > 0) {
+        if (!confirm(`Kategorie "${cat.name}" wird von ${usedCount} Einträgen benutzt. Wirklich löschen? Sie werden der ersten Kategorie zugewiesen.`)) return;
+        const fallback = state.categories.find((_, idx) => idx !== i)?.id;
+        state.events.forEach(e => { if (e.cat === cat.id) e.cat = fallback; });
+        state.calendars.forEach(c => { if (c.cat === cat.id) c.cat = fallback; });
+        state.appleEvents.forEach(e => { if (e.cat === cat.id) e.cat = fallback; });
+      }
+      state.categories.splice(i, 1);
+      renderCatEditor();
+    });
+  });
+}
+
+// Außerhalb Color-Popup klicken = schließen
+document.addEventListener('click', e => {
+  if (!e.target.closest('.color-popup') && !e.target.closest('.color-swatch')) {
+    document.querySelectorAll('.color-popup').forEach(p => p.classList.remove('show'));
+  }
+});
+
+// ============= NOTIFICATIONS =============
+function scheduleNotificationsFor(ev) {
+  if (!ev.remind || ev.remind === 0) return;
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  if (!ev.start) return;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const lookAhead = addDays(today, 90);
+  const dates = expandOwnRecurring(ev, today, lookAhead);
+  dates.slice(0, 10).forEach(ds => {
+    const [h, m] = ev.start.split(':').map(Number);
+    const eventTime = parseDate(ds);
+    eventTime.setHours(h, m, 0, 0);
+    const notifTime = eventTime.getTime() - ev.remind * 60 * 1000;
+    const delay = notifTime - Date.now();
+    if (delay > 0 && delay < 2147483647) {
+      const key = ev.id + '_' + ds;
+      if (state.scheduledNotifs[key]) clearTimeout(state.scheduledNotifs[key]);
+      state.scheduledNotifs[key] = setTimeout(() => {
+        try { new Notification(ev.title, { body: `${getCategory(ev.cat).name} · ${ev.start}${ev.end ? '–' + ev.end : ''}`, tag: ev.id }); } catch(e) {}
+      }, delay);
+    }
+  });
+}
+
+// ============= BACKUP =============
+function exportBackup() {
+  const backup = {
+    app: 'terminplaner', version: 3, exportedAt: new Date().toISOString(),
+    events: state.events, calendars: state.calendars, appleEvents: state.appleEvents,
+    categories: state.categories, settings: state.settings
+  };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `terminplaner_backup_${fmtDate(new Date())}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+function importBackup() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'application/json,.json';
+  input.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (data.app && data.app !== 'terminplaner') {
+          alert('Datei gehört zu anderer App: ' + data.app); return;
+        }
+        if (!Array.isArray(data.events) && !Array.isArray(data.calendars)) {
+          alert('Datei sieht nicht wie ein Terminplaner-Backup aus.'); return;
+        }
+        const msg = `Backup:\n• ${(data.events||[]).length} eigene Termine\n• ${(data.calendars||[]).length} Apple-Abos\n• ${(data.categories||[]).length} Kategorien\n\nOK = ÜBERSCHREIBEN\nAbbrechen = nichts tun`;
+        if (!confirm(msg)) return;
+        state.events = data.events || [];
+        state.calendars = data.calendars || [];
+        state.appleEvents = data.appleEvents || [];
+        if (data.categories) state.categories = data.categories;
+        if (data.settings) state.settings = { ...state.settings, ...data.settings };
+        state.filters = {};
+        state.categories.forEach(c => state.filters[c.id] = true);
+        saveData(); applyTheme(); renderFilters(); render();
+        alert('✓ Backup geladen!');
+      } catch(err) {
+        alert('Fehler: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+  });
+  input.click();
+}
+
+// ============= NAV & BINDINGS =============
+function navigate(dir) {
+  if (state.view === 'day') state.cursor = addDays(state.cursor, dir);
+  else if (state.view === 'week') state.cursor = addDays(state.cursor, dir * 7);
+  else if (state.view === 'month') state.cursor = addMonths(state.cursor, dir);
+  else state.cursor = addDays(state.cursor, dir * 28);
+  render();
+}
+function updateTabs() { document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === state.view)); }
+
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => { state.view = t.dataset.view; updateTabs(); render(); });
+});
+$('prevBtn').addEventListener('click', () => navigate(-1));
+$('nextBtn').addEventListener('click', () => navigate(1));
+$('todayBtn').addEventListener('click', () => { state.cursor = new Date(); render(); });
+$('fabAdd').addEventListener('click', () => openModal());
+$('btnCancel').addEventListener('click', closeModal);
+$('btnSave').addEventListener('click', saveEvent);
+$('btnDelete').addEventListener('click', deleteEvent);
+$('modalBg').addEventListener('click', e => { if (e.target === $('modalBg')) closeModal(); });
+
+$('syncBtn').addEventListener('click', () => syncAllCalendars());
+$('refreshBtn').addEventListener('click', () => syncAllCalendars());
+$('calBtn').addEventListener('click', openCalManager);
+$('btnCalClose').addEventListener('click', closeCalManager);
+$('calModalBg').addEventListener('click', e => { if (e.target === $('calModalBg')) closeCalManager(); });
+$('addCalBtn').addEventListener('click', () => openCalEdit());
+$('btnCalEditCancel').addEventListener('click', closeCalEdit);
+$('btnCalEditSave').addEventListener('click', saveCalEdit);
+$('btnCalEditDelete').addEventListener('click', deleteCalEdit);
+$('calEditBg').addEventListener('click', e => { if (e.target === $('calEditBg')) closeCalEdit(); });
+
+$('settingsBtn').addEventListener('click', openSettings);
+$('settingsCancel').addEventListener('click', closeSettings);
+$('settingsBg').addEventListener('click', e => { if (e.target === $('settingsBg')) closeSettings(); });
+$('settingsSave').addEventListener('click', () => {
+  state.settings.syncPastMonths = Math.max(1, Math.min(36, parseInt($('syncPast').value) || 6));
+  state.settings.syncFutureMonths = Math.max(1, Math.min(36, parseInt($('syncFuture').value) || 12));
+  // Kategorien validieren (Namen nicht leer)
+  state.categories.forEach((c, i) => {
+    if (!c.name.trim()) c.name = 'Kategorie ' + (i + 1);
+  });
+  state.filters = {};
+  state.categories.forEach(c => state.filters[c.id] = state.filters[c.id] !== false);
+  saveData();
+  applyTheme();
+  renderFilters();
+  closeSettings();
+  render();
+});
+document.querySelectorAll('.theme-opt').forEach(b => {
+  b.addEventListener('click', () => {
+    state.settings.theme = b.dataset.theme;
+    applyTheme();
+    document.querySelectorAll('.theme-opt').forEach(x => x.classList.toggle('active', x === b));
+  });
+});
+$('addCatBtn').addEventListener('click', () => {
+  const newId = 'cat_' + Date.now();
+  const usedColors = state.categories.map(c => c.color);
+  const freeColor = COLOR_PALETTE.find(c => !usedColors.includes(c)) || COLOR_PALETTE[0];
+  state.categories.push({ id: newId, name: 'Neue Kategorie', color: freeColor, isShift: false });
+  state.filters[newId] = true;
+  renderCatEditor();
+});
+$('exportDataBtn').addEventListener('click', exportBackup);
+$('importDataBtn').addEventListener('click', importBackup);
+
+// Swipe
+let touchStartX = 0;
+mainEl.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+mainEl.addEventListener('touchend', e => {
+  const diff = e.changedTouches[0].clientX - touchStartX;
+  if (Math.abs(diff) > 80) navigate(diff > 0 ? -1 : 1);
+});
+
+// Init
+loadData();
+applyTheme();
+renderFilters();
+render();
+if (state.calendars.length > 0) {
+  $('syncStatus').style.display = 'flex';
+  $('syncMsg').textContent = `${state.appleEvents.length} Apple-Termine geladen`;
+  setTimeout(() => syncAllCalendars(), 500);
+}
+if ('Notification' in window && Notification.permission === 'granted') {
+  state.events.forEach(scheduleNotificationsFor);
+}
+setInterval(() => { if (state.view === 'day' && isToday(state.cursor)) render(); }, 60000);
+setInterval(() => { if (state.calendars.length > 0) syncAllCalendars(); }, 15 * 60 * 1000);
+
+// Bei Theme "auto" auf Systemwechsel hören
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+  if (state.settings.theme === 'auto') applyTheme();
+});
+</script>
+</body>
+</html>
