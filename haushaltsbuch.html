@@ -1125,15 +1125,16 @@ function renderBudget(){
   );
 
   // ---- Gesamt-Box ----
-  // Klassische Ausgaben ohne Sonderausgaben (für die Anzeige in der Ausgaben-Zeile)
-  const gesamtAusgabenOhneSonder = grundExp + extraExpOhneSonder;
+  // Klassische Ausgaben aus beiden Bereichen (Grund + Extra), OHNE Sonderausgaben
+  // grundExpTopf = Fix+Ausg im Grund-Anteil (Klassisch, ohne Sonderausgaben)
+  // extraExpOhneSonder = Fix+Ausg im Extra-Anteil + Reserve-Extra-NonSonder
+  const gesamtAusgabenOhneSonder = grundExpTopf + extraExpOhneSonder;
   const gesamtIncome = grundIncome + extraIncome;
   const gesamtVorsorge = grundSav + extraSav;
   // Reserve-Anzeige Gesamt: Grund (geparkt) + Reserve-Extra-Geparkt (ohne Sonderausgaben)
   const gesamtReserveGeparkt = grundRes + extraReserveGeparkt;
-  // Summe = Einnahmen − klassische Ausgaben + Reserve-Grund-zurück + Vorsorge-zurück − Sonderausgaben
-  // grundExp enthält bereits grundRes+grundSav (siehe Grundbudget-Box), die werden danach wieder draufgerechnet
-  const gesamtSumme = gesamtIncome - gesamtAusgabenOhneSonder + grundRes + grundSav - extraSonderTotal;
+  // Summe = Einnahmen − klassische Ausgaben − Sonderausgaben + Reserve(geparkt) + Vorsorge
+  const gesamtSumme = gesamtIncome - gesamtAusgabenOhneSonder - extraSonderTotal + grundRes + grundSav;
   document.getElementById('gesamtSummary').innerHTML = summaryHtml(
     gesamtIncome, gesamtAusgabenOhneSonder, gesamtVorsorge, gesamtReserveGeparkt,
     {
