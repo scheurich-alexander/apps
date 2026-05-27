@@ -64,8 +64,9 @@
   .budget-box.grund { border-top:3px solid var(--grund); }
   .budget-box.extra { border-top:3px solid var(--extra); }
   .budget-box.budget-5030 { border-top:3px solid #7c3aed; margin-bottom:14px; }
-  .budget-box.gesamt { border-top:3px solid var(--accent); margin-bottom:14px; }
-  .budget-box.gesamt .bsum-val { color:var(--accent); }
+  .budget-box.gesamt { border-top:3px solid #a855f7; margin-bottom:14px; }
+  .budget-box.gesamt .bsum-val { color:#a855f7; }
+  .budget-box.gesamt .box-title span { color:#a855f7; }
 
   /* Reserve-Konto-Header */
   .reserve-info { padding: 8px 12px 10px; background: var(--surface-2); border-top: 1px solid var(--border); }
@@ -281,6 +282,11 @@
     </div>
   </div>
 
+  <div class="budget-box gesamt">
+    <div class="box-title"><span>Gesamt</span></div>
+    <div class="bsum" id="gesamtSummary"></div>
+  </div>
+
   <div class="budget-row">
     <div class="budget-box grund">
       <div class="box-title"><span>Grundbudget</span></div>
@@ -290,11 +296,6 @@
       <div class="box-title"><span>Extrabudget</span></div>
       <div class="bsum" id="extraSummary"></div>
     </div>
-  </div>
-
-  <div class="budget-box gesamt">
-    <div class="box-title"><span>Gesamt</span></div>
-    <div class="bsum" id="gesamtSummary"></div>
   </div>
 
   <div class="budget-box budget-5030">
