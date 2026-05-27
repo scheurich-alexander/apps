@@ -66,6 +66,17 @@
   .budget-box.budget-5030 { border-top:3px solid #7c3aed; margin-bottom:14px; }
   .budget-box.gesamt { border-top:3px solid var(--accent); margin-bottom:14px; }
   .budget-box.gesamt .bsum-val { color:var(--accent); }
+
+  /* Reserve-Konto-Header */
+  .reserve-info { padding: 8px 12px 10px; background: var(--surface-2); border-top: 1px solid var(--border); }
+  .reserve-pills { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px; }
+  .r-pill { background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:3px 8px; font-size:11px; font-variant-numeric:tabular-nums; }
+  .r-pill .r-label { color:var(--text-muted); font-weight:500; margin-right:4px; }
+  .reserve-progress { display:flex; flex-direction:column; gap:4px; }
+  .reserve-bar { height:6px; background:var(--border); border-radius:3px; overflow:hidden; }
+  .reserve-bar span { display:block; height:100%; background:var(--reserve); border-radius:3px; transition: width 0.2s; }
+  .reserve-progress-label { font-size:11px; color:var(--text-muted); display:flex; justify-content:space-between; gap:8px; font-variant-numeric:tabular-nums; }
+  .r-reached { color:var(--grund); font-weight:600; }
   .budget-box .box-title { font-size:14px; font-weight:600; margin-bottom:12px; display:flex; justify-content:space-between; align-items:baseline; gap:6px; }
   .budget-box .box-title .basis { font-size:11px; color:var(--text-muted); font-weight:500; white-space:nowrap; }
   .bucket { margin-bottom:11px; }
@@ -399,6 +410,45 @@
       <input type="hidden" id="accountCategoryKey" />
       <div class="field"><label>Name des Kontos</label><input type="text" id="accountName" required /></div>
       <div class="hint" id="accountCatHint" style="margin-top:8px;"></div>
+
+      <!-- Reserve-spezifische Felder (nur bei Reserve-Kategorie) -->
+      <div id="reserveFields" style="display:none;">
+        <div class="hint" style="margin-top:12px; padding:10px; background:var(--surface-2); border-radius:8px;">
+          <strong>Reserve-Konto:</strong> Du kannst hier ein eigenes Hauptziel + Rate festlegen.<br>
+          Wenn das Konto Einträge hat, zeigt der Konto-Header zusätzlich die Summe aller Eintrags-Ziele und -Raten an.
+        </div>
+        <div class="field"><label>Budgetziel (€)</label><input type="number" step="0.01" min="0" id="accountBudgetGoal" placeholder="z.B. 5000" /></div>
+        <div class="field"><label>Monatliche Rate (€)</label><input type="number" step="0.01" min="0" id="accountBudgetRate" placeholder="z.B. 250" /></div>
+        <div class="grid2">
+          <div class="field">
+            <label>Rate zählt zu</label>
+            <select id="accountBudgetTo">
+              <option value="grund">Grundbudget</option>
+              <option value="extra" selected>Extrabudget</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Status</label>
+            <select id="accountBudgetActive">
+              <option value="active">Aktiv</option>
+              <option value="paused">Pausiert</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label>Beginnt</label><div class="my-row"><select id="accountBudgetStartMonth"></select><input type="number" id="accountBudgetStartYear" min="2000" max="2099" /></div></div>
+        <div class="field">
+          <label>Häufigkeit</label>
+          <select id="accountBudgetFreq">
+            <option value="monthly" selected>Monatlich</option>
+            <option value="bimonthly">2-monatlich</option>
+            <option value="quarterly">Vierteljährlich</option>
+            <option value="halfyearly">Halbjährlich</option>
+            <option value="yearly">Jährlich</option>
+          </select>
+        </div>
+        <div class="plan-result" id="accountBudgetResult" style="display:none;"></div>
+      </div>
+
       <div class="actions">
         <button type="button" class="btn danger" id="accountDelete" style="display:none;">Löschen</button>
         <div class="grow"></div>
@@ -739,8 +789,93 @@ function entryVisibleIn(e, y, m){ if (isPlan(e)) return planVisibleIn(e, idxOf(y
 
 function categoryAccounts(key){ return state.accounts.filter(a => a.categoryKey === key); }
 function accountEntries(id){ return state.entries.filter(e => e.accountId === id); }
-function accountTotal(id,y,m){ let s=0; for (const e of accountEntries(id)) if (isCounted(e,y,m)) s += effAmount(e,y,m); return s; }
-function accountSplit(id,y,m){ let g=0,x=0; for (const e of accountEntries(id)) if (isCounted(e,y,m)) { g+=effGrund(e,y,m); x+=effExtra(e,y,m); } return {grund:g,extra:x}; }
+// Liefert den effektiven monatlichen Konto-Budget-Beitrag, falls Reserve-Konto mit budget gesetzt ist und aktiv
+function accountBudgetMonthly(a, y, m){
+  if (!a.budget) return null;
+  const b = a.budget;
+  if (b.active === false) return null;
+  const goal = Number(b.goal) || 0;
+  const rate = Number(b.rate) || 0;
+  if (rate <= 0) return null;
+  // Prüfen ob Monat im Aktiv-Zeitraum liegt
+  const startIdx = (b.startYear || 0) * 12 + ((b.startMonth || 1) - 1);
+  const curIdx = idxOf(y, m);
+  if (curIdx < startIdx) return null;
+  // Frequenz-Check (z.B. quarterly: nur jeden 3. Monat ab Start)
+  const monthsSinceStart = curIdx - startIdx;
+  const intMonths = INTERVAL_MONTHS[b.freq] || 1;
+  if (intMonths > 1 && (monthsSinceStart % intMonths) !== 0) return null;
+  // Ziel erreicht? Dann keine weitere Rate
+  if (goal > 0) {
+    const balUpToPrev = accountBalanceUpToWithoutBudget(a.id, y, m, 'prev');
+    if (balUpToPrev >= goal - 0.001) return null;
+  }
+  // Aufteilung Grund / Extra
+  const grund = (b.to === 'grund') ? rate : 0;
+  const extra = (b.to === 'extra') ? rate : 0;
+  return { amount: rate, grund, extra };
+}
+
+// Saldo bis (aber nicht inkl.) dem aktuellen Monat, NUR aus Einträgen + früheren Budget-Raten
+// Wird benutzt um Ziel-Erreichung zu prüfen ohne Rekursion
+function accountBalanceUpToWithoutBudget(accountId, year, month, mode){
+  const e0 = earliestStartIdx();
+  if (e0 === null) return 0;
+  const cur = idxOf(year, month);
+  const endIdx = (mode === 'prev') ? cur - 1 : cur;
+  if (endIdx < e0) return 0;
+  let sum = 0;
+  for (let k = e0; k <= endIdx; k++) {
+    const y = Math.floor(k / 12);
+    const m = (k % 12) + 1;
+    // Einträge
+    for (const e of accountEntries(accountId)) if (isCounted(e, y, m)) sum += effAmount(e, y, m);
+    // Frühere Budget-Raten (durch rekursive Aufrufe via flag verhindern)
+    const a = state.accounts.find(x => x.id === accountId);
+    if (a && a.budget && a.budget.active !== false) {
+      const b = a.budget;
+      const startIdx = (b.startYear || 0) * 12 + ((b.startMonth || 1) - 1);
+      if (k >= startIdx) {
+        const monthsSinceStart = k - startIdx;
+        const intMonths = INTERVAL_MONTHS[b.freq] || 1;
+        const isDue = (intMonths === 1) || (monthsSinceStart % intMonths === 0);
+        if (isDue) {
+          const rate = Number(b.rate) || 0;
+          const goal = Number(b.goal) || 0;
+          // grobe Prüfung: hat das Konto inklusive bisheriger Raten das Ziel schon erreicht?
+          // Hier vereinfacht: addiere Rate solange goal nicht überschritten
+          if (goal <= 0 || sum < goal) {
+            sum += rate;
+            if (goal > 0 && sum > goal) sum = goal;
+          }
+        }
+      }
+    }
+  }
+  return sum;
+}
+
+function accountTotal(id,y,m){
+  let s=0;
+  for (const e of accountEntries(id)) if (isCounted(e,y,m)) s += effAmount(e,y,m);
+  // Konto-eigenes Budget (Reserve)
+  const a = state.accounts.find(x => x.id === id);
+  if (a) {
+    const bm = accountBudgetMonthly(a, y, m);
+    if (bm) s += bm.amount;
+  }
+  return s;
+}
+function accountSplit(id,y,m){
+  let g=0,x=0;
+  for (const e of accountEntries(id)) if (isCounted(e,y,m)) { g+=effGrund(e,y,m); x+=effExtra(e,y,m); }
+  const a = state.accounts.find(x => x.id === id);
+  if (a) {
+    const bm = accountBudgetMonthly(a, y, m);
+    if (bm) { g += bm.grund; x += bm.extra; }
+  }
+  return {grund:g, extra:x};
+}
 function categoryTotal(key,y,m){ let s=0; for (const a of categoryAccounts(key)) s += accountTotal(a.id,y,m); return s; }
 function categorySplit(key,y,m){ let g=0,x=0; for (const a of categoryAccounts(key)) { const s=accountSplit(a.id,y,m); g+=s.grund; x+=s.extra; } return {grund:g,extra:x}; }
 function typeSplit(type,y,m){ let g=0,x=0; for (const c of state.categories) if (c.type===type) { const s=categorySplit(c.key,y,m); g+=s.grund; x+=s.extra; } return {grund:g,extra:x}; }
@@ -779,6 +914,21 @@ function entryOverBudget(e, y, m) {
 function earliestStartIdx(){ let best=null; for (const e of state.entries){ const k=idxOf(e.startYear||0, e.startMonth||1); if (best===null||k<best) best=k; } return best; }
 function totalBalanceUpTo(year, month){ const e0=earliestStartIdx(); if (e0===null) return 0; const cur=idxOf(year,month); if (cur<e0) return 0; let sum=0; for (let k=e0;k<=cur;k++) sum += monthSaldo(Math.floor(k/12),(k%12)+1); return sum; }
 function reserveBalanceUpTo(year, month){ const e0=earliestStartIdx(); if (e0===null) return 0; const cur=idxOf(year,month); if (cur<e0) return 0; let s=0; for (let k=e0;k<=cur;k++) s += monthReserve(Math.floor(k/12),(k%12)+1); return s; }
+
+// Saldo eines einzelnen Kontos bis einschl. übergebenen Monat (alle aktiven Beträge aufsummiert)
+function accountBalanceUpTo(accountId, year, month) {
+  const e0 = earliestStartIdx();
+  if (e0 === null) return 0;
+  const cur = idxOf(year, month);
+  if (cur < e0) return 0;
+  let sum = 0;
+  for (let k = e0; k <= cur; k++) {
+    const y = Math.floor(k / 12);
+    const m = (k % 12) + 1;
+    sum += accountTotal(accountId, y, m);
+  }
+  return sum;
+}
 
 /* ---------- Render: hero / budget ---------- */
 function renderMonthLabel(){ const {year,month}=state.view; document.getElementById('monthLabel').textContent=`${MONTHS_SHORT[month-1]} ${year}`; }
@@ -831,10 +981,9 @@ function renderBudget(){
   document.getElementById('grundSummary').innerHTML = summaryHtml(grundIncome, grundExp, grundSav, grundRes);
   const grundSumme = grundIncome - grundExp + grundSav + grundRes;
 
-  // ---- Extrabudget-Box: eigene Summe-Formel ----
-  // Aktuell laut User: Summe = Einnahmen − Ausgaben + Vorsorge − Reserve
-  // (Wird per Bestätigung ggf. angepasst.)
-  const extraSumme = extraIncome - extraExp + extraSav - extraRes;
+  // ---- Extrabudget-Box: Summe = Einnahmen − (Ausgaben + Vorsorge + Reserve)
+  // Das, was vom Extrabudget übrig bleibt, nachdem alle Töpfe befüllt sind.
+  const extraSumme = extraIncome - (extraExp + extraSav + extraRes);
   document.getElementById('extraSummary').innerHTML = summaryHtml(
     extraIncome, extraExp, extraSav, extraRes,
     { summe: extraSumme }
@@ -889,6 +1038,7 @@ function renderAccountsForCategory(cat, year, month, readonly){
   const accs = categoryAccounts(cat.key);
   if (!accs.length) return `<div class="empty-state">${readonly?'Keine Konten.':'Noch keine Konten in dieser Kategorie.'}</div>`;
   const transferable = (cat.type==='spar' || cat.type==='reserve');
+  const isReserve = (cat.type === 'reserve');
   return accs.map(a=>{
     const s = accountSplit(a.id, year, month);
     const isOpen = !!state.expanded['acc:'+a.id];
@@ -900,15 +1050,82 @@ function renderAccountsForCategory(cat, year, month, readonly){
       <button type="button" class="acc-ctrl" data-acc-up="${a.id}" title="nach oben">▲</button>
       <button type="button" class="acc-ctrl" data-acc-down="${a.id}" title="nach unten">▼</button>
       <button type="button" class="more" data-editaccount="${a.id}" aria-label="Konto bearbeiten">⋯</button>`;
+
+    // Reserve-spezifischer Header-Zusatz
+    let reserveHeader = '';
+    if (isReserve) {
+      reserveHeader = reserveAccountSummaryHtml(a);
+    }
+
     return `
       <div class="acc-card${isOpen?' open':''}" data-accid="${a.id}">
         <div class="acc-head" data-toggle-acc="${a.id}">
           <div class="name"><span class="chev">›</span> ${escapeHtml(a.name)} ${bookedPill(a, readonly)}</div>
           <div class="right">${splitPills(s.grund, s.extra)}${controls}</div>
         </div>
+        ${reserveHeader}
         <div class="acc-content">${entriesHtml}${readonly ? '' : `<button type="button" class="add-btn" data-addentry="${a.id}">+ Posten hinzufügen</button>`}</div>
       </div>`;
   }).join('');
+}
+
+// HTML für Reserve-Konto-Header: zeigt Konto-Hauptziel + Summe der Eintrag-Ziele + Raten + Fortschritt
+function reserveAccountSummaryHtml(a){
+  const {year, month} = state.view;
+  const budget = a.budget || {};
+  const accEntries = accountEntries(a.id);
+  // Summe Ziele aus Einträgen (Anschaffungen mit totalGoal, oder Standard-Einträge mit amount)
+  const entriesGoalSum = accEntries.reduce((s, e) => {
+    if (e.kind === 'anschaffung' || e.kind === 'rueckzahlung') return s + (Number(e.totalGoal) || 0);
+    return s + (Number(e.totalGoal) || Number(e.amount) || 0);
+  }, 0);
+  // Summe Raten aus aktiven Einträgen
+  const entriesRateSum = accEntries.reduce((s, e) => {
+    if (e.kind === 'anschaffung' || e.kind === 'rueckzahlung') {
+      if (e.active === false) return s;
+      return s + (Number(e.rate) || 0);
+    }
+    return s + (Number(e.amount) || 0);
+  }, 0);
+
+  // Aktueller Konto-Saldo bis dieses Monat
+  const saldo = accountBalanceUpTo(a.id, year, month);
+
+  const hasOwnGoal = budget.goal > 0;
+  const ownGoal = Number(budget.goal) || 0;
+  const ownRate = Number(budget.rate) || 0;
+  const ownActive = budget.active !== false;
+  const totalGoal = ownGoal + entriesGoalSum;
+  const totalRate = (ownActive ? ownRate : 0) + entriesRateSum;
+
+  if (!hasOwnGoal && !entriesGoalSum && !entriesRateSum) return ''; // gar kein Budget-Info, nichts zeigen
+
+  const pct = totalGoal > 0 ? Math.min(100, Math.max(0, saldo) / totalGoal * 100) : 0;
+  const reached = totalGoal > 0 && saldo >= totalGoal - 0.001;
+
+  const rows = [];
+  if (hasOwnGoal) {
+    const ownStatus = ownActive ? '' : ' <span style="font-size:10px; color:var(--text-muted);">(pausiert)</span>';
+    rows.push(`<span class="r-pill"><span class="r-label">Ziel</span> ${fmt(ownGoal)}${ownStatus}</span>`);
+    if (ownRate > 0) rows.push(`<span class="r-pill"><span class="r-label">Rate</span> ${fmt(ownRate)} ${FREQ_LABEL[budget.freq || 'monthly']}</span>`);
+  }
+  if (entriesGoalSum > 0) rows.push(`<span class="r-pill"><span class="r-label">Posten-Ziele</span> ${fmt(entriesGoalSum)}</span>`);
+  if (entriesRateSum > 0) rows.push(`<span class="r-pill"><span class="r-label">Posten-Raten</span> ${fmt(entriesRateSum)}</span>`);
+
+  return `
+    <div class="reserve-info">
+      <div class="reserve-pills">${rows.join('')}</div>
+      ${totalGoal > 0 ? `
+        <div class="reserve-progress">
+          <div class="reserve-bar"><span style="width:${pct}%;${reached?'background:var(--grund);':''}"></span></div>
+          <div class="reserve-progress-label">
+            ${fmt(saldo)} / ${fmt(totalGoal)}
+            ${reached ? '<span class="r-reached">✓ Ziel erreicht</span>' : ''}
+          </div>
+        </div>
+      ` : ''}
+    </div>
+  `;
 }
 function entryRowHtml(e, readonly){
   const {year,month}=state.view;
@@ -1057,7 +1274,15 @@ function categoryClickHandler(ev){
   if ((el=t.closest('[data-acc-up]')))   { ev.stopPropagation(); moveAccount(el.dataset.accUp, -1); return; }
   if ((el=t.closest('[data-acc-down]'))) { ev.stopPropagation(); moveAccount(el.dataset.accDown, 1); return; }
   if ((el=t.closest('[data-editentry]'))) { ev.stopPropagation(); const e=state.entries.find(x=>x.id===el.dataset.editentry); if (e) openEntryModal(e, e.accountId, {showAccountSelector:false}); return; }
-  if ((el=t.closest('[data-addentry]')))  { ev.stopPropagation(); openEntryModal(null, el.dataset.addentry, {showAccountSelector:false}); return; }
+  if ((el=t.closest('[data-addentry]')))  {
+    ev.stopPropagation();
+    const accId = el.dataset.addentry;
+    const acc = state.accounts.find(a => a.id === accId);
+    const cat = acc ? catByKey(acc.categoryKey) : null;
+    const isReserve = (cat && cat.type === 'reserve');
+    openEntryModal(null, accId, {showAccountSelector:false, presetKind: isReserve ? 'anschaffung' : 'standard'});
+    return;
+  }
   if ((el=t.closest('[data-editaccount]'))) { ev.stopPropagation(); const a=state.accounts.find(x=>x.id===el.dataset.editaccount); if (a) openAccountModal(a, a.categoryKey); return; }
   if ((el=t.closest('[data-addaccount]')))  { ev.stopPropagation(); openAccountModal(null, el.dataset.addaccount); return; }
   if ((el=t.closest('[data-toggle-booked]'))) { ev.stopPropagation(); const a=state.accounts.find(x=>x.id===el.dataset.toggleBooked); if (a){ a.booked=!a.booked; save(); renderAll(); } return; }
@@ -1219,27 +1444,101 @@ document.getElementById('categoryDelete').addEventListener('click', ()=>{
 });
 
 /* ---------- Account modal ---------- */
+function fillAccountMonthSelect(selectEl){
+  selectEl.innerHTML = MONTHS_FULL.map((m,i)=>`<option value="${i+1}">${m}</option>`).join('');
+}
+function updateAccountBudgetResult(){
+  const goal = Number(document.getElementById('accountBudgetGoal').value) || 0;
+  const rate = Number(document.getElementById('accountBudgetRate').value) || 0;
+  const freq = document.getElementById('accountBudgetFreq').value;
+  const el = document.getElementById('accountBudgetResult');
+  if (!goal || !rate) { el.style.display = 'none'; return; }
+  // Bei nicht-monatlicher Frequenz: Rate gilt pro Intervall
+  const intMonths = (INTERVAL_MONTHS[freq] || 1);
+  const monthlyEquiv = rate / intMonths;
+  const monthsNeeded = monthlyEquiv > 0 ? Math.ceil(goal / monthlyEquiv) : 0;
+  const years = Math.floor(monthsNeeded / 12);
+  const months = monthsNeeded % 12;
+  const dauerStr = years > 0 ? `${years}J ${months}M` : `${months} Monate`;
+  el.style.display = 'block';
+  el.innerHTML = `Mit ${fmt(rate)} ${FREQ_LABEL[freq]}: Ziel von ${fmt(goal)} erreicht in <b>${dauerStr}</b>.`;
+}
+
 function openAccountModal(account, catKey){
   const cat=catByKey(catKey);
+  const isReserve = (cat && cat.type === 'reserve');
   document.getElementById('accountModalTitle').textContent = account?'Konto bearbeiten':'Konto anlegen';
   document.getElementById('accountId').value = account?account.id:'';
   document.getElementById('accountCategoryKey').value = catKey;
   document.getElementById('accountName').value = account?account.name:'';
   document.getElementById('accountCatHint').innerHTML = `Bereich: <b>${cat?escapeHtml(cat.name):'—'}</b>`;
   document.getElementById('accountDelete').style.display = account?'':'none';
+
+  // Reserve-Felder
+  document.getElementById('reserveFields').style.display = isReserve ? 'block' : 'none';
+  if (isReserve) {
+    // Monat-Selects befüllen
+    fillAccountMonthSelect(document.getElementById('accountBudgetStartMonth'));
+    const now = new Date();
+    const budget = (account && account.budget) || {};
+    document.getElementById('accountBudgetGoal').value = budget.goal != null ? budget.goal : '';
+    document.getElementById('accountBudgetRate').value = budget.rate != null ? budget.rate : '';
+    document.getElementById('accountBudgetTo').value = budget.to || 'extra';
+    document.getElementById('accountBudgetActive').value = budget.active === false ? 'paused' : 'active';
+    document.getElementById('accountBudgetStartMonth').value = budget.startMonth || (now.getMonth()+1);
+    document.getElementById('accountBudgetStartYear').value = budget.startYear || now.getFullYear();
+    document.getElementById('accountBudgetFreq').value = budget.freq || 'monthly';
+    updateAccountBudgetResult();
+  }
+
   document.getElementById('accountModal').classList.add('open');
   setTimeout(()=>document.getElementById('accountName').focus(),50);
 }
 function closeAccountModal(){ document.getElementById('accountModal').classList.remove('open'); }
 document.getElementById('accountCancel').addEventListener('click', closeAccountModal);
+
+// Live-Update Reserve-Berechnung
+['accountBudgetGoal','accountBudgetRate','accountBudgetFreq'].forEach(id => {
+  document.getElementById(id).addEventListener('input', updateAccountBudgetResult);
+  document.getElementById(id).addEventListener('change', updateAccountBudgetResult);
+});
+
 document.getElementById('accountForm').addEventListener('submit', (ev)=>{
   ev.preventDefault();
   const id=document.getElementById('accountId').value;
   const name=document.getElementById('accountName').value.trim();
   const catKey=document.getElementById('accountCategoryKey').value;
   if (!name) return;
-  if (id) { const a=state.accounts.find(x=>x.id===id); if (a) a.name=name; }
-  else { state.accounts.push({ id:uid(), categoryKey:catKey, name, booked:false }); state.expanded[catKey]=true; }
+  const cat = catByKey(catKey);
+  const isReserve = (cat && cat.type === 'reserve');
+
+  // Budget-Objekt vorbereiten (nur bei Reserve)
+  let budget = null;
+  if (isReserve) {
+    const goal = Number(document.getElementById('accountBudgetGoal').value) || 0;
+    const rate = Number(document.getElementById('accountBudgetRate').value) || 0;
+    if (goal > 0 || rate > 0) {
+      budget = {
+        goal,
+        rate,
+        to: document.getElementById('accountBudgetTo').value,
+        active: document.getElementById('accountBudgetActive').value === 'active',
+        startMonth: Number(document.getElementById('accountBudgetStartMonth').value) || (new Date().getMonth()+1),
+        startYear: Number(document.getElementById('accountBudgetStartYear').value) || (new Date().getFullYear()),
+        freq: document.getElementById('accountBudgetFreq').value || 'monthly'
+      };
+    }
+  }
+
+  if (id) {
+    const a=state.accounts.find(x=>x.id===id);
+    if (a) { a.name=name; if (isReserve) a.budget = budget; else delete a.budget; }
+  } else {
+    const newAcc = { id:uid(), categoryKey:catKey, name, booked:false };
+    if (isReserve && budget) newAcc.budget = budget;
+    state.accounts.push(newAcc);
+    state.expanded[catKey]=true;
+  }
   save(); closeAccountModal(); renderAll(); showToast(id?'Gespeichert':'Konto angelegt');
 });
 document.getElementById('accountDelete').addEventListener('click', ()=>{
