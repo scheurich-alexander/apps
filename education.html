@@ -13,40 +13,40 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root, :root[data-theme="dark"] {
-    --bg: #0d0a14;
-    --surface: #1a1525;
-    --surface-2: #241c33;
-    --border: #2f2745;
+    --bg: #14110a;
+    --surface: #1f1a10;
+    --surface-2: #2a2418;
+    --border: #3a3220;
     --text: #ecedf0;
-    --text-dim: #9890b0;
-    --text-faint: #5e567a;
-    --accent: #a855f7;
-    --accent-dim: rgba(168, 85, 247, 0.15);
+    --text-dim: #b0a890;
+    --text-faint: #7a7058;
+    --accent: #eab308;
+    --accent-dim: rgba(234, 179, 8, 0.15);
     --green: #10b981;
     --orange: #f59e0b;
     --red: #ef4444;
     --blue: #3b82f6;
   }
   :root[data-theme="light"] {
-    --bg: #fafaff;
+    --bg: #fefdf5;
     --surface: #ffffff;
-    --surface-2: #f3f0f9;
-    --border: #e4dff0;
+    --surface-2: #fdf9e7;
+    --border: #f0eacc;
     --text: #1a1525;
-    --text-dim: #5e567a;
-    --text-faint: #9890b0;
-    --accent: #9333ea;
-    --accent-dim: rgba(147, 51, 234, 0.10);
+    --text-dim: #6e6648;
+    --text-faint: #a59c80;
+    --accent: #ca8a04;
+    --accent-dim: rgba(202, 138, 4, 0.12);
     --green: #059669;
     --orange: #d97706;
     --red: #dc2626;
     --blue: #2563eb;
   }
   @media (prefers-color-scheme: light) {
-    :root[data-theme="auto"] { --bg: #fafaff; --surface: #ffffff; --surface-2: #f3f0f9; --border: #e4dff0; --text: #1a1525; --text-dim: #5e567a; --text-faint: #9890b0; --accent: #9333ea; --accent-dim: rgba(147, 51, 234, 0.10); --green: #059669; --orange: #d97706; --red: #dc2626; --blue: #2563eb; }
+    :root[data-theme="auto"] { --bg: #fefdf5; --surface: #ffffff; --surface-2: #fdf9e7; --border: #f0eacc; --text: #1a1525; --text-dim: #6e6648; --text-faint: #a59c80; --accent: #ca8a04; --accent-dim: rgba(202, 138, 4, 0.12); --green: #059669; --orange: #d97706; --red: #dc2626; --blue: #2563eb; }
   }
   @media (prefers-color-scheme: dark) {
-    :root[data-theme="auto"] { --bg: #0d0a14; --surface: #1a1525; --surface-2: #241c33; --border: #2f2745; --text: #ecedf0; --text-dim: #9890b0; --text-faint: #5e567a; --accent: #a855f7; --accent-dim: rgba(168, 85, 247, 0.15); --green: #10b981; --orange: #f59e0b; --red: #ef4444; --blue: #3b82f6; }
+    :root[data-theme="auto"] { --bg: #14110a; --surface: #1f1a10; --surface-2: #2a2418; --border: #3a3220; --text: #ecedf0; --text-dim: #b0a890; --text-faint: #7a7058; --accent: #eab308; --accent-dim: rgba(234, 179, 8, 0.15); --green: #10b981; --orange: #f59e0b; --red: #ef4444; --blue: #3b82f6; }
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -65,7 +65,7 @@
   .tabs { display: flex; gap: 4px; padding: 12px 16px 8px; overflow-x: auto; scrollbar-width: none; }
   .tabs::-webkit-scrollbar { display: none; }
   .tab { background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); padding: 8px 14px; border-radius: 9px; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
-  .tab.active { background: var(--accent); color: white; border-color: var(--accent); }
+  .tab.active { background: var(--accent); color: #1a1410; border-color: var(--accent); }
 
   main { padding: 0 16px 100px; }
 
@@ -76,7 +76,7 @@
   /* HERO STATS */
   .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
   .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
-  .stat-card.accent { background: linear-gradient(135deg, var(--accent), #6d28d9); color: white; border: none; }
+  .stat-card.accent { background: linear-gradient(135deg, #fbbf24, #d97706); color: white; border: none; }
   .stat-card .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; opacity: 0.85; margin-bottom: 6px; }
   .stat-card .value { font-family: 'JetBrains Mono', monospace; font-size: 26px; font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
   .stat-card .value .unit { font-size: 13px; font-weight: 500; opacity: 0.7; margin-left: 4px; }
@@ -114,13 +114,13 @@
   .empty .text { font-size: 13px; }
 
   /* FAB */
-  .fab { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--accent); color: white; border: none; font-size: 28px; font-weight: 300; cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,0.4); z-index: 100; display: grid; place-items: center; }
+  .fab { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--accent); color: #1a1410; border: none; font-size: 28px; font-weight: 300; cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,0.4); z-index: 100; display: grid; place-items: center; }
   .fab:active { transform: scale(0.92); }
 
   /* THEME SWITCH (in Settings) */
   .theme-switch { display: flex; gap: 4px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 3px; }
   .theme-switch button { background: transparent; border: none; color: var(--text-dim); padding: 8px 12px; border-radius: 7px; font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; flex: 1; }
-  .theme-switch button.active { background: var(--accent); color: white; }
+  .theme-switch button.active { background: var(--accent); color: #1a1410; }
 
   /* MODALS */
   .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 200; display: none; align-items: flex-end; justify-content: center; }
@@ -139,21 +139,21 @@
   .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
   .modal-actions button { flex: 1; padding: 14px; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: 15px; cursor: pointer; border: none; }
   .btn-cancel { background: var(--surface-2); color: var(--text); }
-  .btn-save { background: var(--accent); color: white; }
+  .btn-save { background: var(--accent); color: #1a1410; }
   .btn-delete { background: rgba(239,68,68,0.15); color: var(--red); margin-top: 8px; width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(239,68,68,0.3); font-family: inherit; font-weight: 600; font-size: 13px; cursor: pointer; }
 
   /* POMODORO TIMER */
-  .timer-card { background: linear-gradient(135deg, var(--accent), #6d28d9); color: white; border-radius: 18px; padding: 28px 24px; text-align: center; margin-bottom: 14px; }
+  .timer-card { background: linear-gradient(135deg, #fbbf24, #d97706); color: white; border-radius: 18px; padding: 28px 24px; text-align: center; margin-bottom: 14px; }
   .timer-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.8; font-weight: 700; }
   .timer-display { font-family: 'JetBrains Mono', monospace; font-size: 64px; font-weight: 800; letter-spacing: -0.04em; margin: 14px 0; line-height: 1; }
   .timer-status { font-size: 13px; opacity: 0.85; margin-bottom: 18px; }
   .timer-controls { display: flex; gap: 10px; justify-content: center; }
   .timer-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 12px 24px; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: 14px; cursor: pointer; backdrop-filter: blur(8px); }
   .timer-btn:active { background: rgba(255,255,255,0.3); }
-  .timer-btn.primary { background: white; color: #6d28d9; }
+  .timer-btn.primary { background: white; color: #92400e; }
   .preset-row { display: flex; gap: 6px; margin-top: 14px; }
   .preset-btn { flex: 1; background: rgba(255,255,255,0.15); border: none; color: white; padding: 8px; border-radius: 8px; font-family: inherit; font-size: 11px; font-weight: 700; cursor: pointer; }
-  .preset-btn.active { background: white; color: #6d28d9; }
+  .preset-btn.active { background: white; color: #92400e; }
 
   /* CARDS - Karteikarten Flashcard-Modus */
   .flashcard { background: var(--surface); border: 2px solid var(--border); border-radius: 16px; padding: 32px 20px; min-height: 220px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; cursor: pointer; margin-bottom: 14px; position: relative; }
@@ -955,7 +955,7 @@ function renderStudySession() {
       <button class="rating-btn easy" data-rate="easy"><span class="label-emoji">😎</span>Leicht</button>
     </div>`;
   } else {
-    html += `<button class="btn-save" id="showAnswerBtn" style="width:100%; padding:14px; border-radius:10px; border:none; font-family:inherit; font-weight:700; font-size:15px; cursor:pointer; background:var(--accent); color:white">Antwort zeigen</button>`;
+    html += `<button class="btn-save" id="showAnswerBtn" style="width:100%; padding:14px; border-radius:10px; border:none; font-family:inherit; font-weight:700; font-size:15px; cursor:pointer; background:var(--accent); color:#1a1410">Antwort zeigen</button>`;
   }
   html += `<button class="btn-cancel" id="endStudyBtn" style="width:100%; margin-top:8px; padding:12px; border-radius:10px; border:none; font-family:inherit; font-weight:600; font-size:13px; cursor:pointer; background:var(--surface-2); color:var(--text)">Session beenden</button>`;
 
@@ -1034,7 +1034,7 @@ function renderQuiz() {
   });
   html += `</div></div>`;
   if (q.answered) {
-    html += `<button class="btn-save" id="nextQBtn" style="width:100%; padding:14px; border-radius:10px; border:none; font-family:inherit; font-weight:700; font-size:15px; cursor:pointer; background:var(--accent); color:white">${q.currentIdx + 1 >= q.questions.length ? 'Quiz beenden' : 'Nächste Frage'}</button>`;
+    html += `<button class="btn-save" id="nextQBtn" style="width:100%; padding:14px; border-radius:10px; border:none; font-family:inherit; font-weight:700; font-size:15px; cursor:pointer; background:var(--accent); color:#1a1410">${q.currentIdx + 1 >= q.questions.length ? 'Quiz beenden' : 'Nächste Frage'}</button>`;
   }
   html += `<button class="btn-cancel" id="endQuizBtn" style="width:100%; margin-top:8px; padding:12px; border-radius:10px; border:none; font-family:inherit; font-weight:600; font-size:13px; cursor:pointer; background:var(--surface-2); color:var(--text)">Abbrechen</button>`;
   mainEl.innerHTML = html;
