@@ -989,8 +989,9 @@ function totalBalanceUpTo(year, month){
   let sum=0;
   for (let k=e0;k<=cur;k++){
     const y=Math.floor(k/12), m=(k%12)+1;
-    // Einnahmen − Ausgaben + Reserve(Grund-Anteil neutralisiert: gilt als Guthaben) + Vorsorge (=auch Guthaben)
-    sum += monthSaldo(y,m) + monthReserveGrund(y,m) + monthSavings(y,m);
+    // Saldo = Einnahmen − echte Ausgaben (Reserve-Grund und Vorsorge werden NICHT abgezogen,
+    // sind also schon im Saldo enthalten. Nicht nochmal addieren!)
+    sum += monthSaldo(y,m);
   }
   return sum;
 }
