@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Education">
+<meta name="theme-color" content="#0a0a0c" id="themeColor">
+<title>Education</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root, :root[data-theme="dark"] {
+    --bg: #0d0a14;
+    --surface: #1a1525;
+    --surface-2: #241c33;
+    --border: #2f2745;
+    --text: #ecedf0;
+    --text-dim: #9890b0;
+    --text-faint: #5e567a;
+    --accent: #a855f7;
+    --accent-dim: rgba(168, 85, 247, 0.15);
+    --green: #10b981;
+    --orange: #f59e0b;
+    --red: #ef4444;
+    --blue: #3b82f6;
+  }
+  :root[data-theme="light"] {
+    --bg: #fafaff;
+    --surface: #ffffff;
+    --surface-2: #f3f0f9;
+    --border: #e4dff0;
+    --text: #1a1525;
+    --text-dim: #5e567a;
+    --text-faint: #9890b0;
+    --accent: #9333ea;
+    --accent-dim: rgba(147, 51, 234, 0.10);
+    --green: #059669;
+    --orange: #d97706;
+    --red: #dc2626;
+    --blue: #2563eb;
+  }
+  @media (prefers-color-scheme: light) {
+    :root[data-theme="auto"] { --bg: #fafaff; --surface: #ffffff; --surface-2: #f3f0f9; --border: #e4dff0; --text: #1a1525; --text-dim: #5e567a; --text-faint: #9890b0; --accent: #9333ea; --accent-dim: rgba(147, 51, 234, 0.10); --green: #059669; --orange: #d97706; --red: #dc2626; --blue: #2563eb; }
+  }
+  @media (prefers-color-scheme: dark) {
+    :root[data-theme="auto"] { --bg: #0d0a14; --surface: #1a1525; --surface-2: #241c33; --border: #2f2745; --text: #ecedf0; --text-dim: #9890b0; --text-faint: #5e567a; --accent: #a855f7; --accent-dim: rgba(168, 85, 247, 0.15); --green: #10b981; --orange: #f59e0b; --red: #ef4444; --blue: #3b82f6; }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body { font-family: 'Manrope', -apple-system, sans-serif; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.5; overflow-x: hidden; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); transition: background 0.2s, color 0.2s; }
+
+  /* TOP BAR */
+  .top-bar { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 0; gap: 8px; }
+  .back-link { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 9px; font-size: 13px; color: var(--text-dim); text-decoration: none; font-weight: 600; }
+  .back-link:active { background: var(--surface-2); }
+  .top-actions { display: flex; gap: 6px; }
+  .header-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text); width: 38px; height: 38px; border-radius: 10px; font-size: 16px; cursor: pointer; display: grid; place-items: center; }
+  .header-btn:active { background: var(--surface-2); }
+
+  /* TABS */
+  .tabs { display: flex; gap: 4px; padding: 12px 16px 8px; overflow-x: auto; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); padding: 8px 14px; border-radius: 9px; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+  .tab.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+  main { padding: 0 16px 100px; }
+
+  /* TITLE */
+  .page-title { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; margin: 12px 0 16px; }
+  .page-title .accent { color: var(--accent); }
+
+  /* HERO STATS */
+  .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+  .stat-card.accent { background: linear-gradient(135deg, var(--accent), #6d28d9); color: white; border: none; }
+  .stat-card .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; opacity: 0.85; margin-bottom: 6px; }
+  .stat-card .value { font-family: 'JetBrains Mono', monospace; font-size: 26px; font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
+  .stat-card .value .unit { font-size: 13px; font-weight: 500; opacity: 0.7; margin-left: 4px; }
+  .stat-card .sub { font-size: 11px; opacity: 0.7; margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+
+  /* PROGRESS BAR */
+  .progress { background: var(--border); border-radius: 999px; height: 8px; overflow: hidden; margin-top: 10px; }
+  .progress-bar { height: 100%; background: var(--accent); transition: width 0.3s; border-radius: 999px; }
+  .progress-bar.green { background: var(--green); }
+  .progress-bar.orange { background: var(--orange); }
+  .progress-bar.red { background: var(--red); }
+
+  /* SECTION */
+  .section { margin-bottom: 22px; }
+  .section h2 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); font-weight: 700; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+  .section h2 .count { color: var(--accent); font-family: 'JetBrains Mono', monospace; }
+  .section h2 .action { background: transparent; border: none; color: var(--accent); font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; text-transform: none; letter-spacing: 0; }
+
+  /* CARDS */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 8px; cursor: pointer; }
+  .card:active { background: var(--surface-2); }
+  .card .row { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+  .card .title { font-weight: 700; font-size: 14px; line-height: 1.3; }
+  .card .meta { font-size: 11px; color: var(--text-dim); margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+  .card .badge { font-size: 10px; padding: 3px 8px; border-radius: 5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0; }
+  .badge.urgent { background: rgba(239,68,68,0.15); color: var(--red); }
+  .badge.soon { background: rgba(245,158,11,0.15); color: var(--orange); }
+  .badge.ok { background: rgba(16,185,129,0.15); color: var(--green); }
+  .badge.done { background: var(--surface-2); color: var(--text-dim); }
+  .badge.note { background: rgba(59,130,246,0.15); color: var(--blue); }
+
+  /* EMPTY */
+  .empty { text-align: center; padding: 40px 20px; color: var(--text-faint); }
+  .empty .ic { font-size: 32px; margin-bottom: 8px; opacity: 0.4; }
+  .empty .text { font-size: 13px; }
+
+  /* FAB */
+  .fab { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--accent); color: white; border: none; font-size: 28px; font-weight: 300; cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,0.4); z-index: 100; display: grid; place-items: center; }
+  .fab:active { transform: scale(0.92); }
+
+  /* THEME SWITCH (in Settings) */
+  .theme-switch { display: flex; gap: 4px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 3px; }
+  .theme-switch button { background: transparent; border: none; color: var(--text-dim); padding: 8px 12px; border-radius: 7px; font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; flex: 1; }
+  .theme-switch button.active { background: var(--accent); color: white; }
+
+  /* MODALS */
+  .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 200; display: none; align-items: flex-end; justify-content: center; }
+  .modal-bg.show { display: flex; }
+  .modal { background: var(--surface); width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 20px 20px calc(20px + env(safe-area-inset-bottom)); max-height: 90vh; overflow-y: auto; border-top: 1px solid var(--border); }
+  @media (min-width: 600px) { .modal-bg { align-items: center; } .modal { border-radius: 16px; max-height: 86vh; } }
+  .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; }
+  .modal-title { font-weight: 800; font-size: 20px; margin-bottom: 16px; letter-spacing: -0.01em; }
+
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; font-weight: 700; }
+  .form-group input, .form-group textarea, .form-group select { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 12px 14px; border-radius: 10px; font-family: inherit; font-size: 15px; }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--accent); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+  .modal-actions button { flex: 1; padding: 14px; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: 15px; cursor: pointer; border: none; }
+  .btn-cancel { background: var(--surface-2); color: var(--text); }
+  .btn-save { background: var(--accent); color: white; }
+  .btn-delete { background: rgba(239,68,68,0.15); color: var(--red); margin-top: 8px; width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(239,68,68,0.3); font-family: inherit; font-weight: 600; font-size: 13px; cursor: pointer; }
+
+  /* POMODORO TIMER */
+  .timer-card { background: linear-gradient(135deg, var(--accent), #6d28d9); color: white; border-radius: 18px; padding: 28px 24px; text-align: center; margin-bottom: 14px; }
+  .timer-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.8; font-weight: 700; }
+  .timer-display { font-family: 'JetBrains Mono', monospace; font-size: 64px; font-weight: 800; letter-spacing: -0.04em; margin: 14px 0; line-height: 1; }
+  .timer-status { font-size: 13px; opacity: 0.85; margin-bottom: 18px; }
+  .timer-controls { display: flex; gap: 10px; justify-content: center; }
+  .timer-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 12px 24px; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: 14px; cursor: pointer; backdrop-filter: blur(8px); }
+  .timer-btn:active { background: rgba(255,255,255,0.3); }
+  .timer-btn.primary { background: white; color: #6d28d9; }
+  .preset-row { display: flex; gap: 6px; margin-top: 14px; }
+  .preset-btn { flex: 1; background: rgba(255,255,255,0.15); border: none; color: white; padding: 8px; border-radius: 8px; font-family: inherit; font-size: 11px; font-weight: 700; cursor: pointer; }
+  .preset-btn.active { background: white; color: #6d28d9; }
+
+  /* CARDS - Karteikarten Flashcard-Modus */
+  .flashcard { background: var(--surface); border: 2px solid var(--border); border-radius: 16px; padding: 32px 20px; min-height: 220px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; cursor: pointer; margin-bottom: 14px; position: relative; }
+  .flashcard .flip-hint { position: absolute; top: 12px; right: 14px; font-size: 10px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .flashcard .side-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); font-weight: 700; margin-bottom: 14px; }
+  .flashcard .content { font-size: 17px; line-height: 1.5; font-weight: 600; }
+  .flashcard .progress-text { position: absolute; bottom: 12px; left: 0; right: 0; font-size: 11px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+
+  .rating-buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .rating-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 12px 4px; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: 11px; cursor: pointer; text-transform: uppercase; }
+  .rating-btn .label-emoji { font-size: 18px; margin-bottom: 4px; display: block; }
+  .rating-btn.again { background: rgba(239,68,68,0.10); color: var(--red); border-color: rgba(239,68,68,0.3); }
+  .rating-btn.hard { background: rgba(245,158,11,0.10); color: var(--orange); border-color: rgba(245,158,11,0.3); }
+  .rating-btn.good { background: rgba(59,130,246,0.10); color: var(--blue); border-color: rgba(59,130,246,0.3); }
+  .rating-btn.easy { background: rgba(16,185,129,0.10); color: var(--green); border-color: rgba(16,185,129,0.3); }
+
+  /* TOPIC TAGS */
+  .tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+  .tag { font-size: 10px; padding: 2px 7px; border-radius: 4px; background: var(--accent-dim); color: var(--accent); font-weight: 600; }
+
+  /* STATS-Tab */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .stat-tile { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; text-align: center; }
+  .stat-tile .ic { font-size: 22px; margin-bottom: 4px; }
+  .stat-tile .num { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
+  .stat-tile .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-dim); font-weight: 700; margin-top: 2px; }
+
+  .chart-svg { width: 100%; height: 140px; margin-top: 8px; }
+
+  /* GRADE */
+  .grade-tile { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .grade-tile .info { flex: 1; min-width: 0; }
+  .grade-tile .name { font-weight: 700; font-size: 14px; }
+  .grade-tile .meta { font-size: 11px; color: var(--text-dim); margin-top: 2px; font-family: 'JetBrains Mono', monospace; }
+  .grade-tile .grade { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 800; }
+  .grade.excellent { color: var(--green); }
+  .grade.good { color: var(--blue); }
+  .grade.ok { color: var(--orange); }
+  .grade.fail { color: var(--red); }
+
+  /* Hour-Log NotSan */
+  .hour-entry { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; gap: 10px; cursor: pointer; }
+  .hour-entry:active { background: var(--surface-2); }
+  .hour-entry .info { flex: 1; min-width: 0; }
+  .hour-entry .name { font-weight: 600; font-size: 13px; }
+  .hour-entry .meta { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+  .hour-entry .hrs { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--accent); }
+
+  /* Quiz */
+  .quiz-question { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 12px; }
+  .quiz-q { font-size: 16px; font-weight: 700; margin-bottom: 14px; line-height: 1.4; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 12px 14px; border-radius: 10px; font-family: inherit; font-size: 14px; cursor: pointer; text-align: left; }
+  .quiz-opt:active { background: var(--surface-2); }
+  .quiz-opt.correct { background: rgba(16,185,129,0.15); border-color: var(--green); color: var(--green); }
+  .quiz-opt.wrong { background: rgba(239,68,68,0.15); border-color: var(--red); color: var(--red); }
+</style>
+</head>
+<body>
+  <div class="top-bar">
+    <a href="index.html" class="back-link">← Apps</a>
+    <div class="top-actions">
+      <button class="header-btn" id="settingsBtn" title="Einstellungen">⚙</button>
+    </div>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-tab="fom">FOM</button>
+    <button class="tab" data-tab="notsan">NotSan</button>
+    <button class="tab" data-tab="learn">Lernen</button>
+    <button class="tab" data-tab="stats">Statistik</button>
+  </div>
+
+  <main id="mainContent"></main>
+
+  <button class="fab" id="fabAdd">+</button>
+
+  <!-- Modal: Modul (FOM) -->
+  <div class="modal-bg" id="moduleBg">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <div class="modal-title" id="moduleTitle">Neues Modul</div>
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" id="mName" placeholder="z.B. Risikomanagement">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Semester</label>
+          <input type="number" id="mSem" min="1" max="12" value="1">
+        </div>
+        <div class="form-group">
+          <label>ECTS</label>
+          <input type="number" id="mECTS" min="0" step="1" placeholder="5">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Klausurdatum (optional)</label>
+        <input type="date" id="mExam">
+      </div>
+      <div class="form-group">
+        <label>Note (1.0–5.0, optional)</label>
+        <input type="number" id="mGrade" min="1" max="5" step="0.1" placeholder="—">
+      </div>
+      <div class="form-group">
+        <label>Notiz</label>
+        <textarea id="mNote" rows="3" placeholder="Notizen, Mitschriften, …"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" id="mCancel">Abbrechen</button>
+        <button class="btn-save" id="mSave">Speichern</button>
+      </div>
+      <button class="btn-delete" id="mDelete" style="display:none">Modul löschen</button>
+    </div>
+  </div>
+
+  <!-- Modal: Fortbildung (NotSan) -->
+  <div class="modal-bg" id="fortbildBg">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <div class="modal-title" id="fortbildTitle">Neue Fortbildung</div>
+      <div class="form-group">
+        <label>Titel</label>
+        <input type="text" id="fbName" placeholder="z.B. ERC-Update Reanimation">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Datum</label>
+          <input type="date" id="fbDate">
+        </div>
+        <div class="form-group">
+          <label>Stunden</label>
+          <input type="number" id="fbHours" min="0" step="0.5" value="8">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Thema</label>
+        <select id="fbTopic">
+          <option value="reanimation">Reanimation/ERC/GRC</option>
+          <option value="trauma">Trauma</option>
+          <option value="internistisch">Internistische Notfälle</option>
+          <option value="paediatrie">Pädiatrie</option>
+          <option value="medikamente">Medikamente/Pharmakologie</option>
+          <option value="ekg">EKG/Kardiologie</option>
+          <option value="airway">Airway-Management</option>
+          <option value="hygiene">Hygiene</option>
+          <option value="recht">Recht/Ethik</option>
+          <option value="taktik">Einsatztaktik/MANV</option>
+          <option value="andere">Andere</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="fbStatus">
+          <option value="geplant">Geplant</option>
+          <option value="absolviert">Absolviert</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Notiz / Veranstalter</label>
+        <textarea id="fbNote" rows="2" placeholder="z.B. ÄLRD Bayern, online …"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" id="fbCancel">Abbrechen</button>
+        <button class="btn-save" id="fbSave">Speichern</button>
+      </div>
+      <button class="btn-delete" id="fbDelete" style="display:none">Eintrag löschen</button>
+    </div>
+  </div>
+
+  <!-- Modal: Karteikarte -->
+  <div class="modal-bg" id="cardBg">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <div class="modal-title" id="cardTitle">Neue Karteikarte</div>
+      <div class="form-group">
+        <label>Sammlung</label>
+        <select id="cDeck">
+          <option value="fom">FOM-Studium</option>
+          <option value="notsan">NotSan-Wissen</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Vorderseite (Frage / Begriff)</label>
+        <textarea id="cFront" rows="2" placeholder="z.B. Adrenalin Dosierung bei Reanimation"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Rückseite (Antwort)</label>
+        <textarea id="cBack" rows="3" placeholder="1mg i.v./i.o. alle 3–5 min"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Tag (optional)</label>
+        <input type="text" id="cTag" placeholder="z.B. ALS, Medikamente">
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" id="cCancel">Abbrechen</button>
+        <button class="btn-save" id="cSave">Speichern</button>
+      </div>
+      <button class="btn-delete" id="cDelete" style="display:none">Karte löschen</button>
+    </div>
+  </div>
+
+  <!-- Modal: Settings -->
+  <div class="modal-bg" id="settingsBg">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Einstellungen</div>
+
+      <div class="form-group">
+        <label>Erscheinungsbild</label>
+        <div class="theme-switch">
+          <button data-theme="auto">Auto</button>
+          <button data-theme="light">Hell</button>
+          <button data-theme="dark">Dunkel</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Pflicht-Fortbildungsstunden pro Jahr</label>
+        <input type="number" id="sHoursPerYear" min="0" step="1" value="40">
+      </div>
+
+      <div class="form-group">
+        <label>Pomodoro-Standard</label>
+        <select id="sPomodoroMode">
+          <option value="classic">25 / 5 Min (klassisch)</option>
+          <option value="deep">50 / 10 Min (Deep Focus)</option>
+          <option value="custom">Eigene Zeiten</option>
+        </select>
+      </div>
+      <div class="form-row" id="customPomodoroRow" style="display:none">
+        <div class="form-group">
+          <label>Arbeit (Min)</label>
+          <input type="number" id="sCustomWork" min="5" max="180" step="5" value="45">
+        </div>
+        <div class="form-group">
+          <label>Pause (Min)</label>
+          <input type="number" id="sCustomBreak" min="1" max="60" step="1" value="10">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>FOM-Standort</label>
+        <select id="sFomLocation">
+          <option value="muenchen">München</option>
+          <option value="augsburg">Augsburg</option>
+          <option value="online">Online / Digital</option>
+          <option value="other">Anderer Standort</option>
+        </select>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" id="sCancel">Abbrechen</button>
+        <button class="btn-save" id="sSave">Speichern</button>
+      </div>
+
+      <div style="margin-top: 14px;">
+        <button class="btn-delete" id="exportBtn" style="background:var(--surface-2); color:var(--text); border-color:var(--border)">📤 Backup exportieren</button>
+        <button class="btn-delete" id="importBtn" style="background:var(--surface-2); color:var(--text); border-color:var(--border); margin-top: 6px;">📥 Backup importieren</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+// ============= STORAGE =============
+const STORAGE_KEY = 'education_v1';
+
+let state = {
+  tab: 'fom',
+  modules: [],      // {id, name, sem, ects, examDate, grade, note}
+  fortbild: [],     // {id, name, date, hours, topic, status, note}
+  cards: [],        // {id, deck, front, back, tag, ease, interval, nextReview, lastReview}
+  notes: [],        // {id, title, body, type:'fom'|'notsan', topic, date}
+  sessions: [],     // {id, date, durationMin, type:'pomodoro'|'cards', deck}
+  settings: {
+    theme: 'auto',
+    hoursPerYear: 40,
+    pomodoroMode: 'classic',
+    customWork: 45,
+    customBreak: 10,
+    fomLocation: 'muenchen'
+  },
+  studyMode: null,  // {deck, queue:[ids], currentIdx, showAnswer}
+  quizMode: null    // {questions, currentIdx, score}
+};
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const data = JSON.parse(raw);
+      state.modules = data.modules || [];
+      state.fortbild = data.fortbild || [];
+      state.cards = data.cards || [];
+      state.notes = data.notes || [];
+      state.sessions = data.sessions || [];
+      state.settings = { ...state.settings, ...(data.settings || {}) };
+    }
+  } catch(e) {}
+  applyTheme();
+}
+
+function saveData() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      modules: state.modules, fortbild: state.fortbild,
+      cards: state.cards, notes: state.notes,
+      sessions: state.sessions, settings: state.settings
+    }));
+  } catch(e) {}
+  syncToPlan();
+}
+
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', state.settings.theme);
+  const isDark = state.settings.theme === 'dark' || (state.settings.theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  document.getElementById('themeColor').setAttribute('content', isDark ? '#0d0a14' : '#fafaff');
+}
+
+// ============= HELPERS =============
+const $ = id => document.getElementById(id);
+const mainEl = $('mainContent');
+const TOPIC_LABELS = {
+  reanimation: 'Reanimation', trauma: 'Trauma', internistisch: 'Internist.',
+  paediatrie: 'Pädiatrie', medikamente: 'Medikamente', ekg: 'EKG',
+  airway: 'Airway', hygiene: 'Hygiene', recht: 'Recht', taktik: 'Taktik', andere: 'Andere'
+};
+
+function escape(s) { return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmtDate(d) { return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+function parseDate(s) { return new Date(s + 'T00:00:00'); }
+function daysUntil(dateStr) { const d = parseDate(dateStr); const t = new Date(); t.setHours(0,0,0,0); return Math.round((d - t) / 86400000); }
+function uuid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+
+// Notenfarbe
+function gradeColorClass(g) {
+  if (g <= 1.5) return 'excellent';
+  if (g <= 2.5) return 'good';
+  if (g <= 3.5) return 'ok';
+  return 'fail';
+}
+
+// Aktuelles Jahr Fortbildungsstunden
+function currentYearHours() {
+  const year = new Date().getFullYear();
+  return state.fortbild
+    .filter(f => f.status === 'absolviert' && f.date && f.date.startsWith(year + '-'))
+    .reduce((sum, f) => sum + (Number(f.hours) || 0), 0);
+}
+
+// ============= SYNC TO PLAN =============
+function syncToPlan() {
+  try {
+    const events = [];
+    // FOM Klausurtermine
+    state.modules.forEach(m => {
+      if (!m.examDate) return;
+      events.push({
+        id: 'edu_exam_' + m.id,
+        date: m.examDate,
+        title: `📚 Klausur: ${m.name}`,
+        allDay: true,
+        fromEducation: true,
+        category: 'FOM',
+        topic: 'klausur'
+      });
+    });
+    // NotSan-Fortbildungen (geplant + absolviert)
+    state.fortbild.forEach(f => {
+      if (!f.date) return;
+      const icon = f.status === 'absolviert' ? '✓' : '🩺';
+      events.push({
+        id: 'edu_fb_' + f.id,
+        date: f.date,
+        title: `${icon} ${f.name} (${f.hours}h)`,
+        allDay: true,
+        fromEducation: true,
+        category: 'NotSan-Fortbildung',
+        topic: f.topic
+      });
+    });
+    localStorage.setItem('shared_education_events', JSON.stringify({
+      events, updatedAt: new Date().toISOString(), source: 'education'
+    }));
+  } catch(e) { console.warn('Plan-Sync fehlgeschlagen', e); }
+}
+
+// ============= RENDER ROUTER =============
+function render() {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === state.tab));
+  if (state.tab === 'fom') renderFOM();
+  else if (state.tab === 'notsan') renderNotSan();
+  else if (state.tab === 'learn') renderLearn();
+  else if (state.tab === 'stats') renderStats();
+}
+
+// ============= TAB: FOM =============
+function renderFOM() {
+  const mods = state.modules.slice().sort((a,b) => (a.sem||0) - (b.sem||0) || (a.examDate||'').localeCompare(b.examDate||''));
+  const withExam = mods.filter(m => m.examDate && !m.grade);
+  const nextExam = withExam.sort((a,b) => a.examDate.localeCompare(b.examDate))[0];
+  const completed = mods.filter(m => m.grade != null);
+  const avgGrade = completed.length > 0
+    ? (completed.reduce((s,m) => s + (Number(m.grade) || 0) * (Number(m.ects) || 1), 0) / completed.reduce((s,m) => s + (Number(m.ects) || 1), 0))
+    : null;
+
+  let html = `<h1 class="page-title">Studium<span class="accent">.</span></h1>`;
+
+  // Hero
+  html += `<div class="hero-grid">`;
+  if (nextExam) {
+    const days = daysUntil(nextExam.examDate);
+    const cls = days < 14 ? 'urgent' : days < 30 ? 'soon' : 'ok';
+    html += `<div class="stat-card accent">
+      <div class="label">Nächste Klausur</div>
+      <div class="value">${days}<span class="unit">Tage</span></div>
+      <div class="sub">${escape(nextExam.name)}</div>
+    </div>`;
+  } else {
+    html += `<div class="stat-card accent">
+      <div class="label">Klausuren</div>
+      <div class="value">${mods.filter(m=>!m.grade).length}</div>
+      <div class="sub">noch ausstehend</div>
+    </div>`;
+  }
+  html += `<div class="stat-card">
+    <div class="label">Notenschnitt</div>
+    <div class="value" style="color:var(--accent)">${avgGrade ? avgGrade.toFixed(2) : '—'}</div>
+    <div class="sub">${completed.length} Module abgeschlossen</div>
+  </div>`;
+  html += `</div>`;
+
+  // Anstehende Klausuren
+  const upcoming = mods.filter(m => m.examDate && !m.grade);
+  if (upcoming.length > 0) {
+    html += `<div class="section"><h2>Anstehende Klausuren <span class="count">${upcoming.length}</span></h2>`;
+    upcoming.forEach(m => {
+      const days = daysUntil(m.examDate);
+      const cls = days < 0 ? 'done' : days < 14 ? 'urgent' : days < 30 ? 'soon' : 'ok';
+      const lbl = days < 0 ? 'überfällig' : days === 0 ? 'HEUTE' : days + ' Tage';
+      const dateStr = new Date(m.examDate).toLocaleDateString('de-DE', {day:'2-digit', month:'short', year:'numeric'});
+      html += `<div class="card" data-mod="${m.id}">
+        <div class="row">
+          <div style="flex:1; min-width:0">
+            <div class="title">${escape(m.name)}</div>
+            <div class="meta">Sem ${m.sem || '?'} · ${m.ects || 0} ECTS · ${dateStr}</div>
+          </div>
+          <span class="badge ${cls}">${lbl}</span>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Aktive Module ohne Klausur
+  const noExam = mods.filter(m => !m.examDate && !m.grade);
+  if (noExam.length > 0) {
+    html += `<div class="section"><h2>Module <span class="count">${noExam.length}</span></h2>`;
+    noExam.forEach(m => {
+      html += `<div class="card" data-mod="${m.id}">
+        <div class="row">
+          <div style="flex:1; min-width:0">
+            <div class="title">${escape(m.name)}</div>
+            <div class="meta">Sem ${m.sem || '?'} · ${m.ects || 0} ECTS</div>
+          </div>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Abgeschlossen / Noten
+  if (completed.length > 0) {
+    html += `<div class="section"><h2>Noten <span class="count">${completed.length}</span></h2>`;
+    completed.sort((a,b) => (a.sem||0)-(b.sem||0)).forEach(m => {
+      const g = Number(m.grade);
+      html += `<div class="grade-tile" data-mod="${m.id}">
+        <div class="info">
+          <div class="name">${escape(m.name)}</div>
+          <div class="meta">Sem ${m.sem || '?'} · ${m.ects || 0} ECTS</div>
+        </div>
+        <div class="grade ${gradeColorClass(g)}">${g.toFixed(1)}</div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  if (mods.length === 0) {
+    html += `<div class="empty"><div class="ic">🎓</div><div class="text">Noch keine Module.<br>Tippe „+" um dein erstes Modul anzulegen.</div></div>`;
+  }
+
+  mainEl.innerHTML = html;
+  mainEl.querySelectorAll('[data-mod]').forEach(el => {
+    el.addEventListener('click', () => openModule(el.dataset.mod));
+  });
+}
+
+// ============= TAB: NotSan =============
+function renderNotSan() {
+  const year = new Date().getFullYear();
+  const hours = currentYearHours();
+  const goal = state.settings.hoursPerYear;
+  const pct = Math.min(100, (hours / goal) * 100);
+  const pctClass = pct >= 100 ? 'green' : pct >= 50 ? 'orange' : 'red';
+
+  let html = `<h1 class="page-title">NotSan<span class="accent">.</span></h1>`;
+
+  // Hero: Stunden-Ring
+  html += `<div class="stat-card accent" style="margin-bottom: 14px">
+    <div class="label">Pflichtstunden ${year}</div>
+    <div class="value">${hours.toFixed(1)}<span class="unit">/ ${goal} h</span></div>
+    <div class="sub">${(goal - hours).toFixed(1)}h verbleibend</div>
+    <div class="progress" style="background:rgba(255,255,255,0.2); margin-top: 14px">
+      <div class="progress-bar" style="background:white; width:${pct}%"></div>
+    </div>
+  </div>`;
+
+  // Themen-Verteilung
+  const topicHours = {};
+  state.fortbild.filter(f => f.status === 'absolviert' && f.date && f.date.startsWith(year+'-')).forEach(f => {
+    topicHours[f.topic] = (topicHours[f.topic] || 0) + (Number(f.hours)||0);
+  });
+  const topicEntries = Object.entries(topicHours).sort((a,b) => b[1] - a[1]);
+  if (topicEntries.length > 0) {
+    html += `<div class="section"><h2>Themen ${year}</h2>`;
+    topicEntries.forEach(([key, hrs]) => {
+      const lbl = TOPIC_LABELS[key] || key;
+      html += `<div class="hour-entry">
+        <div class="info"><div class="name">${escape(lbl)}</div></div>
+        <div class="hrs">${hrs.toFixed(1)}h</div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Geplante Fortbildungen
+  const planned = state.fortbild.filter(f => f.status === 'geplant').sort((a,b) => (a.date||'').localeCompare(b.date||''));
+  if (planned.length > 0) {
+    html += `<div class="section"><h2>Geplant <span class="count">${planned.length}</span></h2>`;
+    planned.forEach(f => {
+      const days = f.date ? daysUntil(f.date) : null;
+      const dateStr = f.date ? new Date(f.date).toLocaleDateString('de-DE', {day:'2-digit', month:'short'}) : '—';
+      const cls = days !== null && days < 7 ? 'urgent' : days < 30 ? 'soon' : 'ok';
+      const lbl = days === null ? '—' : days < 0 ? 'verpasst' : days + ' Tage';
+      html += `<div class="card" data-fb="${f.id}">
+        <div class="row">
+          <div style="flex:1; min-width:0">
+            <div class="title">${escape(f.name)}</div>
+            <div class="meta">${dateStr} · ${TOPIC_LABELS[f.topic] || f.topic} · ${f.hours}h</div>
+          </div>
+          <span class="badge ${cls}">${lbl}</span>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Absolvierte Fortbildungen (Letzte 10)
+  const done = state.fortbild.filter(f => f.status === 'absolviert').sort((a,b) => (b.date||'').localeCompare(a.date||''));
+  if (done.length > 0) {
+    html += `<div class="section"><h2>Absolviert <span class="count">${done.length}</span></h2>`;
+    done.slice(0, 10).forEach(f => {
+      const dateStr = f.date ? new Date(f.date).toLocaleDateString('de-DE', {day:'2-digit', month:'short', year:'2-digit'}) : '—';
+      html += `<div class="card" data-fb="${f.id}">
+        <div class="row">
+          <div style="flex:1; min-width:0">
+            <div class="title">${escape(f.name)}</div>
+            <div class="meta">${dateStr} · ${TOPIC_LABELS[f.topic] || f.topic} · ${f.hours}h</div>
+          </div>
+          <span class="badge done">✓</span>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  if (state.fortbild.length === 0) {
+    html += `<div class="empty"><div class="ic">🩺</div><div class="text">Noch keine Fortbildung erfasst.<br>Tippe „+" um deine erste anzulegen.</div></div>`;
+  }
+
+  mainEl.innerHTML = html;
+  mainEl.querySelectorAll('[data-fb]').forEach(el => {
+    el.addEventListener('click', () => openFortbild(el.dataset.fb));
+  });
+}
+
+// ============= TAB: LERNEN =============
+let timerInterval = null;
+let timerState = {
+  mode: 'work',          // 'work' | 'break'
+  remaining: 25 * 60,    // Sekunden
+  workMin: 25,
+  breakMin: 5,
+  running: false,
+  startedAt: null
+};
+
+function setTimerPreset(preset) {
+  if (preset === 'classic') { timerState.workMin = 25; timerState.breakMin = 5; }
+  else if (preset === 'deep') { timerState.workMin = 50; timerState.breakMin = 10; }
+  else if (preset === 'custom') {
+    timerState.workMin = state.settings.customWork || 45;
+    timerState.breakMin = state.settings.customBreak || 10;
+  }
+  if (!timerState.running) {
+    timerState.remaining = (timerState.mode === 'work' ? timerState.workMin : timerState.breakMin) * 60;
+  }
+  state.settings.pomodoroMode = preset;
+  saveData();
+}
+
+function startTimer() {
+  if (timerState.running) return;
+  timerState.running = true;
+  timerState.startedAt = Date.now();
+  timerInterval = setInterval(() => {
+    timerState.remaining--;
+    if (timerState.remaining <= 0) {
+      // Sitzung Ende
+      if (timerState.mode === 'work') {
+        const sessionMin = timerState.workMin;
+        state.sessions.push({ id: uuid(), date: fmtDate(new Date()), durationMin: sessionMin, type: 'pomodoro', deck: null });
+        saveData();
+        timerState.mode = 'break';
+        timerState.remaining = timerState.breakMin * 60;
+        try { new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ==').play(); } catch(e) {}
+        if (Notification.permission === 'granted') try { new Notification('Pause!', { body: `${sessionMin} Min geschafft. Mach ${timerState.breakMin} Min Pause.` }); } catch(e) {}
+      } else {
+        timerState.mode = 'work';
+        timerState.remaining = timerState.workMin * 60;
+        if (Notification.permission === 'granted') try { new Notification('Pause vorbei!', { body: 'Weiter lernen?' }); } catch(e) {}
+      }
+      timerState.running = false;
+      clearInterval(timerInterval);
+    }
+    updateTimerDisplay();
+  }, 1000);
+  updateTimerDisplay();
+}
+
+function pauseTimer() {
+  timerState.running = false;
+  if (timerInterval) clearInterval(timerInterval);
+  updateTimerDisplay();
+}
+
+function resetTimer() {
+  pauseTimer();
+  timerState.mode = 'work';
+  timerState.remaining = timerState.workMin * 60;
+  updateTimerDisplay();
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('timerDisplay');
+  if (!el) return;
+  const m = Math.floor(timerState.remaining / 60);
+  const s = timerState.remaining % 60;
+  el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  const statusEl = document.getElementById('timerStatus');
+  if (statusEl) statusEl.textContent = (timerState.mode === 'work' ? 'Fokus' : 'Pause') + ' · ' + (timerState.running ? 'läuft' : 'pausiert');
+  const ctrlEl = document.getElementById('timerControls');
+  if (ctrlEl) {
+    ctrlEl.innerHTML = timerState.running
+      ? `<button class="timer-btn" id="pauseBtn">Pause</button><button class="timer-btn" id="resetBtn">Reset</button>`
+      : `<button class="timer-btn primary" id="startBtn">${timerState.remaining < (timerState.workMin*60) ? 'Weiter' : 'Start'}</button><button class="timer-btn" id="resetBtn">Reset</button>`;
+    bindTimerButtons();
+  }
+}
+
+function bindTimerButtons() {
+  const start = document.getElementById('startBtn');
+  const pause = document.getElementById('pauseBtn');
+  const reset = document.getElementById('resetBtn');
+  if (start) start.addEventListener('click', startTimer);
+  if (pause) pause.addEventListener('click', pauseTimer);
+  if (reset) reset.addEventListener('click', resetTimer);
+}
+
+function renderLearn() {
+  // Karteikarten fällig
+  const today = fmtDate(new Date());
+  const dueCards = state.cards.filter(c => !c.nextReview || c.nextReview <= today);
+  const fomDue = dueCards.filter(c => c.deck === 'fom').length;
+  const notsanDue = dueCards.filter(c => c.deck === 'notsan').length;
+
+  // Quiz (gespeicherte Karten der NotSan-Sammlung als Multiple-Choice)
+  const notsanCards = state.cards.filter(c => c.deck === 'notsan').length;
+
+  let html = `<h1 class="page-title">Lernen<span class="accent">.</span></h1>`;
+
+  // Pomodoro Timer
+  if (timerState.remaining === (timerState.workMin * 60) && !timerState.running) {
+    // initialisieren aus settings
+    setTimerPreset(state.settings.pomodoroMode);
+  }
+  const mins = Math.floor(timerState.remaining / 60);
+  const secs = timerState.remaining % 60;
+  html += `<div class="timer-card">
+    <div class="timer-label">Pomodoro-Timer</div>
+    <div class="timer-display" id="timerDisplay">${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}</div>
+    <div class="timer-status" id="timerStatus">${timerState.mode === 'work' ? 'Fokus' : 'Pause'} · ${timerState.running ? 'läuft' : 'pausiert'}</div>
+    <div class="timer-controls" id="timerControls">
+      ${timerState.running
+        ? `<button class="timer-btn" id="pauseBtn">Pause</button><button class="timer-btn" id="resetBtn">Reset</button>`
+        : `<button class="timer-btn primary" id="startBtn">${timerState.remaining < (timerState.workMin*60) ? 'Weiter' : 'Start'}</button><button class="timer-btn" id="resetBtn">Reset</button>`}
+    </div>
+    <div class="preset-row">
+      <button class="preset-btn ${state.settings.pomodoroMode === 'classic' ? 'active' : ''}" data-preset="classic">25 / 5</button>
+      <button class="preset-btn ${state.settings.pomodoroMode === 'deep' ? 'active' : ''}" data-preset="deep">50 / 10</button>
+      <button class="preset-btn ${state.settings.pomodoroMode === 'custom' ? 'active' : ''}" data-preset="custom">${state.settings.customWork || 45} / ${state.settings.customBreak || 10}</button>
+    </div>
+  </div>`;
+
+  // Karteikarten-Decks
+  html += `<div class="section"><h2>Karteikarten</h2>`;
+  html += `<div class="card" data-deck="fom">
+    <div class="row">
+      <div style="flex:1">
+        <div class="title">FOM-Studium</div>
+        <div class="meta">${state.cards.filter(c=>c.deck==='fom').length} Karten · ${fomDue} fällig</div>
+      </div>
+      ${fomDue > 0 ? `<span class="badge urgent">${fomDue} fällig</span>` : `<span class="badge done">aktuell</span>`}
+    </div>
+  </div>`;
+  html += `<div class="card" data-deck="notsan">
+    <div class="row">
+      <div style="flex:1">
+        <div class="title">NotSan-Wissen</div>
+        <div class="meta">${state.cards.filter(c=>c.deck==='notsan').length} Karten · ${notsanDue} fällig</div>
+      </div>
+      ${notsanDue > 0 ? `<span class="badge urgent">${notsanDue} fällig</span>` : `<span class="badge done">aktuell</span>`}
+    </div>
+  </div>`;
+  html += `</div>`;
+
+  // Quiz
+  if (notsanCards >= 4) {
+    html += `<div class="section"><h2>Wissens-Quiz</h2>
+    <div class="card" id="quizStart">
+      <div class="row">
+        <div style="flex:1">
+          <div class="title">Multiple-Choice-Quiz</div>
+          <div class="meta">10 zufällige Fragen aus NotSan-Karten</div>
+        </div>
+        <span class="badge note">Start</span>
+      </div>
+    </div></div>`;
+  }
+
+  mainEl.innerHTML = html;
+
+  // Bindings
+  bindTimerButtons();
+  document.querySelectorAll('.preset-btn').forEach(b => b.addEventListener('click', () => { setTimerPreset(b.dataset.preset); renderLearn(); }));
+  document.querySelectorAll('[data-deck]').forEach(el => el.addEventListener('click', () => startStudy(el.dataset.deck)));
+  const qs = document.getElementById('quizStart');
+  if (qs) qs.addEventListener('click', startQuiz);
+}
+
+// ============= SPACED REPETITION (vereinfachtes SM-2) =============
+function startStudy(deck) {
+  const today = fmtDate(new Date());
+  const due = state.cards.filter(c => c.deck === deck && (!c.nextReview || c.nextReview <= today));
+  if (due.length === 0) {
+    if (!confirm('Keine Karten fällig. Trotzdem alle Karten dieses Decks lernen?')) return;
+    state.studyMode = { deck, queue: state.cards.filter(c => c.deck === deck).map(c => c.id), currentIdx: 0, showAnswer: false };
+  } else {
+    state.studyMode = { deck, queue: due.map(c => c.id), currentIdx: 0, showAnswer: false };
+  }
+  renderStudySession();
+}
+
+function renderStudySession() {
+  const sm = state.studyMode;
+  if (!sm || sm.currentIdx >= sm.queue.length) {
+    state.studyMode = null;
+    alert('🎉 Session beendet!');
+    renderLearn();
+    return;
+  }
+  const card = state.cards.find(c => c.id === sm.queue[sm.currentIdx]);
+  if (!card) { sm.currentIdx++; renderStudySession(); return; }
+
+  let html = `<h1 class="page-title">${sm.deck === 'fom' ? 'FOM' : 'NotSan'}-Karten</h1>`;
+  html += `<div class="flashcard">
+    <div class="flip-hint">${sm.showAnswer ? 'Antwort' : 'Tippen zum Umdrehen'}</div>
+    <div class="side-label">${sm.showAnswer ? 'Rückseite' : 'Vorderseite'}</div>
+    <div class="content">${escape(sm.showAnswer ? card.back : card.front)}</div>
+    ${card.tag ? `<div class="tags" style="margin-top: 12px"><span class="tag">${escape(card.tag)}</span></div>` : ''}
+    <div class="progress-text">${sm.currentIdx + 1} / ${sm.queue.length}</div>
+  </div>`;
+
+  if (sm.showAnswer) {
+    html += `<div class="rating-buttons">
+      <button class="rating-btn again" data-rate="again"><span class="label-emoji">😩</span>Nochmal</button>
+      <button class="rating-btn hard" data-rate="hard"><span class="label-emoji">😣</span>Schwer</button>
+      <button class="rating-btn good" data-rate="good"><span class="label-emoji">🙂</span>Gut</button>
+      <button class="rating-btn easy" data-rate="easy"><span class="label-emoji">😎</span>Leicht</button>
+    </div>`;
+  } else {
+    html += `<button class="btn-save" id="showAnswerBtn" style="width:100%; padding:14px; border-radius:10px; border:none; font-family:inherit; font-weight:700; font-size:15px; cursor:pointer; background:var(--accent); color:white">Antwort zeigen</button>`;
+  }
+  html += `<button class="btn-cancel" id="endStudyBtn" style="width:100%; margin-top:8px; padding:12px; border-radius:10px; border:none; font-family:inherit; font-weight:600; font-size:13px; cursor:pointer; background:var(--surface-2); color:var(--text)">Session beenden</button>`;
+
+  mainEl.innerHTML = html;
+  document.querySelector('.flashcard').addEventListener('click', () => { sm.showAnswer = !sm.showAnswer; renderStudySession(); });
+  document.querySelectorAll('[data-rate]').forEach(b => b.addEventListener('click', () => rateCard(b.dataset.rate)));
+  const sa = document.getElementById('showAnswerBtn');
+  if (sa) sa.addEventListener('click', () => { sm.showAnswer = true; renderStudySession(); });
+  document.getElementById('endStudyBtn').addEventListener('click', () => { state.studyMode = null; renderLearn(); });
+}
+
+function rateCard(rating) {
+  const sm = state.studyMode;
+  const card = state.cards.find(c => c.id === sm.queue[sm.currentIdx]);
+  if (!card) return;
+  // SM-2 vereinfacht
+  let ease = card.ease || 2.5;
+  let interval = card.interval || 0;
+  if (rating === 'again') { interval = 1; ease = Math.max(1.3, ease - 0.2); }
+  else if (rating === 'hard') { interval = Math.max(1, Math.round(interval * 1.2)); ease = Math.max(1.3, ease - 0.15); }
+  else if (rating === 'good') { interval = interval === 0 ? 1 : interval === 1 ? 3 : Math.round(interval * ease); }
+  else if (rating === 'easy') { interval = interval === 0 ? 4 : Math.round(interval * ease * 1.3); ease += 0.15; }
+  card.ease = ease;
+  card.interval = interval;
+  card.lastReview = fmtDate(new Date());
+  const next = new Date();
+  next.setDate(next.getDate() + interval);
+  card.nextReview = fmtDate(next);
+  saveData();
+
+  // Session-Statistik
+  if (sm.currentIdx === 0) {
+    state.sessions.push({ id: uuid(), date: fmtDate(new Date()), durationMin: 0, type: 'cards', deck: sm.deck });
+  }
+  sm.currentIdx++;
+  sm.showAnswer = false;
+  renderStudySession();
+}
+
+// ============= QUIZ =============
+function startQuiz() {
+  const pool = state.cards.filter(c => c.deck === 'notsan');
+  if (pool.length < 4) return;
+  const shuffled = [...pool].sort(() => Math.random() - 0.5).slice(0, Math.min(10, pool.length));
+  state.quizMode = {
+    questions: shuffled.map(card => {
+      const wrongs = pool.filter(c => c.id !== card.id).sort(() => Math.random() - 0.5).slice(0, 3).map(c => c.back);
+      const opts = [...wrongs, card.back].sort(() => Math.random() - 0.5);
+      return { front: card.front, correct: card.back, opts };
+    }),
+    currentIdx: 0,
+    score: 0,
+    answered: false
+  };
+  renderQuiz();
+}
+
+function renderQuiz() {
+  const q = state.quizMode;
+  if (!q || q.currentIdx >= q.questions.length) {
+    const score = q ? q.score : 0;
+    const total = q ? q.questions.length : 0;
+    state.quizMode = null;
+    alert(`Quiz beendet! Ergebnis: ${score}/${total} (${total > 0 ? Math.round(score/total*100) : 0}%)`);
+    renderLearn();
+    return;
+  }
+  const current = q.questions[q.currentIdx];
+  let html = `<h1 class="page-title">Quiz <span style="color:var(--text-faint); font-size:14px; font-weight:600">Frage ${q.currentIdx+1}/${q.questions.length} · Score ${q.score}</span></h1>`;
+  html += `<div class="quiz-question">
+    <div class="quiz-q">${escape(current.front)}</div>
+    <div class="quiz-options">`;
+  current.opts.forEach((opt, i) => {
+    const cls = q.answered ? (opt === current.correct ? 'correct' : (opt === q.selected ? 'wrong' : '')) : '';
+    html += `<button class="quiz-opt ${cls}" data-opt="${i}">${escape(opt)}</button>`;
+  });
+  html += `</div></div>`;
+  if (q.answered) {
+    html += `<button class="btn-save" id="nextQBtn" style="width:100%; padding:14px; border-radius:10px; border:none; font-family:inherit; font-weight:700; font-size:15px; cursor:pointer; background:var(--accent); color:white">${q.currentIdx + 1 >= q.questions.length ? 'Quiz beenden' : 'Nächste Frage'}</button>`;
+  }
+  html += `<button class="btn-cancel" id="endQuizBtn" style="width:100%; margin-top:8px; padding:12px; border-radius:10px; border:none; font-family:inherit; font-weight:600; font-size:13px; cursor:pointer; background:var(--surface-2); color:var(--text)">Abbrechen</button>`;
+  mainEl.innerHTML = html;
+  document.querySelectorAll('.quiz-opt').forEach(b => {
+    if (q.answered) return;
+    b.addEventListener('click', () => {
+      const i = parseInt(b.dataset.opt);
+      q.selected = current.opts[i];
+      q.answered = true;
+      if (q.selected === current.correct) q.score++;
+      renderQuiz();
+    });
+  });
+  const next = document.getElementById('nextQBtn');
+  if (next) next.addEventListener('click', () => { q.currentIdx++; q.answered = false; q.selected = null; renderQuiz(); });
+  document.getElementById('endQuizBtn').addEventListener('click', () => { state.quizMode = null; renderLearn(); });
+}
+
+// ============= TAB: STATS =============
+function renderStats() {
+  const last30 = Array.from({length: 30}, (_, i) => {
+    const d = new Date(); d.setDate(d.getDate() - (29 - i));
+    return fmtDate(d);
+  });
+  const minutesPerDay = last30.map(ds => {
+    return state.sessions.filter(s => s.date === ds).reduce((sum, s) => sum + (s.durationMin || 0), 0);
+  });
+  const totalMin = minutesPerDay.reduce((a,b) => a+b, 0);
+  const cardsLearned = state.sessions.filter(s => s.type === 'cards').length;
+  const totalCards = state.cards.length;
+  const masteredCards = state.cards.filter(c => (c.interval || 0) >= 21).length;
+  const year = new Date().getFullYear();
+  const yearHours = currentYearHours();
+  const goal = state.settings.hoursPerYear;
+
+  let html = `<h1 class="page-title">Statistik<span class="accent">.</span></h1>`;
+
+  // Tiles
+  html += `<div class="stats-grid">
+    <div class="stat-tile">
+      <div class="ic">⏱️</div>
+      <div class="num">${Math.round(totalMin/60)}h</div>
+      <div class="lbl">Lernzeit 30T</div>
+    </div>
+    <div class="stat-tile">
+      <div class="ic">🃏</div>
+      <div class="num">${cardsLearned}</div>
+      <div class="lbl">Karten-Sessions</div>
+    </div>
+    <div class="stat-tile">
+      <div class="ic">🎯</div>
+      <div class="num">${masteredCards}/${totalCards}</div>
+      <div class="lbl">Gemastert</div>
+    </div>
+    <div class="stat-tile">
+      <div class="ic">🩺</div>
+      <div class="num">${yearHours.toFixed(0)}/${goal}h</div>
+      <div class="lbl">NotSan ${year}</div>
+    </div>
+  </div>`;
+
+  // Chart: Lernzeit letzte 30 Tage
+  const maxMin = Math.max(60, ...minutesPerDay);
+  const W = 320, H = 140, PAD_L = 30, PAD_R = 8, PAD_T = 10, PAD_B = 22;
+  const barW = (W - PAD_L - PAD_R) / 30;
+  let bars = '';
+  minutesPerDay.forEach((m, i) => {
+    const x = PAD_L + i * barW;
+    const h = (m / maxMin) * (H - PAD_T - PAD_B);
+    const y = H - PAD_B - h;
+    if (m > 0) bars += `<rect x="${x+1}" y="${y}" width="${barW - 2}" height="${h}" fill="var(--accent)" rx="2"/>`;
+  });
+  // Y-Labels
+  const ylabels = [0, Math.round(maxMin/2), maxMin].map(v => {
+    const y = H - PAD_B - (v / maxMin) * (H - PAD_T - PAD_B);
+    return `<text x="${PAD_L - 4}" y="${y + 3}" font-size="9" fill="var(--text-faint)" text-anchor="end" font-family="JetBrains Mono">${v}m</text>`;
+  }).join('');
+
+  html += `<div class="section"><h2>Lernzeit letzte 30 Tage</h2>
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px">
+      <svg class="chart-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+        ${ylabels}
+        ${bars}
+      </svg>
+    </div>
+  </div>`;
+
+  // Klausur-Countdowns
+  const upcoming = state.modules.filter(m => m.examDate && !m.grade)
+    .sort((a,b) => a.examDate.localeCompare(b.examDate)).slice(0, 5);
+  if (upcoming.length > 0) {
+    html += `<div class="section"><h2>Anstehende Klausuren</h2>`;
+    upcoming.forEach(m => {
+      const days = daysUntil(m.examDate);
+      const cls = days < 14 ? 'urgent' : days < 30 ? 'soon' : 'ok';
+      const lbl = days < 0 ? 'überfällig' : days === 0 ? 'HEUTE' : days + 'T';
+      html += `<div class="card">
+        <div class="row">
+          <div style="flex:1; min-width:0">
+            <div class="title">${escape(m.name)}</div>
+            <div class="meta">${new Date(m.examDate).toLocaleDateString('de-DE')}</div>
+          </div>
+          <span class="badge ${cls}">${lbl}</span>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  mainEl.innerHTML = html;
+}
+
+// ============= MODALS =============
+let editingModule = null, editingFortbild = null, editingCard = null;
+
+function openModule(id) {
+  editingModule = id;
+  const m = id ? state.modules.find(x => x.id === id) : null;
+  $('moduleTitle').textContent = m ? 'Modul bearbeiten' : 'Neues Modul';
+  $('mName').value = m?.name || '';
+  $('mSem').value = m?.sem || 1;
+  $('mECTS').value = m?.ects || '';
+  $('mExam').value = m?.examDate || '';
+  $('mGrade').value = m?.grade || '';
+  $('mNote').value = m?.note || '';
+  $('mDelete').style.display = m ? 'block' : 'none';
+  $('moduleBg').classList.add('show');
+}
+function closeModule() { $('moduleBg').classList.remove('show'); editingModule = null; }
+function saveModule() {
+  const name = $('mName').value.trim();
+  if (!name) { alert('Bitte Namen eingeben'); return; }
+  const data = {
+    id: editingModule || uuid(),
+    name, sem: parseInt($('mSem').value) || 1, ects: parseInt($('mECTS').value) || 0,
+    examDate: $('mExam').value || null,
+    grade: $('mGrade').value ? parseFloat($('mGrade').value) : null,
+    note: $('mNote').value.trim()
+  };
+  if (editingModule) state.modules[state.modules.findIndex(x => x.id === editingModule)] = data;
+  else state.modules.push(data);
+  saveData(); closeModule(); render();
+}
+function deleteModule() {
+  if (!editingModule || !confirm('Modul wirklich löschen?')) return;
+  state.modules = state.modules.filter(m => m.id !== editingModule);
+  saveData(); closeModule(); render();
+}
+
+function openFortbild(id) {
+  editingFortbild = id;
+  const f = id ? state.fortbild.find(x => x.id === id) : null;
+  $('fortbildTitle').textContent = f ? 'Fortbildung bearbeiten' : 'Neue Fortbildung';
+  $('fbName').value = f?.name || '';
+  $('fbDate').value = f?.date || fmtDate(new Date());
+  $('fbHours').value = f?.hours || 8;
+  $('fbTopic').value = f?.topic || 'reanimation';
+  $('fbStatus').value = f?.status || 'geplant';
+  $('fbNote').value = f?.note || '';
+  $('fbDelete').style.display = f ? 'block' : 'none';
+  $('fortbildBg').classList.add('show');
+}
+function closeFortbild() { $('fortbildBg').classList.remove('show'); editingFortbild = null; }
+function saveFortbild() {
+  const name = $('fbName').value.trim();
+  if (!name) { alert('Bitte Titel eingeben'); return; }
+  const data = {
+    id: editingFortbild || uuid(),
+    name, date: $('fbDate').value || null,
+    hours: parseFloat($('fbHours').value) || 0,
+    topic: $('fbTopic').value, status: $('fbStatus').value,
+    note: $('fbNote').value.trim()
+  };
+  if (editingFortbild) state.fortbild[state.fortbild.findIndex(x => x.id === editingFortbild)] = data;
+  else state.fortbild.push(data);
+  saveData(); closeFortbild(); render();
+}
+function deleteFortbild() {
+  if (!editingFortbild || !confirm('Eintrag wirklich löschen?')) return;
+  state.fortbild = state.fortbild.filter(f => f.id !== editingFortbild);
+  saveData(); closeFortbild(); render();
+}
+
+function openCard(id) {
+  editingCard = id;
+  const c = id ? state.cards.find(x => x.id === id) : null;
+  $('cardTitle').textContent = c ? 'Karte bearbeiten' : 'Neue Karteikarte';
+  $('cDeck').value = c?.deck || (state.tab === 'notsan' ? 'notsan' : 'fom');
+  $('cFront').value = c?.front || '';
+  $('cBack').value = c?.back || '';
+  $('cTag').value = c?.tag || '';
+  $('cDelete').style.display = c ? 'block' : 'none';
+  $('cardBg').classList.add('show');
+}
+function closeCard() { $('cardBg').classList.remove('show'); editingCard = null; }
+function saveCard() {
+  const front = $('cFront').value.trim();
+  const back = $('cBack').value.trim();
+  if (!front || !back) { alert('Vorder- und Rückseite ausfüllen'); return; }
+  const data = {
+    id: editingCard || uuid(),
+    deck: $('cDeck').value, front, back, tag: $('cTag').value.trim(),
+    ease: 2.5, interval: 0, nextReview: fmtDate(new Date()), lastReview: null
+  };
+  if (editingCard) {
+    const old = state.cards.find(x => x.id === editingCard);
+    data.ease = old.ease; data.interval = old.interval; data.nextReview = old.nextReview; data.lastReview = old.lastReview;
+    state.cards[state.cards.findIndex(x => x.id === editingCard)] = data;
+  } else state.cards.push(data);
+  saveData(); closeCard(); render();
+}
+function deleteCard() {
+  if (!editingCard || !confirm('Karte wirklich löschen?')) return;
+  state.cards = state.cards.filter(c => c.id !== editingCard);
+  saveData(); closeCard(); render();
+}
+
+// FAB-Verhalten je nach Tab
+function fabAction() {
+  if (state.tab === 'fom') openModule(null);
+  else if (state.tab === 'notsan') openFortbild(null);
+  else if (state.tab === 'learn') openCard(null);
+  else if (state.tab === 'stats') {
+    // Statistik: kein FAB-Sinn, aber wir öffnen ein Quick-Menu
+    const choice = prompt('Was anlegen? Tippe: m=Modul, f=Fortbildung, k=Karteikarte');
+    if (choice === 'm') openModule(null);
+    else if (choice === 'f') openFortbild(null);
+    else if (choice === 'k') openCard(null);
+  }
+}
+
+// ============= SETTINGS =============
+function openSettings() {
+  document.querySelectorAll('.theme-switch button').forEach(b => b.classList.toggle('active', b.dataset.theme === state.settings.theme));
+  $('sHoursPerYear').value = state.settings.hoursPerYear;
+  $('sPomodoroMode').value = state.settings.pomodoroMode;
+  $('sCustomWork').value = state.settings.customWork || 45;
+  $('sCustomBreak').value = state.settings.customBreak || 10;
+  $('sFomLocation').value = state.settings.fomLocation || 'muenchen';
+  $('customPomodoroRow').style.display = state.settings.pomodoroMode === 'custom' ? 'grid' : 'none';
+  $('settingsBg').classList.add('show');
+}
+function closeSettings() { $('settingsBg').classList.remove('show'); }
+function saveSettings() {
+  state.settings.hoursPerYear = parseInt($('sHoursPerYear').value) || 40;
+  state.settings.pomodoroMode = $('sPomodoroMode').value;
+  state.settings.customWork = Math.max(5, parseInt($('sCustomWork').value) || 45);
+  state.settings.customBreak = Math.max(1, parseInt($('sCustomBreak').value) || 10);
+  state.settings.fomLocation = $('sFomLocation').value;
+  setTimerPreset(state.settings.pomodoroMode);
+  saveData(); applyTheme(); closeSettings(); render();
+}
+
+// ============= BACKUP =============
+function exportBackup() {
+  const data = { app: 'education', version: 1, exportedAt: new Date().toISOString(), ...state };
+  delete data.tab; delete data.studyMode; delete data.quizMode;
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `education_backup_${fmtDate(new Date())}.json`;
+  a.click(); URL.revokeObjectURL(url);
+}
+function importBackup() {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = 'application/json,.json';
+  input.addEventListener('change', e => {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (data.app && data.app !== 'education') { alert('Falsche App: ' + data.app); return; }
+        if (!confirm(`Backup importieren?\n${(data.modules||[]).length} Module, ${(data.fortbild||[]).length} Fortbildungen, ${(data.cards||[]).length} Karten`)) return;
+        state.modules = data.modules || [];
+        state.fortbild = data.fortbild || [];
+        state.cards = data.cards || [];
+        state.notes = data.notes || [];
+        state.sessions = data.sessions || [];
+        if (data.settings) state.settings = { ...state.settings, ...data.settings };
+        saveData(); applyTheme(); render();
+        alert('✓ Backup geladen!');
+      } catch(err) { alert('Fehler: ' + err.message); }
+    };
+    reader.readAsText(file);
+  });
+  input.click();
+}
+
+// ============= EVENT BINDINGS =============
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => { state.tab = t.dataset.tab; render(); });
+});
+$('fabAdd').addEventListener('click', fabAction);
+
+// Modale Bindings
+$('mCancel').addEventListener('click', closeModule);
+$('mSave').addEventListener('click', saveModule);
+$('mDelete').addEventListener('click', deleteModule);
+$('moduleBg').addEventListener('click', e => { if (e.target === $('moduleBg')) closeModule(); });
+
+$('fbCancel').addEventListener('click', closeFortbild);
+$('fbSave').addEventListener('click', saveFortbild);
+$('fbDelete').addEventListener('click', deleteFortbild);
+$('fortbildBg').addEventListener('click', e => { if (e.target === $('fortbildBg')) closeFortbild(); });
+
+$('cCancel').addEventListener('click', closeCard);
+$('cSave').addEventListener('click', saveCard);
+$('cDelete').addEventListener('click', deleteCard);
+$('cardBg').addEventListener('click', e => { if (e.target === $('cardBg')) closeCard(); });
+
+$('settingsBtn').addEventListener('click', openSettings);
+$('sCancel').addEventListener('click', closeSettings);
+$('sSave').addEventListener('click', saveSettings);
+$('settingsBg').addEventListener('click', e => { if (e.target === $('settingsBg')) closeSettings(); });
+$('exportBtn').addEventListener('click', exportBackup);
+$('importBtn').addEventListener('click', importBackup);
+$('sPomodoroMode').addEventListener('change', () => {
+  $('customPomodoroRow').style.display = $('sPomodoroMode').value === 'custom' ? 'grid' : 'none';
+});
+document.querySelectorAll('.theme-switch button').forEach(b => {
+  b.addEventListener('click', () => {
+    state.settings.theme = b.dataset.theme;
+    document.querySelectorAll('.theme-switch button').forEach(x => x.classList.toggle('active', x === b));
+    applyTheme();
+  });
+});
+
+// Bei Theme "auto" auf Systemwechsel hören
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+  if (state.settings.theme === 'auto') applyTheme();
+});
+
+// Notification permission
+if ('Notification' in window && Notification.permission === 'default') {
+  // Erst beim ersten Timer-Start fragen, nicht beim App-Start
+}
+
+// Init
+loadData();
+setTimerPreset(state.settings.pomodoroMode);
+render();
+</script>
+</body>
+</html>

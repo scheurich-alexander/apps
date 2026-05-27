@@ -469,7 +469,8 @@ const DEFAULT_CATEGORIES = [
   { id: 'sport',   name: 'Sport',          color: '#22c55e', isShift: false },
   { id: 'haus',    name: 'Haushalt',       color: '#3b82f6', isShift: false },
   { id: 'pers',    name: 'Persönlich',     color: '#a855f7', isShift: false },
-  { id: 'finance', name: 'Finanzen',       color: '#0891b2', isShift: false }
+  { id: 'finance', name: 'Finanzen',       color: '#0891b2', isShift: false },
+  { id: 'edu',     name: 'Bildung',        color: '#eab308', isShift: false }
 ];
 
 let state = {
@@ -521,6 +522,15 @@ function loadData() {
     if (!state.categories.find(c => c.id === 'finance')) {
       state.categories.push({ id: 'finance', name: 'Finanzen', color: '#0891b2', isShift: false });
       state.filters.finance = true;
+    }
+    // Education-Kategorie auto-hinzufügen falls nicht da
+    if (!state.categories.find(c => c.id === 'edu')) {
+      state.categories.push({ id: 'edu', name: 'Bildung', color: '#eab308', isShift: false });
+      state.filters.edu = true;
+    } else {
+      // Auto-Migration falls noch alte Lila-Farbe gespeichert
+      const eduCat = state.categories.find(c => c.id === 'edu');
+      if (eduCat && eduCat.color === '#a855f7') eduCat.color = '#eab308';
     }
   } catch(e) { console.warn('Load failed:', e); }
 }
@@ -1003,6 +1013,26 @@ function getFinanceLastSync() {
   } catch(e) { return null; }
 }
 
+// ============= EDUCATION-INTEGRATION =============
+function getEducationEvents() {
+  try {
+    const raw = localStorage.getItem('shared_education_events');
+    if (!raw) return [];
+    const data = JSON.parse(raw);
+    if (!data.events || !Array.isArray(data.events)) return [];
+    return data.events;
+  } catch(e) { return []; }
+}
+
+function getEducationLastSync() {
+  try {
+    const raw = localStorage.getItem('shared_education_events');
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    return data.updatedAt ? new Date(data.updatedAt) : null;
+  } catch(e) { return null; }
+}
+
 function allEventsForRange(rangeStart, rangeEnd) {
   const map = {};
   let d = new Date(rangeStart);
@@ -1049,6 +1079,29 @@ function allEventsForRange(rangeStart, rangeEnd) {
           isFinance: true,
           isIncome: ev.isIncome,
           fromHaushaltsbuch: true
+        });
+      }
+    });
+  }
+
+  // Education-Events einbauen (Klausuren + NotSan-Fortbildungen)
+  if (state.filters.edu !== false) {
+    getEducationEvents().forEach(ev => {
+      if (map[ev.date]) {
+        map[ev.date].push({
+          id: ev.id,
+          title: ev.title,
+          date: ev.date,
+          endDate: ev.date,
+          cat: 'edu',
+          start: '',
+          end: '',
+          allDay: true,
+          note: ev.category || '',
+          remind: 0,
+          repeat: 'none',
+          isEducation: true,
+          fromEducation: true
         });
       }
     });
@@ -1904,21 +1957,30 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () 
   if (state.settings.theme === 'auto') applyTheme();
 });
 
-// Auto-Sync mit Haushaltsbuch wenn Tab wieder sichtbar wird oder localStorage geändert wird
+// Auto-Sync mit Haushaltsbuch und Education wenn Tab wieder sichtbar wird oder localStorage geändert wird
 let lastFinanceSync = getFinanceLastSync();
+let lastEduSync = getEducationLastSync();
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) {
-    const current = getFinanceLastSync();
-    if (current && (!lastFinanceSync || current.getTime() !== lastFinanceSync.getTime())) {
-      lastFinanceSync = current;
-      render();
+    const curFin = getFinanceLastSync();
+    const curEdu = getEducationLastSync();
+    let changed = false;
+    if (curFin && (!lastFinanceSync || curFin.getTime() !== lastFinanceSync.getTime())) {
+      lastFinanceSync = curFin; changed = true;
     }
+    if (curEdu && (!lastEduSync || curEdu.getTime() !== lastEduSync.getTime())) {
+      lastEduSync = curEdu; changed = true;
+    }
+    if (changed) render();
   }
 });
 // Storage-Event triggert auch wenn ein anderer Tab im selben Browser Daten geändert hat
 window.addEventListener('storage', (e) => {
   if (e.key === 'shared_finance_events') {
     lastFinanceSync = getFinanceLastSync();
+    render();
+  } else if (e.key === 'shared_education_events') {
+    lastEduSync = getEducationLastSync();
     render();
   }
 });
