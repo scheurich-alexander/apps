@@ -64,6 +64,8 @@
   .budget-box.grund { border-top:3px solid var(--grund); }
   .budget-box.extra { border-top:3px solid var(--extra); }
   .budget-box.budget-5030 { border-top:3px solid #7c3aed; margin-bottom:14px; }
+  .budget-box.gesamt { border-top:3px solid var(--accent); margin-bottom:14px; }
+  .budget-box.gesamt .bsum-val { color:var(--accent); }
   .budget-box .box-title { font-size:14px; font-weight:600; margin-bottom:12px; display:flex; justify-content:space-between; align-items:baseline; gap:6px; }
   .budget-box .box-title .basis { font-size:11px; color:var(--text-muted); font-weight:500; white-space:nowrap; }
   .bucket { margin-bottom:11px; }
@@ -273,6 +275,11 @@
     </div>
   </div>
 
+  <div class="budget-box gesamt">
+    <div class="box-title"><span>Gesamt</span></div>
+    <div class="bsum" id="gesamtSummary"></div>
+  </div>
+
   <div class="budget-box budget-5030">
     <div class="box-title"><span>50-30-20-Regel</span><span class="basis" id="ruleBasisLabel"></span></div>
     <div id="bucketBox"></div>
@@ -479,8 +486,8 @@ const DEFAULT_CATEGORIES = [
   { key:'fixkosten',   name:'Fixkosten',   color1:'#ef4444', color2:'#b91c1c', type:'fix' },
   { key:'ausgaben',    name:'Ausgaben',    color1:'#f97316', color2:'#c2410c', type:'ausg' },
   { key:'verfuegung',  name:'Verfügung',   color1:'#f59e0b', color2:'#b45309', type:'ausg' },
-  { key:'ersparnisse', name:'Vorsorge',    color1:'#16a34a', color2:'#14532d', type:'spar' },
-  { key:'reserve',     name:'Reserve',     color1:'#22c55e', color2:'#0e7490', type:'reserve' }
+  { key:'reserve',     name:'Reserve',     color1:'#22c55e', color2:'#0e7490', type:'reserve' },
+  { key:'ersparnisse', name:'Vorsorge',    color1:'#16a34a', color2:'#14532d', type:'spar' }
 ];
 
 const BUCKET_DEFS = [
@@ -494,7 +501,7 @@ const MONTHS_SHORT = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Ok
 const FREQ_LABEL = { once:'einmalig', monthly:'monatlich', bimonthly:'2-monatlich', quarterly:'vierteljährlich', halfyearly:'halbjährlich', ninemonthly:'dreivierteljährlich', yearly:'jährlich' };
 const INTERVAL_MONTHS = { bimonthly:2, quarterly:3, halfyearly:6, ninemonthly:9, yearly:12 };
 const KIND_LABEL = { standard:'', anschaffung:'Anschaffung', rueckzahlung:'Rückzahlung' };
-const GROUP_LABEL = { income:'Einnahmen', ausg:'Ausgaben', spar:'Sparkonten', reserve:'Reserve' };
+const GROUP_LABEL = { income:'Einnahmen', ausg:'Ausgaben', reserve:'Reserve', spar:'Sparkonten' };
 const SPARZIEL_KEY = 'ersparnisse';
 function catGroup(type){ if(type==='income')return 'income'; if(type==='spar')return 'spar'; if(type==='reserve')return 'reserve'; return 'ausg'; }
 
@@ -521,6 +528,16 @@ function load() {
         const rc = obj.categories.find(c=>c.key==='reserve'); if (rc && rc.type==='spar') rc.type='reserve';
         const ec = obj.categories.find(c=>c.key==='ersparnisse'); if (ec && ec.name==='Ersparnisse') ec.name='Vorsorge';
         obj.migratedReserve = true;
+      }
+      // Migration: Reserve VOR Vorsorge sortieren
+      if (!obj.migratedReserveOrder) {
+        const resIdx = obj.categories.findIndex(c=>c.key==='reserve');
+        const ersIdx = obj.categories.findIndex(c=>c.key==='ersparnisse');
+        if (resIdx > -1 && ersIdx > -1 && resIdx > ersIdx) {
+          const [resCat] = obj.categories.splice(resIdx, 1);
+          obj.categories.splice(ersIdx, 0, resCat);
+        }
+        obj.migratedReserveOrder = true;
       }
       for (const a of obj.accounts) if (a.booked === undefined) a.booked = false;
       for (const e of obj.entries) {
@@ -768,10 +785,15 @@ function renderMonthLabel(){ const {year,month}=state.view; document.getElementB
 function renderHero(){ const {year,month}=state.view; const bal=totalBalanceUpTo(year,month); const el=document.getElementById('totalBalance'); el.textContent=fmt(bal); el.classList.toggle('neg', bal<-0.001); document.getElementById('totalIncomeHero').textContent = fmt(monthIncome(year,month)); }
 function summaryHtml(income, ausgaben, vorsorge, reserve, opt){
   opt = opt || {};
-  // Wenn ein zusätzlicher "+ Grundbudget"-Übertrag vorliegt (für Extrabudget-Box),
-  // wird er in die Summe und als eigene Zeile mit einbezogen.
+  // Optionaler Wert "+ Grundbudget" als zusätzliche Zeile, fließt in Summe ein
   const grundCarry = Number(opt.grundCarry) || 0;
-  const summe = (income - ausgaben) + vorsorge + reserve + grundCarry;
+  // Berechnungsmodus auswählen:
+  //  - 'standard' (default): Summe = Einnahmen − Ausgaben + Vorsorge + Reserve (+ grundCarry)
+  //  - 'extra': Summe nach User-Definition Extrabudget (wird beim Aufruf via opt.formula gesetzt, hier nur Anzeigesteuerung)
+  const summe = (typeof opt.summe === 'number')
+    ? opt.summe
+    : (income - ausgaben + vorsorge + reserve + grundCarry);
+
   const ausgRow = opt.signed
     ? `<div class="bsum-row"><span class="bsum-label">Ausgaben</span><span class="bsum-val ${ausgaben<-0.001?'neg':''}">${fmt(ausgaben)}</span></div>`
     : `<div class="bsum-row"><span class="bsum-label">Ausgaben</span><span class="bsum-val exp">−${fmt(ausgaben)}</span></div>`;
@@ -781,8 +803,8 @@ function summaryHtml(income, ausgaben, vorsorge, reserve, opt){
   return `
     <div class="bsum-row"><span class="bsum-label">Einnahmen</span><span class="bsum-val">${fmt(income)}</span></div>
     ${ausgRow}
-    <div class="bsum-row"><span class="bsum-label">+ Vorsorge</span><span class="bsum-val">${fmt(vorsorge)}</span></div>
     <div class="bsum-row"><span class="bsum-label">+ Reserve</span><span class="bsum-val">${fmt(reserve)}</span></div>
+    <div class="bsum-row"><span class="bsum-label">+ Vorsorge</span><span class="bsum-val">${fmt(vorsorge)}</span></div>
     ${grundRow}
     <div class="bsum-row strong"><span class="bsum-label">Summe</span><span class="bsum-val ${summe<-0.001?'neg':''}">${fmt(summe)}</span></div>`;
 }
@@ -798,23 +820,35 @@ function renderBudget(){
   const G = Number(state.settings.grundbudget)||0;
   const income = monthIncome(year,month);
   const incS=typeSplit('income',year,month);
-  const grundIncome = incS.grund;   // Grundbudget-Anteil der Einnahmen-Konten
-  const extraIncome = incS.extra;   // Extrabudget-Anteil der Einnahmen-Konten
+  const grundIncome = incS.grund;
+  const extraIncome = incS.extra;
   const fixS=typeSplit('fix',year,month), ausgS=typeSplit('ausg',year,month), sparS=typeSplit('spar',year,month), resS=typeSplit('reserve',year,month);
   const grundExp = fixS.grund + ausgS.grund, extraExp = fixS.extra + ausgS.extra;
   const grundSav = sparS.grund, extraSav = sparS.extra;
   const grundRes = resS.grund, extraRes = resS.extra;
 
-  // Grundbudget-Box: Ausgaben aus Grund-Anteil
+  // ---- Grundbudget-Box: Standard-Berechnung ----
   document.getElementById('grundSummary').innerHTML = summaryHtml(grundIncome, grundExp, grundSav, grundRes);
+  const grundSumme = grundIncome - grundExp + grundSav + grundRes;
 
-  // Grundbudget-Saldo dieses Monats (= "Summe" der Grund-Box)
-  const grundSumme = (grundIncome - grundExp) + grundSav + grundRes;
-
-  // Extrabudget-Box: NUR Extra-Anteil als Ausgaben, plus Grund-Saldo als Übertrag
+  // ---- Extrabudget-Box: eigene Summe-Formel ----
+  // Aktuell laut User: Summe = Einnahmen − Ausgaben + Vorsorge − Reserve
+  // (Wird per Bestätigung ggf. angepasst.)
+  const extraSumme = extraIncome - extraExp + extraSav - extraRes;
   document.getElementById('extraSummary').innerHTML = summaryHtml(
     extraIncome, extraExp, extraSav, extraRes,
-    { grundCarry: grundSumme, showGrundCarry: true }
+    { summe: extraSumme }
+  );
+
+  // ---- Gesamt-Box: alle Werte aggregiert (Grund + Extra) ----
+  const gesamtIncome = grundIncome + extraIncome;
+  const gesamtAusgaben = grundExp + extraExp;
+  const gesamtVorsorge = grundSav + extraSav;
+  const gesamtReserve = grundRes + extraRes;
+  const gesamtSumme = gesamtIncome - gesamtAusgaben + gesamtVorsorge + gesamtReserve;
+  document.getElementById('gesamtSummary').innerHTML = summaryHtml(
+    gesamtIncome, gesamtAusgaben, gesamtVorsorge, gesamtReserve,
+    { summe: gesamtSumme }
   );
 
   document.getElementById('ruleBasisLabel').textContent = `· auf Gesamteinnahmen ${fmt(income)}`;
