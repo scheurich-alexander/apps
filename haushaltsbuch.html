@@ -1035,6 +1035,11 @@ function summaryHtml(income, ausgaben, vorsorge, reserve, opt){
   const vorsorgeLabel = opt.neutralVorsorge ? '+ Vorsorge <span class="bsum-hint">(±0)</span>' : '+ Vorsorge';
   const vorsorgeRow = opt.hideVorsorge ? '' :
     `<div class="bsum-row"><span class="bsum-label">${vorsorgeLabel}</span><span class="bsum-val">${fmt(vorsorge)}</span></div>`;
+  // Sonderausgaben-Zeile (Abgang) – nur wenn > 0
+  const sonderAbgang = Number(opt.sonderAbgang) || 0;
+  const sonderRow = sonderAbgang > 0.001
+    ? `<div class="bsum-row"><span class="bsum-label">− Sonderausgaben</span><span class="bsum-val exp">−${fmt(sonderAbgang)}</span></div>`
+    : '';
 
   return `
     <div class="bsum-row"><span class="bsum-label">Einnahmen</span><span class="bsum-val">${fmt(income)}</span></div>
@@ -1044,6 +1049,7 @@ function summaryHtml(income, ausgaben, vorsorge, reserve, opt){
     <div class="bsum-divider double"></div>
     ${reserveRow}
     ${vorsorgeRow}
+    ${sonderRow}
     ${grundRow}
     <div class="bsum-row strong"><span class="bsum-label">Summe</span><span class="bsum-val ${summe<-0.001?'neg':''}">${fmt(summe)}</span></div>`;
 }
@@ -1089,25 +1095,39 @@ function renderBudget(){
 
   // ---- Extrabudget-Box ----
   // Extra-Vorsorge gibt's nicht mehr → 0
-  // Reserve-Extra: enthält die Posten die als Ausgaben verbucht werden (inkl. Sonderausgaben)
-  const extraReserveAnzeige = reserveExtraOhneSonder + sonderS.extra; // alle Reserve-Extra-Beträge zum Anzeigen
-  const extraSumme = extraIncome - extraExp; // Vorsorge=0, Reserve schon in Ausgaben
+  // Aufteilung Anzeige:
+  //  - "+ Reserve" = NUR die geparkten Reserve-Posten (reserveExtraOhneSonder) → werden in dieser Variante NICHT abgezogen
+  //  - "Sonderausgaben" = eigene Zeile als Abgang
+  const extraSonderTotal = sonderS.extra; // = sonderByTopf.extra
+  const extraReserveGeparkt = reserveExtraOhneSonder; // nur normale Reserve-Posten im Extra-Anteil
+  const extraSumme = extraIncome - extraExp; // extraExp enthält bereits Sonderausgaben
   document.getElementById('extraSummary').innerHTML = summaryHtml(
-    extraIncome, extraExp, extraSav, extraReserveAnzeige,
-    { summe: extraSumme, neutralReserve: false, neutralVorsorge: true, hideVorsorge: true }
+    extraIncome, extraExp, extraSav, extraReserveGeparkt,
+    {
+      summe: extraSumme,
+      neutralReserve: true,
+      neutralVorsorge: true,
+      hideVorsorge: true,
+      sonderAbgang: extraSonderTotal
+    }
   );
 
   // ---- Gesamt-Box ----
   const gesamtIncome = grundIncome + extraIncome;
   const gesamtAusgaben = grundExp + extraExp;
   const gesamtVorsorge = grundSav + extraSav;
-  const gesamtReserve = grundRes + extraReserveAnzeige;
+  // Reserve-Anzeige Gesamt: Grund (geparkt) + Reserve-Extra-Geparkt (ohne Sonderausgaben)
+  const gesamtReserveGeparkt = grundRes + extraReserveGeparkt;
   // Summe = was diesen Monat netto an Geld da ist
-  // (Reserve-Grund + Vorsorge bleiben als Guthaben erhalten, daher addiert)
+  // gesamtAusgaben enthält bereits Sonderausgaben (in extraExp drin)
   const gesamtSumme = gesamtIncome - gesamtAusgaben + grundRes + grundSav;
   document.getElementById('gesamtSummary').innerHTML = summaryHtml(
-    gesamtIncome, gesamtAusgaben, gesamtVorsorge, gesamtReserve,
-    { summe: gesamtSumme, neutralReserveGrund: true }
+    gesamtIncome, gesamtAusgaben, gesamtVorsorge, gesamtReserveGeparkt,
+    {
+      summe: gesamtSumme,
+      neutralReserve: true,
+      sonderAbgang: extraSonderTotal
+    }
   );
 
   document.getElementById('ruleBasisLabel').textContent = `· auf Gesamteinnahmen ${fmt(income)}`;
