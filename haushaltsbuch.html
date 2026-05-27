@@ -96,6 +96,7 @@
   .bsum-row.strong .bsum-label { color:var(--text); font-weight:600; }
   .bsum-divider { height:1px; background:var(--border); margin:2px 0; }
   .bsum-divider.double { height:3px; border-top:1px solid var(--border); border-bottom:1px solid var(--border); background:transparent; margin:4px 0 2px; }
+  .bsum-hint { font-size:10px; color:var(--text-muted); font-weight:400; opacity:0.7; }
   .bsum-val { font-variant-numeric:tabular-nums; font-weight:600; white-space:nowrap; }
   .budget-box.grund .bsum-val { color:var(--grund); }
   .budget-box.extra .bsum-val { color:var(--extra); }
@@ -165,9 +166,10 @@
   .badge { display:inline-block; font-size:10px; font-weight:600; padding:2px 7px; border-radius:999px; letter-spacing:0.04em; text-transform:uppercase; vertical-align:middle; }
   .badge.anschaff { background:#ffedd5; color:#9a3412; }
   .badge.rueck { background:#e0e7ff; color:#3730a3; }
+  .badge.sonder { background:#fce7f3; color:#9d174d; }
   .badge.paused { background:var(--surface-2); color:var(--text-muted); }
   .badge.transfer { background:#cffafe; color:#0e7490; }
-  @media (prefers-color-scheme: dark) { .badge.anschaff { background:#43200a; color:#fdba74; } .badge.rueck { background:#1e1b4b; color:#a5b4fc; } .badge.transfer { background:#083344; color:#67e8f9; } }
+  @media (prefers-color-scheme: dark) { .badge.anschaff { background:#43200a; color:#fdba74; } .badge.rueck { background:#1e1b4b; color:#a5b4fc; } .badge.sonder { background:#4c0519; color:#fbcfe8; } .badge.transfer { background:#083344; color:#67e8f9; } }
 
   .empty-state { font-size:13px; color:var(--text-muted); padding:8px 4px; text-align:center; }
 
@@ -346,7 +348,17 @@
           <option value="standard">Standard (Einnahme / Ausgabe)</option>
           <option value="anschaffung">Anschaffung</option>
           <option value="rueckzahlung">Rückzahlung</option>
+          <option value="sonderausgabe">Sonderausgabe</option>
         </select>
+      </div>
+      <div class="field" id="sonderTopfField" style="display:none;">
+        <label>Verbuchen in Bereich</label>
+        <select id="entrySonderTopf">
+          <option value="fix">Fixkosten</option>
+          <option value="ausg">Ausgaben</option>
+          <option value="verfuegung">Verfügung</option>
+        </select>
+        <div class="hint">Der Posten bleibt im Reserve-Konto sichtbar, wird aber in der 50-30-20-Regel und Bilanz im gewählten Bereich verbucht.</div>
       </div>
       <div class="field"><label>Beschreibung</label><input type="text" id="entryDesc" required /></div>
       <div class="grid2">
@@ -554,7 +566,7 @@ const MONTHS_FULL  = ['Januar','Februar','März','April','Mai','Juni','Juli','Au
 const MONTHS_SHORT = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
 const FREQ_LABEL = { once:'einmalig', monthly:'monatlich', bimonthly:'2-monatlich', quarterly:'vierteljährlich', halfyearly:'halbjährlich', ninemonthly:'dreivierteljährlich', yearly:'jährlich' };
 const INTERVAL_MONTHS = { bimonthly:2, quarterly:3, halfyearly:6, ninemonthly:9, yearly:12 };
-const KIND_LABEL = { standard:'', anschaffung:'Anschaffung', rueckzahlung:'Rückzahlung' };
+const KIND_LABEL = { standard:'', anschaffung:'Anschaffung', rueckzahlung:'Rückzahlung', sonderausgabe:'Sonderausgabe' };
 const GROUP_LABEL = { income:'Einnahmen', ausg:'Ausgaben', reserve:'Reserve', spar:'Sparkonten' };
 const SPARZIEL_KEY = 'ersparnisse';
 function catGroup(type){ if(type==='income')return 'income'; if(type==='spar')return 'spar'; if(type==='reserve')return 'reserve'; return 'ausg'; }
@@ -592,6 +604,26 @@ function load() {
           obj.categories.splice(ersIdx, 0, resCat);
         }
         obj.migratedReserveOrder = true;
+      }
+      // Migration: Vorsorge-Extra → alles auf Grund, Reserve-Extra → Sonderausgaben
+      if (!obj.migratedReserveSonder) {
+        for (const e of obj.entries) {
+          const a = obj.accounts.find(x => x.id === e.accountId);
+          if (!a) continue;
+          const c = obj.categories.find(x => x.key === a.categoryKey);
+          if (!c) continue;
+          // Vorsorge: alles auf Grund umstellen
+          if (c.type === 'spar' && e.amount && (e.grundbudget < e.amount)) {
+            e.grundbudget = e.amount;
+          }
+          // Reserve-Konto + Standard-Posten mit Extra-Anteil → zu Sonderausgaben konvertieren
+          if (c.type === 'reserve' && e.kind === 'standard' && Number(e.grundbudget||0) < Number(e.amount||0) - 0.001) {
+            e.kind = 'sonderausgabe';
+            e.sonderTopf = 'ausg';
+            e.grundbudget = 0; // komplett zu Extra
+          }
+        }
+        obj.migratedReserveSonder = true;
       }
       for (const a of obj.accounts) if (a.booked === undefined) a.booked = false;
       for (const e of obj.entries) {
@@ -745,7 +777,7 @@ function darken(hex, f){ hex=String(hex||'#888888').replace('#',''); if(hex.leng
 function catByKey(key){ return state.categories.find(c => c.key === key); }
 function accCatKey(accId){ const a=state.accounts.find(x=>x.id===accId); return a?a.categoryKey:null; }
 function isPlan(e){ return e.kind==='anschaffung' || e.kind==='rueckzahlung'; }
-function kindBadge(kind){ if (!kind || kind==='standard') return ''; return `<span class="badge ${kind==='anschaffung'?'anschaff':'rueck'}">${KIND_LABEL[kind]}</span>`; }
+function kindBadge(kind){ if (!kind || kind==='standard') return ''; const cls = kind==='anschaffung'?'anschaff':(kind==='rueckzahlung'?'rueck':'sonder'); return `<span class="badge ${cls}">${KIND_LABEL[kind]}</span>`; }
 function splitPills(grund, extra){ return `<span class="split"><span class="amt-grund" title="Grundbudget">${fmt(grund)}</span><span class="amt-extra" title="Extrabudget">${fmt(extra)}</span></span>`; }
 function bookedPill(a, readonly){
   const yes = !!a.booked; const label = yes ? '✓ Verbucht' : 'Nicht verbucht';
@@ -886,10 +918,42 @@ function typeSplit(type,y,m){ let g=0,x=0; for (const c of state.categories) if 
 function sumTypes(types,y,m){ let s=0; for (const c of state.categories) if (types.includes(c.type)) s += categoryTotal(c.key,y,m); return s; }
 
 function monthIncome(y,m){ return sumTypes(['income'],y,m); }
-function monthExpense(y,m){ return sumTypes(['fix','ausg'],y,m); }
+function monthExpense(y,m){ return sumTypes(['fix','ausg'],y,m) + monthReserveExtraExpense(y,m) + monthSonderToTopf(y,m); }
 function monthSavings(y,m){ return sumTypes(['spar'],y,m); }
 function monthReserve(y,m){ return sumTypes(['reserve'],y,m); }
-function monthSaldo(y,m){ return monthIncome(y,m) - monthExpense(y,m) + monthReserve(y,m); } // Reserve +, Vorsorge neutral
+// Reserve nur Grund-Anteil zählt als positives Polster, Extra-Anteil ist echte Ausgabe
+function monthReserveGrund(y,m){ let s=0; for (const c of state.categories) if (c.type==='reserve') { const sp=categorySplit(c.key,y,m); s+=sp.grund; } return s; }
+function monthReserveExtraExpense(y,m){
+  // Summe aller Reserve-Extra-Werte (normale Posten + Sonderausgaben), abzüglich Sonderausgaben die NICHT in einen Topf gehen
+  // Da Sonderausgaben gleich in monthSonderToTopf gehen, hier nur Reserve-Extra OHNE Sonderausgaben
+  let s = 0;
+  for (const c of state.categories) if (c.type === 'reserve') {
+    for (const a of categoryAccounts(c.key)) {
+      for (const e of accountEntries(a.id)) {
+        if (!isCounted(e, y, m)) continue;
+        if (e.kind === 'sonderausgabe') continue; // werden separat verbucht
+        s += effExtra(e, y, m);
+      }
+    }
+  }
+  return s;
+}
+// Sonderausgaben: werden in den gewählten Topf gebucht (sonderTopf = 'fix' | 'ausg' | 'verfuegung')
+function monthSonderToTopf(y,m){
+  let s = 0;
+  for (const c of state.categories) if (c.type === 'reserve') {
+    for (const a of categoryAccounts(c.key)) {
+      for (const e of accountEntries(a.id)) {
+        if (e.kind !== 'sonderausgabe') continue;
+        if (!isCounted(e, y, m)) continue;
+        s += effAmount(e, y, m);
+      }
+    }
+  }
+  return s;
+}
+// Saldo: Einnahmen − Ausgaben (inkl. Reserve-Extra + Sonderausgaben), Vorsorge & Reserve-Grund sind neutral und gehören zum Vermögen
+function monthSaldo(y,m){ return monthIncome(y,m) - monthExpense(y,m); }
 
 function availableForRate(excludeId, y, m) {
   let income = 0, out = 0;
@@ -916,7 +980,19 @@ function entryOverBudget(e, y, m) {
 }
 
 function earliestStartIdx(){ let best=null; for (const e of state.entries){ const k=idxOf(e.startYear||0, e.startMonth||1); if (best===null||k<best) best=k; } return best; }
-function totalBalanceUpTo(year, month){ const e0=earliestStartIdx(); if (e0===null) return 0; const cur=idxOf(year,month); if (cur<e0) return 0; let sum=0; for (let k=e0;k<=cur;k++) sum += monthSaldo(Math.floor(k/12),(k%12)+1); return sum; }
+function totalBalanceUpTo(year, month){
+  const e0=earliestStartIdx();
+  if (e0===null) return 0;
+  const cur=idxOf(year,month);
+  if (cur<e0) return 0;
+  let sum=0;
+  for (let k=e0;k<=cur;k++){
+    const y=Math.floor(k/12), m=(k%12)+1;
+    // Einnahmen − Ausgaben + Reserve(Grund-Anteil neutralisiert: gilt als Guthaben) + Vorsorge (=auch Guthaben)
+    sum += monthSaldo(y,m) + monthReserveGrund(y,m) + monthSavings(y,m);
+  }
+  return sum;
+}
 function reserveBalanceUpTo(year, month){ const e0=earliestStartIdx(); if (e0===null) return 0; const cur=idxOf(year,month); if (cur<e0) return 0; let s=0; for (let k=e0;k<=cur;k++) s += monthReserve(Math.floor(k/12),(k%12)+1); return s; }
 
 // Saldo eines einzelnen Kontos bis einschl. übergebenen Monat (alle aktiven Beträge aufsummiert)
@@ -939,11 +1015,7 @@ function renderMonthLabel(){ const {year,month}=state.view; document.getElementB
 function renderHero(){ const {year,month}=state.view; const bal=totalBalanceUpTo(year,month); const el=document.getElementById('totalBalance'); el.textContent=fmt(bal); el.classList.toggle('neg', bal<-0.001); document.getElementById('totalIncomeHero').textContent = fmt(monthIncome(year,month)); }
 function summaryHtml(income, ausgaben, vorsorge, reserve, opt){
   opt = opt || {};
-  // Optionaler Wert "+ Grundbudget" als zusätzliche Zeile, fließt in Summe ein
   const grundCarry = Number(opt.grundCarry) || 0;
-  // Berechnungsmodus auswählen:
-  //  - 'standard' (default): Summe = Einnahmen − Ausgaben + Vorsorge + Reserve (+ grundCarry)
-  //  - 'extra': Summe nach User-Definition Extrabudget (wird beim Aufruf via opt.formula gesetzt, hier nur Anzeigesteuerung)
   const summe = (typeof opt.summe === 'number')
     ? opt.summe
     : (income - ausgaben + vorsorge + reserve + grundCarry);
@@ -957,14 +1029,21 @@ function summaryHtml(income, ausgaben, vorsorge, reserve, opt){
   const grundRow = opt.showGrundCarry
     ? `<div class="bsum-row"><span class="bsum-label">+ Grundbudget</span><span class="bsum-val ${grundCarry<-0.001?'neg':''}">${fmt(grundCarry)}</span></div>`
     : '';
+  // Hinweis falls Reserve neutralisiert ist
+  const reserveLabel = opt.neutralReserve ? '+ Reserve <span class="bsum-hint">(±0)</span>' : '+ Reserve';
+  const reserveRow = `<div class="bsum-row"><span class="bsum-label">${reserveLabel}</span><span class="bsum-val">${fmt(reserve)}</span></div>`;
+  const vorsorgeLabel = opt.neutralVorsorge ? '+ Vorsorge <span class="bsum-hint">(±0)</span>' : '+ Vorsorge';
+  const vorsorgeRow = opt.hideVorsorge ? '' :
+    `<div class="bsum-row"><span class="bsum-label">${vorsorgeLabel}</span><span class="bsum-val">${fmt(vorsorge)}</span></div>`;
+
   return `
     <div class="bsum-row"><span class="bsum-label">Einnahmen</span><span class="bsum-val">${fmt(income)}</span></div>
     ${ausgRow}
     <div class="bsum-divider"></div>
     <div class="bsum-row sub"><span class="bsum-label">Zwischensumme</span><span class="bsum-val ${zwischen<-0.001?'neg':''}">${fmt(zwischen)}</span></div>
     <div class="bsum-divider double"></div>
-    <div class="bsum-row"><span class="bsum-label">+ Reserve</span><span class="bsum-val">${fmt(reserve)}</span></div>
-    <div class="bsum-row"><span class="bsum-label">+ Vorsorge</span><span class="bsum-val">${fmt(vorsorge)}</span></div>
+    ${reserveRow}
+    ${vorsorgeRow}
     ${grundRow}
     <div class="bsum-row strong"><span class="bsum-label">Summe</span><span class="bsum-val ${summe<-0.001?'neg':''}">${fmt(summe)}</span></div>`;
 }
@@ -983,36 +1062,126 @@ function renderBudget(){
   const grundIncome = incS.grund;
   const extraIncome = incS.extra;
   const fixS=typeSplit('fix',year,month), ausgS=typeSplit('ausg',year,month), sparS=typeSplit('spar',year,month), resS=typeSplit('reserve',year,month);
-  const grundExp = fixS.grund + ausgS.grund, extraExp = fixS.extra + ausgS.extra;
-  const grundSav = sparS.grund, extraSav = sparS.extra;
-  const grundRes = resS.grund, extraRes = resS.extra;
+  // Klassische Topf-Ausgaben (Fix + Ausg)
+  const grundExpTopf = fixS.grund + ausgS.grund;
+  const extraExpTopf = fixS.extra + ausgS.extra;
+  // Vorsorge (spar): nur Grund-Anteil zählt jetzt (Extra wurde aus Vorsorge entfernt)
+  const grundSav = sparS.grund, extraSav = 0; // Vorsorge hat kein Extra mehr (Migration)
+  // Reserve: Grund nur anzeigen (neutralisiert), Extra ohne Sonderausgaben als Ausgabe, Sonderausgaben separat
+  const grundRes = resS.grund;
+  const sonderS = reserveSonderSplit(year, month); // Sonderausgaben (immer Extra)
+  // Reserve-Extra OHNE Sonderausgaben (separat behandelt)
+  const reserveExtraOhneSonder = reserveExtraNonSonder(year, month);
+  // Sonderausgaben werden nach Topf umverteilt
+  const sonderByTopf = reserveSonderByTopf(year, month);
+  // Endgültige Ausgaben pro Bereich (inklusive Sonderausgaben in Töpfen + Reserve-Extra)
+  const grundExp = grundExpTopf + (sonderByTopf.grund || 0); // Sonderausgaben mit grund-Anteil
+  const extraExp = extraExpTopf + reserveExtraOhneSonder + (sonderByTopf.extra || 0);
 
-  // ---- Grundbudget-Box: Standard-Berechnung ----
-  document.getElementById('grundSummary').innerHTML = summaryHtml(grundIncome, grundExp, grundSav, grundRes);
-  const grundSumme = grundIncome - grundExp + grundSav + grundRes;
-
-  // ---- Extrabudget-Box: Summe = Einnahmen − (Ausgaben + Vorsorge + Reserve)
-  // Das, was vom Extrabudget übrig bleibt, nachdem alle Töpfe befüllt sind.
-  const extraSumme = extraIncome - (extraExp + extraSav + extraRes);
-  document.getElementById('extraSummary').innerHTML = summaryHtml(
-    extraIncome, extraExp, extraSav, extraRes,
-    { summe: extraSumme }
+  // ---- Grundbudget-Box ----
+  // Reserve-Grund wird angezeigt, aber NICHT verbucht (neutralisiert)
+  // Vorsorge-Grund wird angezeigt, aber auch NICHT verbucht (Sparen = Geld bleibt da)
+  const grundSumme = grundIncome - grundExp; // Reserve + Vorsorge sind neutral
+  document.getElementById('grundSummary').innerHTML = summaryHtml(
+    grundIncome, grundExp, grundSav, grundRes,
+    { summe: grundSumme, neutralReserve: true, neutralVorsorge: true }
   );
 
-  // ---- Gesamt-Box: alle Werte aggregiert (Grund + Extra) ----
+  // ---- Extrabudget-Box ----
+  // Extra-Vorsorge gibt's nicht mehr → 0
+  // Reserve-Extra: enthält die Posten die als Ausgaben verbucht werden (inkl. Sonderausgaben)
+  const extraReserveAnzeige = reserveExtraOhneSonder + sonderS.extra; // alle Reserve-Extra-Beträge zum Anzeigen
+  const extraSumme = extraIncome - extraExp; // Vorsorge=0, Reserve schon in Ausgaben
+  document.getElementById('extraSummary').innerHTML = summaryHtml(
+    extraIncome, extraExp, extraSav, extraReserveAnzeige,
+    { summe: extraSumme, neutralReserve: false, neutralVorsorge: true, hideVorsorge: true }
+  );
+
+  // ---- Gesamt-Box ----
   const gesamtIncome = grundIncome + extraIncome;
   const gesamtAusgaben = grundExp + extraExp;
   const gesamtVorsorge = grundSav + extraSav;
-  const gesamtReserve = grundRes + extraRes;
-  const gesamtSumme = gesamtIncome - gesamtAusgaben + gesamtVorsorge + gesamtReserve;
+  const gesamtReserve = grundRes + extraReserveAnzeige;
+  // Summe = was diesen Monat netto an Geld da ist
+  // (Reserve-Grund + Vorsorge bleiben als Guthaben erhalten, daher addiert)
+  const gesamtSumme = gesamtIncome - gesamtAusgaben + grundRes + grundSav;
   document.getElementById('gesamtSummary').innerHTML = summaryHtml(
     gesamtIncome, gesamtAusgaben, gesamtVorsorge, gesamtReserve,
-    { summe: gesamtSumme }
+    { summe: gesamtSumme, neutralReserveGrund: true }
   );
 
   document.getElementById('ruleBasisLabel').textContent = `· auf Gesamteinnahmen ${fmt(income)}`;
-  document.getElementById('bucketBox').innerHTML = BUCKET_DEFS.map(b=>{ const used=sumTypes([b.type],year,month); return budgetBucketRow(b.name, used, income*b.pct, b.color); }).join('');
+  document.getElementById('bucketBox').innerHTML = BUCKET_DEFS.map(b=>{
+    let used = sumTypes([b.type], year, month);
+    // Sonderausgaben mit passendem Topf addieren
+    if (b.type === 'fix') used += reserveSonderForTopf('fix', year, month);
+    else if (b.type === 'ausg') used += reserveSonderForTopf('ausg', year, month) + reserveSonderForTopf('verfuegung', year, month);
+    return budgetBucketRow(b.name, used, income*b.pct, b.color);
+  }).join('');
   document.getElementById('grundBudgetInput').value = G;
+}
+
+// Hilfsfunktionen für Sonderausgaben-Aufteilung
+function reserveSonderSplit(year, month){
+  let g = 0, x = 0;
+  for (const c of state.categories) if (c.type === 'reserve') {
+    for (const a of categoryAccounts(c.key)) {
+      for (const e of accountEntries(a.id)) {
+        if (e.kind !== 'sonderausgabe') continue;
+        if (!isCounted(e, year, month)) continue;
+        g += effGrund(e, year, month);
+        x += effExtra(e, year, month);
+      }
+    }
+  }
+  return { grund: g, extra: x };
+}
+// Sonderausgaben gruppiert nach Topf (fix/ausg/verfuegung)
+function reserveSonderByTopf(year, month){
+  const result = { grund: 0, extra: 0, fix: 0, ausg: 0, verfuegung: 0 };
+  for (const c of state.categories) if (c.type === 'reserve') {
+    for (const a of categoryAccounts(c.key)) {
+      for (const e of accountEntries(a.id)) {
+        if (e.kind !== 'sonderausgabe') continue;
+        if (!isCounted(e, year, month)) continue;
+        const topf = e.sonderTopf || 'ausg';
+        const g = effGrund(e, year, month);
+        const x = effExtra(e, year, month);
+        result.grund += g;
+        result.extra += x;
+        result[topf] = (result[topf] || 0) + g + x;
+      }
+    }
+  }
+  return result;
+}
+function reserveSonderForTopf(topf, year, month){
+  let s = 0;
+  for (const c of state.categories) if (c.type === 'reserve') {
+    for (const a of categoryAccounts(c.key)) {
+      for (const e of accountEntries(a.id)) {
+        if (e.kind !== 'sonderausgabe') continue;
+        if (!isCounted(e, year, month)) continue;
+        if ((e.sonderTopf || 'ausg') !== topf) continue;
+        s += effAmount(e, year, month);
+      }
+    }
+  }
+  return s;
+}
+// Reserve-Extra-Werte OHNE Sonderausgaben (z.B. normal angelegte Posten die im Extra-Anteil sind)
+function reserveExtraNonSonder(year, month){
+  let s = 0;
+  for (const c of state.categories) if (c.type === 'reserve') {
+    for (const a of categoryAccounts(c.key)) {
+      for (const e of accountEntries(a.id)) {
+        if (e.kind === 'sonderausgabe') continue;
+        if (!isCounted(e, year, month)) continue;
+        s += effExtra(e, year, month);
+      }
+    }
+  }
+  return s;
 }
 
 /* ---------- Render: category bars ---------- */
@@ -1402,21 +1571,45 @@ function updateScopeVisibility(){ const editing=!!document.getElementById('entry
 function updateKindMode(){
   const k=document.getElementById('entryKind').value;
   const ersp = (k==='standard' && modalIsSparziel());
-  document.getElementById('standardFields').style.display = k==='standard'?'':'none';
-  document.getElementById('planFields').style.display = k==='standard'?'none':'';
+  const isSonder = (k === 'sonderausgabe');
+  // Vorsorge-Konto: kein Grund/Extra-Split mehr (alles geht auf Grund)
+  const accId = document.getElementById('entryAccountField').style.display!=='none'
+    ? document.getElementById('entryAccountSelect').value
+    : document.getElementById('entryAccountId').value;
+  const accCat = catByKey(accCatKey(accId));
+  const isVorsorge = (accCat && accCat.type === 'spar');
+  // Sonderausgaben benutzen das Standard-Layout (Betrag, Tag, Frequenz) ohne Split-Auswahl
+  document.getElementById('standardFields').style.display = (k==='standard' || isSonder) ? '' : 'none';
+  document.getElementById('planFields').style.display = (k==='anschaffung' || k==='rueckzahlung') ? '' : 'none';
   document.getElementById('targetField').style.display = k==='anschaffung'?'':'none';
   document.getElementById('sparzielField').style.display = ersp?'':'none';
   document.getElementById('sparzielResult').style.display = ersp?'':'none';
-  document.getElementById('freqRow').style.display = ersp?'none':(k==='standard'?'':'none');
+  document.getElementById('freqRow').style.display = ersp ? 'none' : ((k==='standard' || isSonder) ? '' : 'none');
   document.getElementById('monthlyRateField').style.display = (ersp)?'none':document.getElementById('monthlyRateField').style.display;
-  document.getElementById('stdSplitRow').style.display = ersp?'none':'';
+  // Bei Sonderausgaben oder Vorsorge-Konto: kein Grund/Extra-Split
+  document.getElementById('stdSplitRow').style.display = (ersp || isSonder || isVorsorge) ? 'none' : '';
   document.getElementById('endRow').style.display = ersp?'none':'';
+  // Topf-Auswahl nur bei Sonderausgabe
+  document.getElementById('sonderTopfField').style.display = isSonder ? '' : 'none';
   if (ersp) document.getElementById('amountLabel').textContent='Sparziel (€)';
+  else if (isSonder) document.getElementById('amountLabel').textContent='Betrag (€)';
   else document.getElementById('amountLabel').textContent = k==='standard'?'Gesamtbetrag (€)':(k==='anschaffung'?'Gesamtbetrag / Ziel (€)':'Gesamtbetrag / Schuld (€)');
-  if (k!=='standard') updatePlanResult();
+  if (k==='anschaffung' || k==='rueckzahlung') updatePlanResult();
   else if (ersp) updateSparziel();
   else { updateFreqVisibility(); updateMonthlyRate(); updateSplitDisplay(); }
   updateScopeVisibility(); updateAffordHint();
+  // Bei Vorsorge-Konto Grund auf Vollbetrag setzen
+  if (isVorsorge && (k === 'standard') && !ersp) {
+    const monthly = formMonthlyAmount();
+    document.getElementById('entryGrund').value = monthly ? round2(monthly) : '';
+  }
+  // PlanBudget Extra-Option bei Vorsorge ausblenden
+  const planBudgetSel = document.getElementById('entryPlanBudget');
+  if (planBudgetSel) {
+    const extraOpt = planBudgetSel.querySelector('option[value="extra"]');
+    if (extraOpt) extraOpt.style.display = (accCat && accCat.type === 'spar') ? 'none' : '';
+    if (accCat && accCat.type === 'spar' && planBudgetSel.value === 'extra') planBudgetSel.value = 'grund';
+  }
 }
 
 /* ---------- Category modal ---------- */
@@ -1599,6 +1792,7 @@ function openEntryModal(entry, accountId, opts={}){
   const effAcc = entry?entry.accountId:accountId;
   const acc = state.accounts.find(a=>a.id===effAcc);
   const cat = acc?catByKey(acc.categoryKey):null;
+  const isReserve = (cat && cat.type === 'reserve');
   const kind = entry?(entry.kind||'standard'):(presetKind||'standard');
   document.getElementById('entryModalTitle').textContent = (entry?'Posten bearbeiten':'Posten hinzufügen')+(cat?' · '+cat.name:'');
   document.getElementById('entryId').value = entry?entry.id:'';
@@ -1606,8 +1800,14 @@ function openEntryModal(entry, accountId, opts={}){
   document.getElementById('entryDelete').style.display = entry?'':'none';
   const acctField=document.getElementById('entryAccountField');
   if (showAccountSelector) { acctField.style.display=''; fillAccountSelect(effAcc); } else acctField.style.display='none';
+
+  // Sonderausgabe-Option im Dropdown nur bei Reserve-Konten
+  const sonderOpt = document.querySelector('#entryKind option[value="sonderausgabe"]');
+  if (sonderOpt) sonderOpt.style.display = isReserve ? '' : 'none';
+
   document.getElementById('entryKind').value = kind;
-  document.getElementById('kindField').style.display = (kind!=='standard') ? 'none' : '';
+  // kindField immer sichtbar lassen, wenn der User die Art ändern können soll
+  document.getElementById('kindField').style.display = '';
   const {year,month}=state.view;
   document.getElementById('entryDesc').value = entry?effDesc(entry,year,month):'';
   document.getElementById('entryDay').value  = entry?effDay(entry,year,month):1;
@@ -1615,7 +1815,14 @@ function openEntryModal(entry, accountId, opts={}){
   document.getElementById('entryStartYear').value  = entry?entry.startYear:year;
   const ersp = (kind==='standard' && accCatKey(effAcc)===SPARZIEL_KEY);
 
-  if (kind==='standard') {
+  // Sonderausgabe-Topf laden
+  if (kind === 'sonderausgabe' && entry) {
+    document.getElementById('entrySonderTopf').value = entry.sonderTopf || 'ausg';
+  } else if (kind === 'sonderausgabe') {
+    document.getElementById('entrySonderTopf').value = 'ausg';
+  }
+
+  if (kind==='standard' || kind === 'sonderausgabe') {
     if (ersp) {
       document.getElementById('entryAmount').value = entry?(entry.totalGoal||''):'';
       document.getElementById('entrySparzielMonth').value = (entry&&entry.endMonth)?entry.endMonth:month;
@@ -1675,7 +1882,45 @@ document.getElementById('entryForm').addEventListener('submit', (ev)=>{
     const months=monthsInclusive(startYear,startMonth,tY,tM);
     const rate=round2(total/months);
     payload={ id:id||uid(), accountId, kind:'standard', description, amount:rate, grundbudget:rate, totalGoal:total, sparplan:true, day, frequency:'monthly', months:[], startMonth, startYear, endMonth:tM, endYear:tY, targetMonth:tM, targetYear:tY, active:true };
+  } else if (kind === 'sonderausgabe') {
+    // Sonderausgabe: kompletter Betrag zu Extra (grundbudget=0), wird im gewählten Topf verbucht
+    const freq=document.getElementById('entryFreq').value;
+    const iv=INTERVAL_MONTHS[freq];
+    const monthly = iv ? total/iv : total;
+    const sonderTopf = document.getElementById('entrySonderTopf').value || 'ausg';
+    const hasEnd=document.getElementById('entryHasEnd').checked;
+    const endMonth=hasEnd?Number(document.getElementById('entryEndMonth').value):null;
+    const endYear=hasEnd?Number(document.getElementById('entryEndYear').value):null;
+    payload = { id:id||uid(), accountId, kind:'sonderausgabe', description, amount:monthly, grundbudget:0, day, frequency: iv?'monthly':freq, months:[], startMonth, startYear, endMonth, endYear, active:true, sonderTopf };
+    if (iv) { payload.intervalFreq=freq; payload.totalGoal=total; payload.payMonths = Array.from(document.querySelectorAll('#monthGrid input[type=checkbox]:checked')).map(c=>Number(c.value)); }
+    scopeApplies = (freq!=='once');
   } else if (kind==='standard') {
+    // Bei Reserve-Grund-Konten: Leistbarkeits-Check
+    const cat = catByKey(accCatKey(accountId));
+    if (cat && cat.type === 'reserve') {
+      // Prüfung: aktuelle Ausgaben + neuer Beitrag ≤ Gehalt
+      const freq=document.getElementById('entryFreq').value;
+      const iv=INTERVAL_MONTHS[freq];
+      const monthly = iv ? total/iv : total;
+      const grundInput = parseFloat(document.getElementById('entryGrund').value);
+      const grundAnteil = isNaN(grundInput) ? monthly : Math.min(Math.max(0,grundInput),monthly);
+      // Nur prüfen, wenn der Reserve-Posten zum Grundbudget gehört
+      if (grundAnteil > 0) {
+        const income = monthIncome(state.view.year, state.view.month);
+        const currentExp = monthExpense(state.view.year, state.view.month);
+        // Wenn wir bearbeiten: alten Beitrag rausrechnen
+        let adjustedExp = currentExp;
+        if (id) {
+          const orig = state.entries.find(e => e.id === id);
+          if (orig && isCounted(orig, state.view.year, state.view.month)) {
+            adjustedExp -= effGrund(orig, state.view.year, state.view.month);
+          }
+        }
+        if (adjustedExp + grundAnteil > income + 0.001) {
+          if (!confirm(`Achtung: Dieser Reserve-Posten (${fmt(grundAnteil)}) übersteigt zusammen mit deinen Ausgaben (${fmt(adjustedExp)}) dein Monatseinkommen (${fmt(income)}).\n\nWirklich speichern?`)) return;
+        }
+      }
+    }
     const freq=document.getElementById('entryFreq').value;
     const iv=INTERVAL_MONTHS[freq];
     const monthly = iv ? total/iv : total;
