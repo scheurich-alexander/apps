@@ -90,8 +90,12 @@
   .bsum { display:flex; flex-direction:column; gap:6px; margin-bottom:2px; }
   .bsum-row { display:flex; justify-content:space-between; align-items:baseline; font-size:13px; gap:8px; }
   .bsum-row .bsum-label { color:var(--text-muted); }
+  .bsum-row.sub .bsum-label { color:var(--text); font-weight:500; }
+  .bsum-row.sub .bsum-val { font-weight:600; }
   .bsum-row.strong { padding-top:5px; }
   .bsum-row.strong .bsum-label { color:var(--text); font-weight:600; }
+  .bsum-divider { height:1px; background:var(--border); margin:2px 0; }
+  .bsum-divider.double { height:3px; border-top:1px solid var(--border); border-bottom:1px solid var(--border); background:transparent; margin:4px 0 2px; }
   .bsum-val { font-variant-numeric:tabular-nums; font-weight:600; white-space:nowrap; }
   .budget-box.grund .bsum-val { color:var(--grund); }
   .budget-box.extra .bsum-val { color:var(--extra); }
@@ -944,6 +948,9 @@ function summaryHtml(income, ausgaben, vorsorge, reserve, opt){
     ? opt.summe
     : (income - ausgaben + vorsorge + reserve + grundCarry);
 
+  // Zwischensumme: Einnahmen − Ausgaben
+  const zwischen = income - ausgaben;
+
   const ausgRow = opt.signed
     ? `<div class="bsum-row"><span class="bsum-label">Ausgaben</span><span class="bsum-val ${ausgaben<-0.001?'neg':''}">${fmt(ausgaben)}</span></div>`
     : `<div class="bsum-row"><span class="bsum-label">Ausgaben</span><span class="bsum-val exp">−${fmt(ausgaben)}</span></div>`;
@@ -953,6 +960,9 @@ function summaryHtml(income, ausgaben, vorsorge, reserve, opt){
   return `
     <div class="bsum-row"><span class="bsum-label">Einnahmen</span><span class="bsum-val">${fmt(income)}</span></div>
     ${ausgRow}
+    <div class="bsum-divider"></div>
+    <div class="bsum-row sub"><span class="bsum-label">Zwischensumme</span><span class="bsum-val ${zwischen<-0.001?'neg':''}">${fmt(zwischen)}</span></div>
+    <div class="bsum-divider double"></div>
     <div class="bsum-row"><span class="bsum-label">+ Reserve</span><span class="bsum-val">${fmt(reserve)}</span></div>
     <div class="bsum-row"><span class="bsum-label">+ Vorsorge</span><span class="bsum-val">${fmt(vorsorge)}</span></div>
     ${grundRow}
