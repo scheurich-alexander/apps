@@ -1125,18 +1125,20 @@ function renderBudget(){
   );
 
   // ---- Gesamt-Box ----
-  // Klassische Ausgaben aus beiden Bereichen (Grund + Extra), OHNE Sonderausgaben
-  // grundExpTopf = Fix+Ausg im Grund-Anteil (Klassisch, ohne Sonderausgaben)
-  // extraExpOhneSonder = Fix+Ausg im Extra-Anteil + Reserve-Extra-NonSonder
-  const gesamtAusgabenOhneSonder = grundExpTopf + extraExpOhneSonder;
+  // Klare Formel:
+  //   Einnahmen = Grund + Extra (alle Einnahmen-Konten)
+  //   Ausgaben  = Fix + Ausg + Verfügung (Grund + Extra, ohne Reserve/Vorsorge/Sonderausgaben)
+  //   Zwischensumme = Einnahmen − Ausgaben
+  //   Summe = Zwischensumme + Reserve + Vorsorge − Sonderausgaben
+  // ausgS und fixS sind typeSplit('ausg') und typeSplit('fix')
+  // Hinweis: typeSplit('ausg', ...) enthält BEIDE Kategorien 'ausgaben' UND 'verfuegung' (beide haben type='ausg')
   const gesamtIncome = grundIncome + extraIncome;
+  const gesamtAusgabenKlassisch = (fixS.grund + fixS.extra) + (ausgS.grund + ausgS.extra);
   const gesamtVorsorge = grundSav + extraSav;
-  // Reserve-Anzeige Gesamt: Grund (geparkt) + Reserve-Extra-Geparkt (ohne Sonderausgaben)
   const gesamtReserveGeparkt = grundRes + extraReserveGeparkt;
-  // Summe = Einnahmen − klassische Ausgaben − Sonderausgaben + Reserve(geparkt) + Vorsorge
-  const gesamtSumme = gesamtIncome - gesamtAusgabenOhneSonder - extraSonderTotal + grundRes + grundSav;
+  const gesamtSumme = gesamtIncome - gesamtAusgabenKlassisch + gesamtReserveGeparkt + gesamtVorsorge - extraSonderTotal;
   document.getElementById('gesamtSummary').innerHTML = summaryHtml(
-    gesamtIncome, gesamtAusgabenOhneSonder, gesamtVorsorge, gesamtReserveGeparkt,
+    gesamtIncome, gesamtAusgabenKlassisch, gesamtVorsorge, gesamtReserveGeparkt,
     {
       summe: gesamtSumme,
       neutralReserve: false,
