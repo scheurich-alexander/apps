@@ -1085,12 +1085,19 @@ function renderBudget(){
   const extraExp = extraExpTopf + reserveExtraOhneSonder + (sonderByTopf.extra || 0);
 
   // ---- Grundbudget-Box ----
-  // Reserve-Grund wird angezeigt, aber NICHT verbucht (neutralisiert)
-  // Vorsorge-Grund wird angezeigt, aber auch NICHT verbucht (Sparen = Geld bleibt da)
-  const grundSumme = grundIncome - grundExp; // Reserve + Vorsorge sind neutral
+  // Reserve-Grund und Vorsorge-Grund werden in die Ausgaben mit eingerechnet
+  // (zeigt: Geld geht in Töpfe), in der Zwischensumme sind sie schon abgezogen,
+  // dann werden sie in den +Zeilen wieder als Polster gutgeschrieben.
+  // Endeffekt: gleiche Summe, aber klarere Logik wo das Geld bleibt.
+  const grundExpInklTopfe = grundExp + grundRes + grundSav;
+  const grundSumme = grundIncome - grundExpInklTopfe + grundRes + grundSav;
   document.getElementById('grundSummary').innerHTML = summaryHtml(
-    grundIncome, grundExp, grundSav, grundRes,
-    { summe: grundSumme, neutralReserve: true, neutralVorsorge: true }
+    grundIncome, grundExpInklTopfe, grundSav, grundRes,
+    {
+      summe: grundSumme,
+      neutralReserve: false,  // wird wieder dazugerechnet
+      neutralVorsorge: false
+    }
   );
 
   // ---- Extrabudget-Box ----
