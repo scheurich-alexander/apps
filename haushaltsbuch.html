@@ -844,10 +844,13 @@ function accountBudgetMonthly(a, y, m){
   const monthsSinceStart = curIdx - startIdx;
   const intMonths = INTERVAL_MONTHS[b.freq] || 1;
   if (intMonths > 1 && (monthsSinceStart % intMonths) !== 0) return null;
-  // Ziel erreicht? Dann keine weitere Rate
+  // Ziel erreicht? Prüfe plan-basiert (Soll-Raten bisher − Abbuchungen)
   if (goal > 0) {
-    const balUpToPrev = accountBalanceUpToWithoutBudget(a.id, y, m, 'prev');
-    if (balUpToPrev >= goal - 0.001) return null;
+    // Net bis vorigen Monat berechnen
+    const prevDate = new Date(y, m - 2, 1); // Vormonat
+    const py = prevDate.getFullYear(), pm = prevDate.getMonth() + 1;
+    const plannedNetPrev = accountBudgetPlannedNet(a, py, pm);
+    if (plannedNetPrev >= goal - 0.001) return null;
   }
   // Aufteilung Grund / Extra
   const grund = (b.to === 'grund') ? rate : 0;
@@ -1272,8 +1275,13 @@ function renderAccountsForCategory(cat, year, month, readonly){
       const startIdx = (b.startYear || 0) * 12 + ((b.startMonth || 1) - 1);
       const curIdx = idxOf(year, month);
       const goal = Number(b.goal) || 0;
-      const balUpToPrev = goal > 0 ? accountBalanceUpToWithoutBudget(a.id, year, month, 'prev') : 0;
-      const goalReached = goal > 0 && balUpToPrev >= goal - 0.001;
+      // Plan-basierte Ziel-Erreichung: Rate × Raten bisher − Abbuchungen, bis Vormonat
+      let goalReached = false;
+      if (goal > 0) {
+        const prevDate = new Date(year, month - 2, 1);
+        const plannedNet = accountBudgetPlannedNet(a, prevDate.getFullYear(), prevDate.getMonth() + 1);
+        goalReached = plannedNet >= goal - 0.001;
+      }
       // Anzeigen wenn: aktiv & Start erreicht & nicht schon zielerreicht
       if (curIdx >= startIdx) {
         const monthsSinceStart = curIdx - startIdx;
@@ -1333,6 +1341,81 @@ function renderAccountsForCategory(cat, year, month, readonly){
   }).join('');
 }
 
+// Plan-basierter Spar-Stand des Konto-Budgets:
+// = (Rate × Anzahl bisher fälliger Raten) − Abbuchungen / Transfers
+// Wird verwendet um Ziel-Erreichung zu prüfen
+function accountBudgetPlannedNet(a, year, month) {
+  if (!a.budget) return 0;
+  const b = a.budget;
+  const curIdx = idxOf(year, month);
+  const startIdx = (b.startYear || 0) * 12 + ((b.startMonth || 1) - 1);
+  if (curIdx < startIdx) return 0;
+  // Anzahl fälliger Raten bis (inkl.) cur
+  const monthsSinceStart = curIdx - startIdx;
+  const intMonths = INTERVAL_MONTHS[b.freq] || 1;
+  const ratesCount = Math.floor(monthsSinceStart / intMonths) + 1;
+  let planned = ratesCount * (Number(b.rate) || 0);
+
+  // Abbuchungen: alle negativen Beträge & Transfers von diesem Konto bis cur
+  const e0 = earliestStartIdx();
+  if (e0 !== null) {
+    for (let k = Math.max(e0, startIdx); k <= curIdx; k++) {
+      const y = Math.floor(k / 12), m = (k % 12) + 1;
+      for (const e of accountEntries(a.id)) {
+        if (!isCounted(e, y, m)) continue;
+        // Sonderausgaben gehen weg, Transfers (negative Beträge) auch
+        if (e.kind === 'sonderausgabe') planned -= effAmount(e, y, m);
+        else if (e.transfer) planned -= effAmount(e, y, m);
+        else if (Number(e.amount) < 0) planned -= Math.abs(effAmount(e, y, m));
+      }
+    }
+  }
+  return planned;
+}
+
+// Plan-basierte Berechnung: wieviel hätten alle Raten dieses Kontos bis zum aktuellen Monat eingezahlt?
+// Berücksichtigt Konto-Budget (a.budget) und Posten (Anschaffungen, Standard-Raten).
+function reservePlannedDeposits(a, year, month) {
+  const curIdx = idxOf(year, month);
+  let planned = 0;
+
+  // Konto-eigenes Budget
+  if (a.budget && a.budget.active !== false) {
+    const b = a.budget;
+    const startIdx = (b.startYear || 0) * 12 + ((b.startMonth || 1) - 1);
+    if (curIdx >= startIdx) {
+      const monthsSinceStart = curIdx - startIdx;
+      const intMonths = INTERVAL_MONTHS[b.freq] || 1;
+      // Anzahl Raten = Monate / Intervall + 1 (Startmonat zählt)
+      const ratesCount = Math.floor(monthsSinceStart / intMonths) + 1;
+      planned += ratesCount * (Number(b.rate) || 0);
+    }
+  }
+
+  // Posten (Anschaffungen + Standard mit Rate)
+  for (const e of accountEntries(a.id)) {
+    const startIdx = (e.startYear || 0) * 12 + ((e.startMonth || 1) - 1);
+    if (curIdx < startIdx) continue;
+    if (e.kind === 'anschaffung' || e.kind === 'rueckzahlung') {
+      if (e.active === false) continue;
+      // Rate * Monate seit Start (gecappt durch Zielmonat falls Anschaffung)
+      const targetIdx = e.targetYear ? (e.targetYear * 12 + (e.targetMonth - 1)) : (curIdx);
+      const endIdx = Math.min(curIdx, targetIdx);
+      const monthsRated = Math.max(0, endIdx - startIdx + 1);
+      planned += monthsRated * (Number(e.rate) || 0);
+    } else if (e.kind === 'standard') {
+      // Regelmäßige Standard-Posten mit Frequenz
+      const intMonths = INTERVAL_MONTHS[e.intervalFreq || e.frequency] || 1;
+      const monthsSinceStart = curIdx - startIdx;
+      const endIdx = (e.endYear && e.endMonth) ? (e.endYear * 12 + e.endMonth - 1) : curIdx;
+      const effectiveEnd = Math.min(curIdx, endIdx);
+      const ratesCount = Math.floor((effectiveEnd - startIdx) / intMonths) + 1;
+      if (ratesCount > 0) planned += ratesCount * (Number(e.amount) || 0);
+    }
+  }
+  return planned;
+}
+
 // HTML für Reserve-Konto-Header: zeigt Konto-Hauptziel + Summe der Eintrag-Ziele + Raten + Fortschritt
 function reserveAccountSummaryHtml(a){
   const {year, month} = state.view;
@@ -1364,8 +1447,10 @@ function reserveAccountSummaryHtml(a){
 
   if (!hasOwnGoal && !entriesGoalSum && !entriesRateSum) return ''; // gar kein Budget-Info, nichts zeigen
 
-  const pct = totalGoal > 0 ? Math.min(100, Math.max(0, saldo) / totalGoal * 100) : 0;
-  const reached = totalGoal > 0 && saldo >= totalGoal - 0.001;
+  // Plan-basierte Ziel-Erreichung: Soll-Raten bisher − Abbuchungen
+  const plannedNet = accountBudgetPlannedNet(a, year, month);
+  const pct = totalGoal > 0 ? Math.min(100, Math.max(0, plannedNet) / totalGoal * 100) : 0;
+  const reached = totalGoal > 0 && plannedNet >= totalGoal - 0.001;
 
   const rows = [];
   if (hasOwnGoal) {
@@ -1383,7 +1468,7 @@ function reserveAccountSummaryHtml(a){
         <div class="reserve-progress">
           <div class="reserve-bar"><span style="width:${pct}%;${reached?'background:var(--grund);':''}"></span></div>
           <div class="reserve-progress-label">
-            ${fmt(saldo)} / ${fmt(totalGoal)}
+            ${fmt(plannedNet)} / ${fmt(totalGoal)}
             ${reached ? '<span class="r-reached">✓ Ziel erreicht</span>' : ''}
           </div>
         </div>
