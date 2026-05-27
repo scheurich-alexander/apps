@@ -81,6 +81,8 @@
   body { font-family: 'Manrope', -apple-system, sans-serif; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.5; overscroll-behavior: none; transition: background 0.2s, color 0.2s; }
   .app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; padding-top: var(--safe-top); padding-bottom: calc(70px + var(--safe-bot)); }
   header { padding: 14px 20px 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-shrink: 0; }
+  .back-btn { background: var(--surface-2); border: 1px solid var(--border); color: var(--text); width: 38px; height: 38px; border-radius: 10px; font-size: 22px; font-weight: 600; cursor: pointer; display: grid; place-items: center; text-decoration: none; line-height: 1; padding-bottom: 2px; }
+  .back-btn:active { background: var(--border); }
   .title { font-weight: 800; font-size: 22px; letter-spacing: -0.02em; }
   .title .accent { color: var(--green); }
   .header-btn { background: var(--surface-2); border: 1px solid var(--border); color: var(--text); width: 38px; height: 38px; border-radius: 10px; font-size: 16px; cursor: pointer; display: grid; place-items: center; }
@@ -339,6 +341,7 @@
 <body>
 <div class="app">
   <header>
+    <a href="health.html" class="back-btn" title="Zurück zu Health">‹</a>
     <div class="title">Fuel<span class="accent">.</span></div>
     <div class="header-actions">
       <button class="header-btn" id="settingsBtn" title="Einstellungen">⚙</button>

@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Organizer">
+<meta name="apple-mobile-web-app-title" content="Health">
 <meta name="theme-color" content="#0a0a0c" id="themeColor">
-<title>Organizer</title>
+<title>Health</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -48,11 +48,15 @@
   }
   .container { max-width: 600px; margin: 0 auto; padding: 28px 20px 40px; }
 
-  header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 36px; }
-  .brand { font-size: 14px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); }
+  header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; gap: 8px; }
+  .back-link { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 9px; font-size: 13px; color: var(--text-dim); text-decoration: none; font-weight: 600; }
+  .back-link:active { background: var(--surface-2); }
   .theme-switch { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 3px; }
   .theme-switch button { background: transparent; border: none; color: var(--text-dim); padding: 6px 10px; border-radius: 7px; font-family: inherit; font-size: 12px; cursor: pointer; }
   .theme-switch button.active { background: var(--surface-2); color: var(--text); }
+
+  .page-title { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 24px; }
+  .page-title .dot { color: #f97316; }
 
   .apps { display: flex; flex-direction: column; gap: 14px; }
   .app-card {
@@ -74,10 +78,8 @@
     top: 0; left: 0; right: 0; height: 3px;
     background: var(--card-color);
   }
-  .app-card.plan   { --card-color: #94a3b8; }
-  .app-card.health { --card-color: #f97316; }
-  .app-card.money  { --card-color: #a855f7; }
-  .app-card.edu    { --card-color: #eab308; }
+  .app-card.fuel  { --card-color: #10b981; }
+  .app-card.train { --card-color: #ef4444; }
   .app-card .title { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; }
   .app-card .title .dot { color: var(--card-color); }
   .app-card .arrow { position: absolute; top: 50%; right: 24px; transform: translateY(-50%); color: var(--text-faint); font-size: 24px; opacity: 0.5; }
@@ -86,39 +88,32 @@
     .container { padding: 20px 14px 30px; }
     .app-card { padding: 22px 18px; }
     .app-card .title { font-size: 21px; }
+    .page-title { font-size: 24px; }
   }
 </style>
 </head>
 <body>
 <div class="container">
   <header>
-    <div class="brand">Organizer</div>
+    <a href="index.html" class="back-link">← Apps</a>
     <div class="theme-switch">
-      <button data-theme="auto" title="Automatisch">A</button>
-      <button data-theme="light" title="Hell">☀</button>
-      <button data-theme="dark" title="Dunkel">🌙</button>
+      <button data-theme="auto">A</button>
+      <button data-theme="light">☀</button>
+      <button data-theme="dark">🌙</button>
     </div>
   </header>
 
+  <div class="page-title">Health<span class="dot">.</span></div>
+
   <div class="apps">
-    <a href="terminplaner.html" class="app-card plan">
+    <a href="fuel.html" class="app-card fuel">
       <div class="arrow">›</div>
-      <div class="title">Plan<span class="dot">.</span></div>
+      <div class="title">Fuel<span class="dot">.</span></div>
     </a>
 
-    <a href="health.html" class="app-card health">
+    <a href="train.html" class="app-card train">
       <div class="arrow">›</div>
-      <div class="title">Health<span class="dot">.</span></div>
-    </a>
-
-    <a href="haushaltsbuch.html" class="app-card money">
-      <div class="arrow">›</div>
-      <div class="title">Budget<span class="dot">.</span></div>
-    </a>
-
-    <a href="education.html" class="app-card edu">
-      <div class="arrow">›</div>
-      <div class="title">Education<span class="dot">.</span></div>
+      <div class="title">Train<span class="dot">.</span></div>
     </a>
   </div>
 </div>
