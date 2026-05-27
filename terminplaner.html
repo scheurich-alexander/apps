@@ -71,6 +71,8 @@
   body { font-family: 'Manrope', -apple-system, sans-serif; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.5; overscroll-behavior: none; transition: background 0.2s, color 0.2s; }
   .app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; padding-top: var(--safe-top); padding-bottom: var(--safe-bot); }
   header { padding: 16px 20px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-shrink: 0; }
+  .back-btn { background: var(--surface-2); border: 1px solid var(--border); color: var(--text); width: 38px; height: 38px; border-radius: 10px; font-size: 22px; font-weight: 600; cursor: pointer; display: grid; place-items: center; text-decoration: none; line-height: 1; padding-bottom: 2px; }
+  .back-btn:active { background: var(--border); }
   .title { font-weight: 800; font-size: 22px; letter-spacing: -0.02em; }
   .title .accent { color: var(--accent); }
   .header-btn { background: var(--surface-2); border: 1px solid var(--border); color: var(--text); width: 38px; height: 38px; border-radius: 10px; font-size: 16px; cursor: pointer; display: grid; place-items: center; }
@@ -253,6 +255,7 @@
 <body>
 <div class="app">
   <header>
+    <a href="index.html" class="back-btn" title="Zurück zur Übersicht">‹</a>
     <div class="title">Plan<span class="accent">.</span></div>
     <div class="header-actions">
       <button class="header-btn" id="syncBtn" title="Apple-Kalender synchronisieren">↻</button>
@@ -461,11 +464,12 @@ const COLOR_PALETTE = [
 
 // Default-Kategorien (User kann ändern/erweitern)
 const DEFAULT_CATEGORIES = [
-  { id: 'rd',    name: 'Rettungsdienst', color: '#ef4444', isShift: true  },
-  { id: 'brk',   name: 'BRK Ehrenamt',   color: '#f97316', isShift: false },
-  { id: 'sport', name: 'Sport',          color: '#22c55e', isShift: false },
-  { id: 'haus',  name: 'Haushalt',       color: '#3b82f6', isShift: false },
-  { id: 'pers',  name: 'Persönlich',     color: '#a855f7', isShift: false }
+  { id: 'rd',      name: 'Rettungsdienst', color: '#ef4444', isShift: true  },
+  { id: 'brk',     name: 'BRK Ehrenamt',   color: '#f97316', isShift: false },
+  { id: 'sport',   name: 'Sport',          color: '#22c55e', isShift: false },
+  { id: 'haus',    name: 'Haushalt',       color: '#3b82f6', isShift: false },
+  { id: 'pers',    name: 'Persönlich',     color: '#a855f7', isShift: false },
+  { id: 'finance', name: 'Finanzen',       color: '#0891b2', isShift: false }
 ];
 
 let state = {
@@ -513,6 +517,11 @@ function loadData() {
     state.categories.forEach(c => {
       if (state.filters[c.id] === undefined) state.filters[c.id] = true;
     });
+    // Finance-Kategorie auto-hinzufügen falls nicht da (für Bestands-User)
+    if (!state.categories.find(c => c.id === 'finance')) {
+      state.categories.push({ id: 'finance', name: 'Finanzen', color: '#0891b2', isShift: false });
+      state.filters.finance = true;
+    }
   } catch(e) { console.warn('Load failed:', e); }
 }
 function saveData() {
@@ -973,6 +982,27 @@ function expandOwnRecurring(ev, rangeStart, rangeEnd) {
   return results;
 }
 
+// ============= HAUSHALTSBUCH-INTEGRATION =============
+// Liest gemeinsame Finanz-Daten aus localStorage (vom Haushaltsbuch geschrieben)
+function getFinanceEvents() {
+  try {
+    const raw = localStorage.getItem('shared_finance_events');
+    if (!raw) return [];
+    const data = JSON.parse(raw);
+    if (!data.events || !Array.isArray(data.events)) return [];
+    return data.events;
+  } catch(e) { return []; }
+}
+
+function getFinanceLastSync() {
+  try {
+    const raw = localStorage.getItem('shared_finance_events');
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    return data.updatedAt ? new Date(data.updatedAt) : null;
+  } catch(e) { return null; }
+}
+
 function allEventsForRange(rangeStart, rangeEnd) {
   const map = {};
   let d = new Date(rangeStart);
@@ -998,6 +1028,32 @@ function allEventsForRange(rangeStart, rangeEnd) {
       if (map[ev.date]) map[ev.date].push({ ...ev });
     }
   });
+
+  // Haushaltsbuch-Finanzevents einbauen (falls Filter aktiv)
+  if (state.filters.finance !== false) {
+    getFinanceEvents().forEach(ev => {
+      if (map[ev.date]) {
+        // In Plan-kompatibles Format konvertieren
+        map[ev.date].push({
+          id: ev.id,
+          title: ev.title,
+          date: ev.date,
+          endDate: ev.date,
+          cat: 'finance',
+          start: '',
+          end: '',
+          allDay: true,
+          note: ev.category ? `${ev.category} · ${ev.accountName || ''}` : (ev.accountName || ''),
+          remind: 0,
+          repeat: 'none',
+          isFinance: true,
+          isIncome: ev.isIncome,
+          fromHaushaltsbuch: true
+        });
+      }
+    });
+  }
+
   return map;
 }
 
@@ -1846,6 +1902,25 @@ setInterval(() => { if (state.calendars.length > 0) syncAllCalendars(); }, 15 * 
 // Bei Theme "auto" auf Systemwechsel hören
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
   if (state.settings.theme === 'auto') applyTheme();
+});
+
+// Auto-Sync mit Haushaltsbuch wenn Tab wieder sichtbar wird oder localStorage geändert wird
+let lastFinanceSync = getFinanceLastSync();
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    const current = getFinanceLastSync();
+    if (current && (!lastFinanceSync || current.getTime() !== lastFinanceSync.getTime())) {
+      lastFinanceSync = current;
+      render();
+    }
+  }
+});
+// Storage-Event triggert auch wenn ein anderer Tab im selben Browser Daten geändert hat
+window.addEventListener('storage', (e) => {
+  if (e.key === 'shared_finance_events') {
+    lastFinanceSync = getFinanceLastSync();
+    render();
+  }
 });
 </script>
 </body>
