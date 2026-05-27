@@ -1100,7 +1100,9 @@ function renderBudget(){
   //  - "Sonderausgaben" = eigene Zeile als Abgang
   const extraSonderTotal = sonderS.extra; // = sonderByTopf.extra
   const extraReserveGeparkt = reserveExtraOhneSonder; // nur normale Reserve-Posten im Extra-Anteil
-  const extraSumme = extraIncome - extraExp; // extraExp enthält bereits Sonderausgaben
+  // Summe = Einnahmen − Ausgaben (Sonderausgaben sind nicht in extraExp, da sie separat behandelt werden müssen)
+  // extraExp enthält Sonderausgaben bereits, daher zusätzlich abziehen sie ein zweites Mal
+  const extraSumme = extraIncome - extraExp - extraSonderTotal;
   document.getElementById('extraSummary').innerHTML = summaryHtml(
     extraIncome, extraExp, extraSav, extraReserveGeparkt,
     {
@@ -1119,8 +1121,8 @@ function renderBudget(){
   // Reserve-Anzeige Gesamt: Grund (geparkt) + Reserve-Extra-Geparkt (ohne Sonderausgaben)
   const gesamtReserveGeparkt = grundRes + extraReserveGeparkt;
   // Summe = was diesen Monat netto an Geld da ist
-  // gesamtAusgaben enthält bereits Sonderausgaben (in extraExp drin)
-  const gesamtSumme = gesamtIncome - gesamtAusgaben + grundRes + grundSav;
+  // Sonderausgaben werden zusätzlich abgezogen (wie in Extra-Box)
+  const gesamtSumme = gesamtIncome - gesamtAusgaben + grundRes + grundSav - extraSonderTotal;
   document.getElementById('gesamtSummary').innerHTML = summaryHtml(
     gesamtIncome, gesamtAusgaben, gesamtVorsorge, gesamtReserveGeparkt,
     {
