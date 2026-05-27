@@ -264,10 +264,12 @@
   <header>
     <h1>Budget<span class="accent">.</span></h1>
     <div class="month-picker">
-      <button id="prevMonth" aria-label="Vorheriger Monat">‹</button>
+      <button id="prevYear" aria-label="Vorheriges Jahr" title="Vorheriges Jahr">«</button>
+      <button id="prevMonth" aria-label="Vorheriger Monat" title="Vorheriger Monat">‹</button>
       <span id="monthLabel">—</span>
-      <button id="nextMonth" aria-label="Nächster Monat">›</button>
-      <button id="todayBtn" title="Zum aktuellen Monat">Heute</button>
+      <button id="nextMonth" aria-label="Nächster Monat" title="Nächster Monat">›</button>
+      <button id="nextYear" aria-label="Nächstes Jahr" title="Nächstes Jahr">»</button>
+      <button id="todayBtn" title="Zum aktuellen Monat">akt. Monat</button>
     </div>
   </header>
 
@@ -1260,7 +1262,52 @@ function renderAccountsForCategory(cat, year, month, readonly){
     const s = accountSplit(a.id, year, month);
     const isOpen = !!state.expanded['acc:'+a.id];
     const entries = accountEntries(a.id).filter(e => entryVisibleIn(e, year, month));
-    const entriesHtml = entries.length ? entries.map(e => entryRowHtml(e, readonly)).join('') : '<div class="empty-state">Keine aktiven Posten in diesem Monat.</div>';
+    const isReserve = (cat.type === 'reserve');
+
+    // Bei Reserve-Konten: Konto-Budget als virtueller Posten anzeigen (falls aktiv und sichtbar in diesem Monat)
+    let budgetEntryHtml = '';
+    if (isReserve && a.budget) {
+      const bm = accountBudgetMonthly(a, year, month);
+      const b = a.budget;
+      const startIdx = (b.startYear || 0) * 12 + ((b.startMonth || 1) - 1);
+      const curIdx = idxOf(year, month);
+      const goal = Number(b.goal) || 0;
+      const balUpToPrev = goal > 0 ? accountBalanceUpToWithoutBudget(a.id, year, month, 'prev') : 0;
+      const goalReached = goal > 0 && balUpToPrev >= goal - 0.001;
+      // Anzeigen wenn: aktiv & Start erreicht & nicht schon zielerreicht
+      if (curIdx >= startIdx) {
+        const monthsSinceStart = curIdx - startIdx;
+        const intMonths = INTERVAL_MONTHS[b.freq] || 1;
+        const isDue = (intMonths === 1) || (monthsSinceStart % intMonths === 0);
+        if (isDue) {
+          const rate = Number(b.rate) || 0;
+          const active = b.active !== false;
+          const toLabel = b.to === 'grund' ? 'Grundbudget' : 'Extrabudget';
+          const statusBadge = goalReached
+            ? '<span class="badge done">✓ Ziel erreicht</span>'
+            : (active ? '<span class="badge anschaff">Konto-Budget</span>' : '<span class="badge done">Pausiert</span>');
+          const valDisplay = (active && !goalReached) ? fmt(rate) : fmt(0);
+          budgetEntryHtml = `
+            <div class="entry-row" style="opacity:${(active && !goalReached) ? 1 : 0.5}">
+              <div class="entry-main">
+                <div class="entry-desc">
+                  <span class="entry-name">${escapeHtml(a.name)} – Sparplan</span>
+                  ${statusBadge}
+                </div>
+                <div class="entry-meta">Rate ${fmt(rate)} ${FREQ_LABEL[b.freq || 'monthly']} · ${toLabel}${goal > 0 ? ` · Ziel ${fmt(goal)}` : ''}</div>
+              </div>
+              <div class="entry-right">
+                <span class="entry-amount">${valDisplay}</span>
+                ${!readonly ? `<button type="button" class="more" data-editaccount="${a.id}" title="Konto-Budget bearbeiten">⋯</button>` : ''}
+              </div>
+            </div>`;
+        }
+      }
+    }
+
+    const entriesHtml = (entries.length || budgetEntryHtml)
+      ? budgetEntryHtml + entries.map(e => entryRowHtml(e, readonly)).join('')
+      : '<div class="empty-state">Keine aktiven Posten in diesem Monat.</div>';
     const transferBtn = (!readonly && transferable) ? `<button type="button" class="acc-ctrl" data-transfer="${a.id}" title="Abbuchen / Umbuchen">⇄</button>` : '';
     const controls = readonly ? '' : `
       ${transferBtn}
@@ -1520,7 +1567,10 @@ document.getElementById('rueckzahlungenContent').addEventListener('click', kindP
 /* ---------- Month navigation ---------- */
 document.getElementById('prevMonth').addEventListener('click', () => shiftMonth(-1));
 document.getElementById('nextMonth').addEventListener('click', () => shiftMonth(1));
+document.getElementById('prevYear').addEventListener('click', () => shiftYear(-1));
+document.getElementById('nextYear').addEventListener('click', () => shiftYear(1));
 document.getElementById('todayBtn').addEventListener('click', () => { const n=new Date(); state.view.year=n.getFullYear(); state.view.month=n.getMonth()+1; save(); renderAll(); });
+function shiftYear(delta){ state.view.year += delta; save(); renderAll(); }
 function shiftMonth(delta){ let m=state.view.month+delta, y=state.view.year; while(m<1){m+=12;y--;} while(m>12){m-=12;y++;} state.view.month=m; state.view.year=y; save(); renderAll(); }
 
 /* ---------- Grundbudget setting ---------- */
