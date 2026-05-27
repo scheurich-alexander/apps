@@ -768,15 +768,22 @@ function renderMonthLabel(){ const {year,month}=state.view; document.getElementB
 function renderHero(){ const {year,month}=state.view; const bal=totalBalanceUpTo(year,month); const el=document.getElementById('totalBalance'); el.textContent=fmt(bal); el.classList.toggle('neg', bal<-0.001); document.getElementById('totalIncomeHero').textContent = fmt(monthIncome(year,month)); }
 function summaryHtml(income, ausgaben, vorsorge, reserve, opt){
   opt = opt || {};
-  const summe = (income - ausgaben) + vorsorge + reserve;
+  // Wenn ein zusätzlicher "+ Grundbudget"-Übertrag vorliegt (für Extrabudget-Box),
+  // wird er in die Summe und als eigene Zeile mit einbezogen.
+  const grundCarry = Number(opt.grundCarry) || 0;
+  const summe = (income - ausgaben) + vorsorge + reserve + grundCarry;
   const ausgRow = opt.signed
     ? `<div class="bsum-row"><span class="bsum-label">Ausgaben</span><span class="bsum-val ${ausgaben<-0.001?'neg':''}">${fmt(ausgaben)}</span></div>`
     : `<div class="bsum-row"><span class="bsum-label">Ausgaben</span><span class="bsum-val exp">−${fmt(ausgaben)}</span></div>`;
+  const grundRow = opt.showGrundCarry
+    ? `<div class="bsum-row"><span class="bsum-label">+ Grundbudget</span><span class="bsum-val ${grundCarry<-0.001?'neg':''}">${fmt(grundCarry)}</span></div>`
+    : '';
   return `
     <div class="bsum-row"><span class="bsum-label">Einnahmen</span><span class="bsum-val">${fmt(income)}</span></div>
     ${ausgRow}
     <div class="bsum-row"><span class="bsum-label">+ Vorsorge</span><span class="bsum-val">${fmt(vorsorge)}</span></div>
     <div class="bsum-row"><span class="bsum-label">+ Reserve</span><span class="bsum-val">${fmt(reserve)}</span></div>
+    ${grundRow}
     <div class="bsum-row strong"><span class="bsum-label">Summe</span><span class="bsum-val ${summe<-0.001?'neg':''}">${fmt(summe)}</span></div>`;
 }
 function budgetBucketRow(name, used, target, color){
@@ -797,9 +804,19 @@ function renderBudget(){
   const grundExp = fixS.grund + ausgS.grund, extraExp = fixS.extra + ausgS.extra;
   const grundSav = sparS.grund, extraSav = sparS.extra;
   const grundRes = resS.grund, extraRes = resS.extra;
-  const extraAusgaben = grundExp + extraExp; // alle Ausgaben-Posten (Grund- + Extra-Anteil)
+
+  // Grundbudget-Box: Ausgaben aus Grund-Anteil
   document.getElementById('grundSummary').innerHTML = summaryHtml(grundIncome, grundExp, grundSav, grundRes);
-  document.getElementById('extraSummary').innerHTML = summaryHtml(extraIncome, extraAusgaben, extraSav + grundSav, extraRes + grundRes);
+
+  // Grundbudget-Saldo dieses Monats (= "Summe" der Grund-Box)
+  const grundSumme = (grundIncome - grundExp) + grundSav + grundRes;
+
+  // Extrabudget-Box: NUR Extra-Anteil als Ausgaben, plus Grund-Saldo als Übertrag
+  document.getElementById('extraSummary').innerHTML = summaryHtml(
+    extraIncome, extraExp, extraSav, extraRes,
+    { grundCarry: grundSumme, showGrundCarry: true }
+  );
+
   document.getElementById('ruleBasisLabel').textContent = `· auf Gesamteinnahmen ${fmt(income)}`;
   document.getElementById('bucketBox').innerHTML = BUCKET_DEFS.map(b=>{ const used=sumTypes([b.type],year,month); return budgetBucketRow(b.name, used, income*b.pct, b.color); }).join('');
   document.getElementById('grundBudgetInput').value = G;
