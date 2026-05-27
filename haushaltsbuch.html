@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="theme-color" content="#7c3aed" />
-<title>Haushaltsbuch</title>
+<title>Budget</title>
 <style>
   :root, :root[data-theme="light"] {
     --bg:#f5f5f7; --surface:#fff; --surface-2:#ececef; --border:#e3e3e6;
@@ -26,7 +26,8 @@
   body { padding-bottom: env(safe-area-inset-bottom); }
   .app { max-width:920px; margin:0 auto; padding:20px 18px 80px; }
   header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; gap:8px; flex-wrap:wrap; }
-  header h1 { font-size:22px; margin:0; letter-spacing:-0.01em; font-weight:600; }
+  header h1 { font-size:22px; margin:0; letter-spacing:-0.02em; font-weight:800; }
+  header h1 .accent { color: #a855f7; }
   .top-bar { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:12px; }
   .back-link { display:inline-flex; align-items:center; gap:6px; padding:7px 12px; background:var(--surface); border:1px solid var(--border); border-radius:8px; font-size:13px; color:var(--text-muted); text-decoration:none; font-weight:500; }
   .back-link:hover { background:var(--surface-2); color:var(--text); }
@@ -241,7 +242,7 @@
     </div>
   </div>
   <header>
-    <h1>Haushaltsbuch</h1>
+    <h1>Budget<span class="accent">.</span></h1>
     <div class="month-picker">
       <button id="prevMonth" aria-label="Vorheriger Monat">‹</button>
       <span id="monthLabel">—</span>
