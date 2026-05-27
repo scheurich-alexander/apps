@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Apps">
+<meta name="apple-mobile-web-app-title" content="Organizer">
 <meta name="theme-color" content="#0a0a0c" id="themeColor">
-<title>Meine Apps</title>
+<title>Organizer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -64,16 +64,11 @@
   }
   .container { max-width: 600px; margin: 0 auto; padding: 28px 20px 40px; }
 
-  header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+  header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 36px; }
   .brand { font-size: 14px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); }
   .theme-switch { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 3px; }
   .theme-switch button { background: transparent; border: none; color: var(--text-dim); padding: 6px 10px; border-radius: 7px; font-family: inherit; font-size: 12px; cursor: pointer; }
   .theme-switch button.active { background: var(--surface-2); color: var(--text); }
-
-  .hero { margin-bottom: 36px; }
-  .greeting { font-size: 13px; color: var(--text-dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
-  .hero h1 { font-size: 36px; font-weight: 900; letter-spacing: -0.03em; line-height: 1.1; }
-  .hero p { color: var(--text-dim); font-size: 15px; margin-top: 12px; line-height: 1.5; }
 
   .apps { display: flex; flex-direction: column; gap: 14px; }
   .app-card {
@@ -81,7 +76,7 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 18px;
-    padding: 22px 22px;
+    padding: 28px 24px;
     text-decoration: none;
     color: var(--text);
     transition: transform 0.15s, border-color 0.15s;
@@ -99,34 +94,20 @@
   .app-card.fuel { --card-color: #10b981; }
   .app-card.train { --card-color: #ef4444; }
   .app-card.money { --card-color: #0891b2; }
-  .app-card .head { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
-  .app-card .icon-circle { width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center; font-size: 24px; }
-  .app-card.plan .icon-circle { background: rgba(255, 181, 71, 0.15); }
-  .app-card.fuel .icon-circle { background: rgba(16, 185, 129, 0.15); }
-  .app-card.train .icon-circle { background: rgba(239, 68, 68, 0.15); }
-  .app-card.money .icon-circle { background: rgba(8, 145, 178, 0.15); }
-  .app-card .title { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; }
-  .app-card .badge { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; padding: 3px 8px; border-radius: 5px; background: var(--surface-2); color: var(--text-dim); margin-left: auto; }
-  .app-card .desc { color: var(--text-dim); font-size: 14px; line-height: 1.5; }
-  .app-card .features { display: flex; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
-  .app-card .feature { font-size: 11px; color: var(--text-faint); display: flex; align-items: center; gap: 4px; font-weight: 600; }
-  .app-card .arrow { position: absolute; top: 22px; right: 22px; color: var(--text-faint); font-size: 20px; opacity: 0.5; }
-
-  .footer { margin-top: 40px; text-align: center; color: var(--text-faint); font-size: 12px; line-height: 1.6; }
-  .footer .tip { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px; margin-top: 16px; font-size: 12px; color: var(--text-dim); text-align: left; line-height: 1.5; }
-  .footer .tip strong { color: var(--text); }
+  .app-card .title { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; }
+  .app-card .arrow { position: absolute; top: 50%; right: 24px; transform: translateY(-50%); color: var(--text-faint); font-size: 24px; opacity: 0.5; }
 
   @media (max-width: 380px) {
     .container { padding: 20px 14px 30px; }
-    .hero h1 { font-size: 28px; }
-    .app-card { padding: 18px 16px; }
+    .app-card { padding: 22px 18px; }
+    .app-card .title { font-size: 21px; }
   }
 </style>
 </head>
 <body>
 <div class="container">
   <header>
-    <div class="brand">⚡ Meine Apps</div>
+    <div class="brand">Organizer</div>
     <div class="theme-switch">
       <button data-theme="auto" title="Automatisch">A</button>
       <button data-theme="light" title="Hell">☀</button>
@@ -134,80 +115,30 @@
     </div>
   </header>
 
-  <div class="hero">
-    <div class="greeting" id="greeting">Willkommen</div>
-    <h1>Bereit?</h1>
-    <p>Drei Apps für Schichtdienst, Ernährung und Training – alles offline-fähig, deine Daten bleiben auf deinem Gerät.</p>
-  </div>
-
   <div class="apps">
     <a href="terminplaner.html" class="app-card plan">
       <div class="arrow">›</div>
-      <div class="head">
-        <div class="icon-circle">📅</div>
-        <div class="title">Plan</div>
-      </div>
-      <div class="desc">Terminplaner mit Schichtdienst, Apple-Kalender-Sync und individuellen Kategorien.</div>
-      <div class="features">
-        <div class="feature">⏰ Schichten</div>
-        <div class="feature">⇄ Apple-Sync</div>
-        <div class="feature">🔔 Erinnerungen</div>
-      </div>
+      <div class="title">Plan</div>
     </a>
 
     <a href="fuel.html" class="app-card fuel">
       <div class="arrow">›</div>
-      <div class="head">
-        <div class="icon-circle">🍽️</div>
-        <div class="title">Fuel</div>
-      </div>
-      <div class="desc">Ernährung, Wasser und Körperwerte tracken. Mit Barcode-Scanner und Online-Datenbank.</div>
-      <div class="features">
-        <div class="feature">📷 Barcode</div>
-        <div class="feature">🌐 Online-Suche</div>
-        <div class="feature">📊 Trends</div>
-      </div>
+      <div class="title">Fuel</div>
     </a>
 
     <a href="train.html" class="app-card train">
       <div class="arrow">›</div>
-      <div class="head">
-        <div class="icon-circle">🥊</div>
-        <div class="title">Train</div>
-      </div>
-      <div class="desc">Krav-Maga-Techniken, Krafttraining, Boxsack-Timer und Fortschritts-Statistik.</div>
-      <div class="features">
-        <div class="feature">📖 Techniken</div>
-        <div class="feature">⏱️ Timer</div>
-        <div class="feature">📊 Statistik</div>
-      </div>
+      <div class="title">Train</div>
     </a>
 
     <a href="haushaltsbuch.html" class="app-card money">
       <div class="arrow">›</div>
-      <div class="head">
-        <div class="icon-circle">💰</div>
-        <div class="title">Haushalt</div>
-      </div>
-      <div class="desc">Einnahmen, Ausgaben und Budgets nach 50-30-20-Regel. Synchronisiert mit Plan.</div>
-      <div class="features">
-        <div class="feature">💸 Budgets</div>
-        <div class="feature">📅 Fälligkeiten</div>
-        <div class="feature">⇄ Sync zu Plan</div>
-      </div>
+      <div class="title">Budget</div>
     </a>
-  </div>
-
-  <div class="footer">
-    <div class="tip">
-      <strong>💡 Tipp:</strong> Diese Seite auf dem iPhone als App speichern: Safari → <strong>Teilen-Button</strong> (Kästchen mit Pfeil) → <strong>„Zum Home-Bildschirm"</strong>. Dann hast du ein App-Symbol wie eine echte App.
-    </div>
-    <div style="margin-top: 14px">Made with ❤️ • Daten bleiben lokal im Browser</div>
   </div>
 </div>
 
 <script>
-  // Theme-Logik
   const THEME_KEY = 'apps_home_theme';
   let theme = localStorage.getItem(THEME_KEY) || 'auto';
   function applyTheme() {
@@ -227,17 +158,6 @@
     if (theme === 'auto') applyTheme();
   });
   applyTheme();
-
-  // Begrüßung nach Uhrzeit
-  const h = new Date().getHours();
-  let greeting = 'Hallo';
-  if (h < 5) greeting = 'Späte Stunde';
-  else if (h < 11) greeting = 'Guten Morgen';
-  else if (h < 14) greeting = 'Hallo';
-  else if (h < 18) greeting = 'Guten Tag';
-  else if (h < 22) greeting = 'Guten Abend';
-  else greeting = 'Späte Stunde';
-  document.getElementById('greeting').textContent = greeting;
 </script>
 </body>
 </html>
