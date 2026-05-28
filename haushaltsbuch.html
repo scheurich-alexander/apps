@@ -1277,7 +1277,7 @@ function renderCategoryBars(containerId, readonly){
     //  - Vorsorge (spar): nur Grund
     let barTotal;
     if (cat.type === 'spar') barTotal = s.grund;
-    else if (cat.type === 'reserve') barTotal = s.grund + (s.extra - s.grund); // = s.extra (benötigter Betrag)
+    else if (cat.type === 'reserve') barTotal = s.grund + s.extra; // Polster + zu zahlen
     else barTotal = s.grund + s.extra;
     const barTotalHtml = `<span class="cat-total">${fmt(barTotal)}</span>`;
 
@@ -1391,11 +1391,11 @@ function renderAccountsForCategory(cat, year, month, readonly){
       reserveHeader = reserveAccountSummaryHtml(a);
     }
 
-    // Konto-Header rechts: bei Reserve den benötigten Gesamtbetrag (Grund + Noch-zu-zahlen),
+    // Konto-Header rechts: bei Reserve den Gesamtbetrag (Polster + zu zahlen),
     // sonst den normalen Grund/Extra-Split
     let accRightVal;
     if (isReserve) {
-      const gesamt = s.grund + (s.extra - s.grund); // = s.extra (benötigter Betrag)
+      const gesamt = s.grund + s.extra; // Polster + zu zahlen
       accRightVal = `<span class="cat-total" style="background:rgba(168,85,247,0.18); color:var(--text);">${fmt(gesamt)}</span>`;
     } else {
       accRightVal = splitPills(s.grund, s.extra);
