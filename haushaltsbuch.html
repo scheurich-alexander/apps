@@ -1278,8 +1278,13 @@ function renderCategoryBars(containerId, readonly){
     let barTotal;
     if (cat.type === 'spar') barTotal = s.grund;
     else if (cat.type === 'reserve') {
-      const nochZuZahlen = Math.max(0, s.extra - s.grund);
-      barTotal = s.grund + nochZuZahlen;
+      // Pro Konto rechnen, dann summieren (sonst gehen Polster zwischen Konten verloren)
+      barTotal = 0;
+      for (const a of categoryAccounts(cat.key)) {
+        const acs = accountSplit(a.id, year, month);
+        const nochZuZahlen = Math.max(0, acs.extra - acs.grund);
+        barTotal += acs.grund + nochZuZahlen;
+      }
     }
     else barTotal = s.grund + s.extra;
     const barTotalHtml = `<span class="cat-total">${fmt(barTotal)}</span>`;
@@ -1290,12 +1295,19 @@ function renderCategoryBars(containerId, readonly){
       // Vorsorge: nur Grund anzeigen
       splitHeader = `<div class="cat-split-header"><span class="csh-item"><span class="csh-label">Grundbudget</span><span class="csh-val grund">${fmt(s.grund)}</span></span></div>`;
     } else if (cat.type === 'reserve') {
-      // Reserve: Grundbudget = Polster, Noch-zu-zahlen = max(0, Extra − Grund)
-      const nochZuZahlen = Math.max(0, s.extra - s.grund);
+      // Reserve: Grundbudget = Polster (Summe über Konten),
+      // Noch-zu-zahlen = pro Konto max(0, extra − grund), dann summieren
+      let nochZuZahlenSum = 0;
+      let grundSum = 0;
+      for (const a of categoryAccounts(cat.key)) {
+        const acs = accountSplit(a.id, year, month);
+        nochZuZahlenSum += Math.max(0, acs.extra - acs.grund);
+        grundSum += acs.grund;
+      }
       splitHeader = `
         <div class="cat-split-header">
-          <span class="csh-item"><span class="csh-label">Grundbudget</span><span class="csh-val grund">${fmt(s.grund)}</span></span>
-          <span class="csh-item"><span class="csh-label">Noch zu zahlen</span><span class="csh-val ${nochZuZahlen>0.001?'extra':'grund'}">${fmt(nochZuZahlen)}</span></span>
+          <span class="csh-item"><span class="csh-label">Grundbudget</span><span class="csh-val grund">${fmt(grundSum)}</span></span>
+          <span class="csh-item"><span class="csh-label">Noch zu zahlen</span><span class="csh-val ${nochZuZahlenSum>0.001?'extra':'grund'}">${fmt(nochZuZahlenSum)}</span></span>
         </div>`;
     } else {
       splitHeader = `
