@@ -25,10 +25,12 @@
   html, body { margin:0; padding:0; background:var(--bg); color:var(--text); font-family:var(--font); -webkit-font-smoothing:antialiased; }
   body { padding-bottom: env(safe-area-inset-bottom); }
   .app { max-width:920px; margin:0 auto; padding:20px 18px 80px; }
-  header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; gap:8px; flex-wrap:wrap; }
-  header h1 { font-size:22px; margin:0; letter-spacing:-0.02em; font-weight:800; }
-  header h1 .accent { color: #a855f7; }
-  .top-bar { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:12px; }
+  header { display:none; }
+  .top-bar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
+  .top-bar-left { display:flex; align-items:center; gap:8px; }
+  .top-title { font-size:32px; margin:0; letter-spacing:-0.02em; font-weight:800; }
+  .top-title .accent { color: #a855f7; }
+  @media (max-width:480px) { .top-title { font-size:26px; } }
   .back-link { display:inline-flex; align-items:center; gap:6px; padding:7px 12px; background:var(--surface); border:1px solid var(--border); border-radius:8px; font-size:13px; color:var(--text-muted); text-decoration:none; font-weight:500; }
   .back-link:hover { background:var(--surface-2); color:var(--text); }
   .theme-switch { display:flex; gap:3px; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:3px; }
@@ -36,9 +38,11 @@
   .theme-switch button.active { background:var(--surface-2); color:var(--text); }
 
   .month-picker { display:flex; align-items:center; gap:2px; background:var(--surface); border:1px solid var(--border); padding:4px; border-radius:10px; }
+  .month-picker-wrap { display:flex; justify-content:center; align-items:center; gap:8px; margin:0 0 16px; flex-wrap:wrap; }
+  .month-picker-wrap.month-picker-bottom { margin-top:32px; }
   .month-picker button { background:transparent; border:none; cursor:pointer; color:var(--text); height:30px; min-width:30px; border-radius:7px; font-size:17px; line-height:1; padding:0 6px; }
   .month-picker button:hover { background:var(--bg); }
-  .month-picker button#todayBtn { font-size:12px; font-weight:600; color:var(--accent); }
+  .month-picker button#todayBtn, .month-picker button#todayBtnB { font-size:12px; font-weight:600; color:var(--accent); padding:0 12px; }
   .month-picker span { min-width:104px; text-align:center; font-weight:500; font-size:14px; }
 
   nav.tabs { display:flex; gap:4px; background:var(--surface); border:1px solid var(--border); padding:4px; border-radius:12px; margin-bottom:14px; overflow-x:auto; -webkit-overflow-scrolling:touch; }
@@ -267,24 +271,28 @@
 <body>
 <div class="app">
   <div class="top-bar">
-    <a href="index.html" class="back-link">← Apps</a>
-    <div class="theme-switch">
-      <button data-theme="auto" title="Automatisch">Auto</button>
-      <button data-theme="light" title="Hell">☀</button>
-      <button data-theme="dark" title="Dunkel">🌙</button>
+    <div class="top-bar-left">
+      <a href="index.html" class="back-link">← Apps</a>
+      <div class="theme-switch">
+        <button data-theme="auto" title="Automatisch">Auto</button>
+        <button data-theme="light" title="Hell">☀</button>
+        <button data-theme="dark" title="Dunkel">🌙</button>
+      </div>
     </div>
+    <h1 class="top-title">Budget<span class="accent">.</span></h1>
   </div>
-  <header>
-    <h1>Budget<span class="accent">.</span></h1>
+  <div class="month-picker-wrap">
     <div class="month-picker">
       <button id="prevYear" aria-label="Vorheriges Jahr" title="Vorheriges Jahr">«</button>
       <button id="prevMonth" aria-label="Vorheriger Monat" title="Vorheriger Monat">‹</button>
       <span id="monthLabel">—</span>
       <button id="nextMonth" aria-label="Nächster Monat" title="Nächster Monat">›</button>
       <button id="nextYear" aria-label="Nächstes Jahr" title="Nächstes Jahr">»</button>
+    </div>
+    <div class="month-picker today-pill">
       <button id="todayBtn" title="Zum aktuellen Monat">akt. Monat</button>
     </div>
-  </header>
+  </div>
 
   <div class="hero-grid">
     <div class="hero hero-main">
@@ -342,6 +350,19 @@
 
   <section class="page" id="page-anschaffungen"><div id="anschaffungenContent"></div></section>
   <section class="page" id="page-rueckzahlungen"><div id="rueckzahlungenContent"></div></section>
+
+  <div class="month-picker-wrap month-picker-bottom">
+    <div class="month-picker">
+      <button id="prevYearB" aria-label="Vorheriges Jahr" title="Vorheriges Jahr">«</button>
+      <button id="prevMonthB" aria-label="Vorheriger Monat" title="Vorheriger Monat">‹</button>
+      <span id="monthLabelB">—</span>
+      <button id="nextMonthB" aria-label="Nächster Monat" title="Nächster Monat">›</button>
+      <button id="nextYearB" aria-label="Nächstes Jahr" title="Nächstes Jahr">»</button>
+    </div>
+    <div class="month-picker today-pill">
+      <button id="todayBtnB" title="Zum aktuellen Monat">akt. Monat</button>
+    </div>
+  </div>
 
   <div style="text-align:center;"><span class="settings-link" id="openSettings">⚙ Einstellungen</span></div>
 </div>
@@ -1045,7 +1066,7 @@ function accountBalanceUpTo(accountId, year, month) {
 }
 
 /* ---------- Render: hero / budget ---------- */
-function renderMonthLabel(){ const {year,month}=state.view; document.getElementById('monthLabel').textContent=`${MONTHS_SHORT[month-1]} ${year}`; }
+function renderMonthLabel(){ const {year,month}=state.view; const txt=`${MONTHS_SHORT[month-1]} ${year}`; document.getElementById('monthLabel').textContent=txt; const b=document.getElementById('monthLabelB'); if (b) b.textContent=txt; }
 function renderHero(){ const {year,month}=state.view; const bal=totalBalanceUpTo(year,month); const el=document.getElementById('totalBalance'); el.textContent=fmt(bal); el.classList.toggle('neg', bal<-0.001); const incEl=document.getElementById('totalIncomeHero'); if (incEl) incEl.textContent = fmt(monthIncome(year,month)); }
 function summaryHtml(income, ausgaben, vorsorge, reserve, opt){
   opt = opt || {};
@@ -1743,6 +1764,12 @@ document.getElementById('nextMonth').addEventListener('click', () => shiftMonth(
 document.getElementById('prevYear').addEventListener('click', () => shiftYear(-1));
 document.getElementById('nextYear').addEventListener('click', () => shiftYear(1));
 document.getElementById('todayBtn').addEventListener('click', () => { const n=new Date(); state.view.year=n.getFullYear(); state.view.month=n.getMonth()+1; save(); renderAll(); });
+// Untere Monatsnavigation (gespiegelt)
+document.getElementById('prevMonthB').addEventListener('click', () => shiftMonth(-1));
+document.getElementById('nextMonthB').addEventListener('click', () => shiftMonth(1));
+document.getElementById('prevYearB').addEventListener('click', () => shiftYear(-1));
+document.getElementById('nextYearB').addEventListener('click', () => shiftYear(1));
+document.getElementById('todayBtnB').addEventListener('click', () => { const n=new Date(); state.view.year=n.getFullYear(); state.view.month=n.getMonth()+1; save(); renderAll(); });
 function shiftYear(delta){ state.view.year += delta; save(); renderAll(); }
 function shiftMonth(delta){ let m=state.view.month+delta, y=state.view.year; while(m<1){m+=12;y--;} while(m>12){m-=12;y++;} state.view.month=m; state.view.year=y; save(); renderAll(); }
 
