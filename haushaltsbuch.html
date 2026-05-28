@@ -120,6 +120,13 @@
   .cat-bar { display:flex; align-items:center; justify-content:space-between; width:100%; padding:13px 18px; gap:10px; color:white; font-family:var(--font); font-size:15px; font-weight:600; letter-spacing:-0.005em; }
   .cat-bar .left { display:flex; align-items:center; gap:10px; min-width:0; flex:1; cursor:pointer; }
   .cat-bar .chevron { display:inline-block; transition:transform 0.2s; font-weight:700; font-size:16px; flex-shrink:0; }
+  .cat-total { background:rgba(0,0,0,0.22); padding:4px 11px; border-radius:7px; font-variant-numeric:tabular-nums; font-weight:700; font-size:14px; white-space:nowrap; }
+  .cat-split-header { display:flex; gap:18px; padding:10px 16px; background:var(--surface-2); border-bottom:1px solid var(--border); font-size:12px; font-variant-numeric:tabular-nums; justify-content:flex-end; }
+  .cat-split-header .csh-item { display:flex; flex-direction:column; gap:2px; align-items:flex-end; }
+  .cat-split-header .csh-label { color:var(--text-muted); font-size:10px; text-transform:uppercase; letter-spacing:0.04em; font-weight:600; }
+  .cat-split-header .csh-val { font-weight:700; font-size:14px; }
+  .cat-split-header .csh-val.grund { color:var(--grund); }
+  .cat-split-header .csh-val.extra { color:var(--extra); }
   .cat.open .cat-bar .chevron { transform:rotate(90deg); }
   .cat-right { display:flex; align-items:center; gap:5px; flex-shrink:0; }
   .cat-ctrl { background:rgba(255,255,255,0.22); border:none; color:white; cursor:pointer; width:26px; height:26px; border-radius:7px; font-size:11px; display:inline-flex; align-items:center; justify-content:center; padding:0; }
@@ -275,7 +282,7 @@
 
   <div class="hero-grid">
     <div class="hero hero-main">
-      <div class="label">Gesamtguthaben</div>
+      <div class="label">Nettovermögen</div>
       <div class="value" id="totalBalance">0,00 €</div>
     </div>
     <div class="hero hero-inc">
@@ -627,6 +634,24 @@ function load() {
           }
         }
         obj.migratedReserveSonder = true;
+      }
+      // Migration: alte "Rücklagen"-Kategorie entfernen (war eine Sparkonten-Kategorie über Vorsorge)
+      if (!obj.migratedRemoveRuecklagen) {
+        const ruecklIdx = obj.categories.findIndex(c =>
+          c.name === 'Rücklagen' || c.key === 'ruecklagen' || c.key === 'rücklagen'
+        );
+        if (ruecklIdx > -1) {
+          const ruecklCat = obj.categories[ruecklIdx];
+          // Zugehörige Konten finden
+          const ruecklAccs = obj.accounts.filter(a => a.categoryKey === ruecklCat.key);
+          const ruecklAccIds = ruecklAccs.map(a => a.id);
+          // Konten + zugehörige Einträge entfernen
+          obj.accounts = obj.accounts.filter(a => a.categoryKey !== ruecklCat.key);
+          obj.entries = obj.entries.filter(e => !ruecklAccIds.includes(e.accountId));
+          // Kategorie entfernen
+          obj.categories.splice(ruecklIdx, 1);
+        }
+        obj.migratedRemoveRuecklagen = true;
       }
       for (const a of obj.accounts) if (a.booked === undefined) a.booked = false;
       for (const e of obj.entries) {
@@ -1053,12 +1078,14 @@ function summaryHtml(income, ausgaben, vorsorge, reserve, opt){
     ${ausgRow}
     <div class="bsum-divider"></div>
     <div class="bsum-row sub"><span class="bsum-label">Zwischensumme</span><span class="bsum-val ${zwischen<-0.001?'neg':''}">${fmt(zwischen)}</span></div>
-    <div class="bsum-divider double"></div>
+    <div class="bsum-divider"></div>
     ${reserveRow}
     ${vorsorgeRow}
     ${sonderRow}
     ${grundRow}
-    <div class="bsum-row strong"><span class="bsum-label">Summe</span><span class="bsum-val ${summe<-0.001?'neg':''}">${fmt(summe)}</span></div>`;
+    <div class="bsum-divider double"></div>
+    <div class="bsum-row strong"><span class="bsum-label">Summe</span><span class="bsum-val ${summe<-0.001?'neg':''}">${fmt(summe)}</span></div>
+    <div class="bsum-divider"></div>`;
 }
 function budgetBucketRow(name, used, target, color){
   const isOver = used > target + 0.001;
@@ -1241,13 +1268,37 @@ function renderCategoryBars(containerId, readonly){
       <button type="button" class="cat-ctrl" data-cat-up="${cat.key}" title="nach oben">▲</button>
       <button type="button" class="cat-ctrl" data-cat-down="${cat.key}" title="nach unten">▼</button>
       <button type="button" class="cat-ctrl" data-cat-edit="${cat.key}" title="Bereich bearbeiten">✎</button>`;
+
+    // Gesamtbetrag auf dem Balken (rechts):
+    //  - Standard-Bereiche: Grund + Extra
+    //  - Reserve: Grund + Extra
+    //  - Vorsorge (spar): nur Grund
+    let barTotal;
+    if (cat.type === 'spar') barTotal = s.grund;
+    else barTotal = s.grund + s.extra;
+    const barTotalHtml = `<span class="cat-total">${fmt(barTotal)}</span>`;
+
+    // Split-Anzeige beim Aufklappen (oben im Inhalt)
+    let splitHeader = '';
+    if (cat.type === 'spar') {
+      // Vorsorge: nur Grund anzeigen
+      splitHeader = `<div class="cat-split-header"><span class="csh-item"><span class="csh-label">Grundbudget</span><span class="csh-val grund">${fmt(s.grund)}</span></span></div>`;
+    } else {
+      splitHeader = `
+        <div class="cat-split-header">
+          <span class="csh-item"><span class="csh-label">Grundbudget</span><span class="csh-val grund">${fmt(s.grund)}</span></span>
+          <span class="csh-item"><span class="csh-label">Extrabudget</span><span class="csh-val extra">${fmt(s.extra)}</span></span>
+        </div>`;
+    }
+
     return sep + `
       <div class="cat${isOpen?' open':''}" data-catkey="${cat.key}">
         <div class="cat-bar" style="background:linear-gradient(135deg,${cat.color1},${cat.color2});">
           <span class="left" data-toggle-cat="${cat.key}"><span class="chevron">›</span><span class="name">${escapeHtml(cat.name)}</span></span>
-          <span class="cat-right">${splitPills(s.grund, s.extra)}${controls}</span>
+          <span class="cat-right">${barTotalHtml}${controls}</span>
         </div>
         <div class="cat-content">
+          ${splitHeader}
           ${renderAccountsForCategory(cat, year, month, readonly)}
           ${readonly ? '' : `<button type="button" class="add-btn" data-addaccount="${cat.key}">+ Konto hinzufügen</button>`}
         </div>
