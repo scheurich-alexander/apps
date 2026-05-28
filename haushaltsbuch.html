@@ -1277,7 +1277,10 @@ function renderCategoryBars(containerId, readonly){
     //  - Vorsorge (spar): nur Grund
     let barTotal;
     if (cat.type === 'spar') barTotal = s.grund;
-    else if (cat.type === 'reserve') barTotal = s.grund + s.extra; // Polster + zu zahlen
+    else if (cat.type === 'reserve') {
+      const nochZuZahlen = Math.max(0, s.extra - s.grund);
+      barTotal = s.grund + nochZuZahlen;
+    }
     else barTotal = s.grund + s.extra;
     const barTotalHtml = `<span class="cat-total">${fmt(barTotal)}</span>`;
 
@@ -1287,8 +1290,8 @@ function renderCategoryBars(containerId, readonly){
       // Vorsorge: nur Grund anzeigen
       splitHeader = `<div class="cat-split-header"><span class="csh-item"><span class="csh-label">Grundbudget</span><span class="csh-val grund">${fmt(s.grund)}</span></span></div>`;
     } else if (cat.type === 'reserve') {
-      // Reserve: Grundbudget = Polster, Extrabudget = noch zu zahlen (Differenz)
-      const nochZuZahlen = s.extra - s.grund;
+      // Reserve: Grundbudget = Polster, Noch-zu-zahlen = max(0, Extra − Grund)
+      const nochZuZahlen = Math.max(0, s.extra - s.grund);
       splitHeader = `
         <div class="cat-split-header">
           <span class="csh-item"><span class="csh-label">Grundbudget</span><span class="csh-val grund">${fmt(s.grund)}</span></span>
@@ -1391,11 +1394,12 @@ function renderAccountsForCategory(cat, year, month, readonly){
       reserveHeader = reserveAccountSummaryHtml(a);
     }
 
-    // Konto-Header rechts: bei Reserve den Gesamtbetrag (Polster + zu zahlen),
+    // Konto-Header rechts: bei Reserve den Gesamtbetrag (Polster + noch fehlende Differenz),
     // sonst den normalen Grund/Extra-Split
     let accRightVal;
     if (isReserve) {
-      const gesamt = s.grund + s.extra; // Polster + zu zahlen
+      const nochZuZahlen = Math.max(0, s.extra - s.grund);
+      const gesamt = s.grund + nochZuZahlen;
       accRightVal = `<span class="cat-total" style="background:rgba(168,85,247,0.18); color:var(--text);">${fmt(gesamt)}</span>`;
     } else {
       accRightVal = splitPills(s.grund, s.extra);
