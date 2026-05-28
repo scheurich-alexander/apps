@@ -49,17 +49,23 @@
   .page { display:none; }
   .page.active { display:block; }
 
-  .hero-grid { display:grid; grid-template-columns:2fr 1fr; gap:10px; margin-bottom:12px; }
-  @media (max-width:540px) { .hero-grid { grid-template-columns:1.6fr 1fr; } }
+  .hero-grid { display:grid; grid-template-columns:1fr; gap:10px; margin-bottom:12px; }
   .hero { color:white; border-radius:var(--radius-lg); padding:20px 22px; }
-  .hero-main { background:linear-gradient(135deg,#7c3aed 0%,#a855f7 100%); box-shadow:0 6px 20px rgba(124,58,237,0.18); }
+  .hero-main { background:linear-gradient(135deg,#7c3aed 0%,#a855f7 100%); box-shadow:0 6px 20px rgba(124,58,237,0.18); text-align:center; }
   .hero-inc { background:linear-gradient(135deg,#3b82f6,#2563eb); box-shadow:0 6px 20px rgba(37,99,235,0.18); }
   .hero .label { font-size:13px; opacity:0.92; font-weight:500; }
   .hero .value { font-size:30px; font-weight:700; letter-spacing:-0.02em; margin-top:4px; word-break:break-word; line-height:1.1; }
   .hero .value.neg { color:#ffb3b3; }
 
   .budget-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
-  @media (max-width:540px) { .budget-row { grid-template-columns:1fr; } }
+  @media (max-width:540px) {
+    .budget-row { grid-template-columns:1fr 1fr; gap:6px; }
+    .budget-row .budget-box { padding:10px 10px; }
+    .budget-row .box-title { font-size:12px; margin-bottom:8px; }
+    .budget-row .bsum-row { font-size:11px; gap:4px; }
+    .budget-row .bsum-val { font-size:11px; }
+    .budget-row .bsum-hint { font-size:8px; }
+  }
   .budget-box { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:14px 16px; }
   .budget-box.grund { border-top:3px solid var(--grund); }
   .budget-box.extra { border-top:3px solid var(--extra); }
@@ -284,10 +290,6 @@
     <div class="hero hero-main">
       <div class="label">Nettovermögen</div>
       <div class="value" id="totalBalance">0,00 €</div>
-    </div>
-    <div class="hero hero-inc">
-      <div class="label">Monatseinnahmen</div>
-      <div class="value" id="totalIncomeHero">0,00 €</div>
     </div>
   </div>
 
@@ -1044,7 +1046,7 @@ function accountBalanceUpTo(accountId, year, month) {
 
 /* ---------- Render: hero / budget ---------- */
 function renderMonthLabel(){ const {year,month}=state.view; document.getElementById('monthLabel').textContent=`${MONTHS_SHORT[month-1]} ${year}`; }
-function renderHero(){ const {year,month}=state.view; const bal=totalBalanceUpTo(year,month); const el=document.getElementById('totalBalance'); el.textContent=fmt(bal); el.classList.toggle('neg', bal<-0.001); document.getElementById('totalIncomeHero').textContent = fmt(monthIncome(year,month)); }
+function renderHero(){ const {year,month}=state.view; const bal=totalBalanceUpTo(year,month); const el=document.getElementById('totalBalance'); el.textContent=fmt(bal); el.classList.toggle('neg', bal<-0.001); const incEl=document.getElementById('totalIncomeHero'); if (incEl) incEl.textContent = fmt(monthIncome(year,month)); }
 function summaryHtml(income, ausgaben, vorsorge, reserve, opt){
   opt = opt || {};
   const grundCarry = Number(opt.grundCarry) || 0;
