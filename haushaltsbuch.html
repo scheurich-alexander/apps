@@ -1271,10 +1271,11 @@ function renderCategoryBars(containerId, readonly){
 
     // Gesamtbetrag auf dem Balken (rechts):
     //  - Standard-Bereiche: Grund + Extra
-    //  - Reserve: Grund + Extra
+    //  - Reserve: Extra − Grund (was noch zu zahlen ist, Polster abgezogen)
     //  - Vorsorge (spar): nur Grund
     let barTotal;
     if (cat.type === 'spar') barTotal = s.grund;
+    else if (cat.type === 'reserve') barTotal = s.extra - s.grund;
     else barTotal = s.grund + s.extra;
     const barTotalHtml = `<span class="cat-total">${fmt(barTotal)}</span>`;
 
@@ -1283,6 +1284,14 @@ function renderCategoryBars(containerId, readonly){
     if (cat.type === 'spar') {
       // Vorsorge: nur Grund anzeigen
       splitHeader = `<div class="cat-split-header"><span class="csh-item"><span class="csh-label">Grundbudget</span><span class="csh-val grund">${fmt(s.grund)}</span></span></div>`;
+    } else if (cat.type === 'reserve') {
+      // Reserve: Grundbudget = Polster, Extrabudget = noch zu zahlen (Differenz)
+      const nochZuZahlen = s.extra - s.grund;
+      splitHeader = `
+        <div class="cat-split-header">
+          <span class="csh-item"><span class="csh-label">Grundbudget</span><span class="csh-val grund">${fmt(s.grund)}</span></span>
+          <span class="csh-item"><span class="csh-label">Noch zu zahlen</span><span class="csh-val ${nochZuZahlen>0.001?'extra':'grund'}">${fmt(nochZuZahlen)}</span></span>
+        </div>`;
     } else {
       splitHeader = `
         <div class="cat-split-header">
