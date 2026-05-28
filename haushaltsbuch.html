@@ -876,6 +876,50 @@ function entryVisibleIn(e, y, m){ if (isPlan(e)) return planVisibleIn(e, idxOf(y
 
 function categoryAccounts(key){ return state.accounts.filter(a => a.categoryKey === key); }
 function accountEntries(id){ return state.entries.filter(e => e.accountId === id); }
+// Kumuliertes Polster eines Reserve-Kontos bis (inkl.) Monat y/m:
+// Jeden Monat += Rate, dann werden Sonderausgaben abgezogen, aber Polster bleibt min. 0.
+// Wenn Sonderausgabe > Polster: Polster wird 0 (Differenz wird extern bezahlt).
+// Wenn Sonderausgabe ≤ Polster: Polster reduziert sich entsprechend.
+function reserveAccountPolster(a, year, month) {
+  if (!a.budget) return 0;
+  const b = a.budget;
+  if (b.active === false) return 0;
+  if (b.to !== 'grund') return 0; // nur Grundbudget-Polster
+  const rate = Number(b.rate) || 0;
+  if (rate <= 0) return 0;
+  const startIdx = (b.startYear || 0) * 12 + ((b.startMonth || 1) - 1);
+  const curIdx = idxOf(year, month);
+  if (curIdx < startIdx) return 0;
+  const intMonths = INTERVAL_MONTHS[b.freq] || 1;
+  const goal = Number(b.goal) || 0;
+
+  let polster = 0;
+  // Iteriere Monat für Monat ab StartIdx
+  for (let k = startIdx; k <= curIdx; k++) {
+    const y = Math.floor(k / 12), m = (k % 12) + 1;
+    // Rate fällig diesen Monat?
+    const monthsSinceStart = k - startIdx;
+    const isDue = (intMonths === 1) || (monthsSinceStart % intMonths === 0);
+    // Ziel-Erreichungs-Check: wenn Polster (vor Rate-Addition) bereits Ziel erreicht hat, keine weitere Rate
+    if (isDue) {
+      if (goal <= 0 || polster < goal - 0.001) {
+        polster += rate;
+      }
+    }
+    // Sonderausgaben dieses Monats von Posten abziehen
+    let sonderSumThisMonth = 0;
+    for (const e of accountEntries(a.id)) {
+      if (e.kind !== 'sonderausgabe') continue;
+      if (!isCounted(e, y, m)) continue;
+      sonderSumThisMonth += effAmount(e, y, m);
+    }
+    if (sonderSumThisMonth > 0) {
+      polster = Math.max(0, polster - sonderSumThisMonth);
+    }
+  }
+  return polster;
+}
+
 // Liefert den effektiven monatlichen Konto-Budget-Beitrag, falls Reserve-Konto mit budget gesetzt ist und aktiv
 function accountBudgetMonthly(a, y, m){
   if (!a.budget) return null;
@@ -1299,12 +1343,14 @@ function renderCategoryBars(containerId, readonly){
     let barTotal;
     if (cat.type === 'spar') barTotal = s.grund;
     else if (cat.type === 'reserve') {
-      // Pro Konto rechnen, dann summieren (sonst gehen Polster zwischen Konten verloren)
+      // Pro Konto rechnen mit kumuliertem Polster
       barTotal = 0;
       for (const a of categoryAccounts(cat.key)) {
         const acs = accountSplit(a.id, year, month);
-        const nochZuZahlen = Math.max(0, acs.extra - acs.grund);
-        barTotal += acs.grund + nochZuZahlen;
+        const polster = reserveAccountPolster(a, year, month);
+        const sonderThisMonth = acs.extra;
+        const nochZuZahlen = Math.max(0, sonderThisMonth - polster);
+        barTotal += polster + nochZuZahlen;
       }
     }
     else barTotal = s.grund + s.extra;
@@ -1316,14 +1362,15 @@ function renderCategoryBars(containerId, readonly){
       // Vorsorge: nur Grund anzeigen
       splitHeader = `<div class="cat-split-header"><span class="csh-item"><span class="csh-label">Grundbudget</span><span class="csh-val grund">${fmt(s.grund)}</span></span></div>`;
     } else if (cat.type === 'reserve') {
-      // Reserve: Grundbudget = Polster (Summe über Konten),
-      // Noch-zu-zahlen = pro Konto max(0, extra − grund), dann summieren
+      // Reserve: kumuliertes Polster (Rate × Monate − Sonderausgaben, nie negativ),
+      // Noch-zu-zahlen = pro Konto max(0, Sonderausgaben-dieser-Monat − Polster)
       let nochZuZahlenSum = 0;
       let grundSum = 0;
       for (const a of categoryAccounts(cat.key)) {
         const acs = accountSplit(a.id, year, month);
-        nochZuZahlenSum += Math.max(0, acs.extra - acs.grund);
-        grundSum += acs.grund;
+        const polster = reserveAccountPolster(a, year, month);
+        nochZuZahlenSum += Math.max(0, acs.extra - polster);
+        grundSum += polster;
       }
       splitHeader = `
         <div class="cat-split-header">
@@ -1427,12 +1474,13 @@ function renderAccountsForCategory(cat, year, month, readonly){
       reserveHeader = reserveAccountSummaryHtml(a);
     }
 
-    // Konto-Header rechts: bei Reserve den Gesamtbetrag (Polster + noch fehlende Differenz),
+    // Konto-Header rechts: bei Reserve den Gesamtbetrag (Polster kumuliert + noch fehlende Differenz),
     // sonst den normalen Grund/Extra-Split
     let accRightVal;
     if (isReserve) {
-      const nochZuZahlen = Math.max(0, s.extra - s.grund);
-      const gesamt = s.grund + nochZuZahlen;
+      const polster = reserveAccountPolster(a, year, month);
+      const nochZuZahlen = Math.max(0, s.extra - polster);
+      const gesamt = polster + nochZuZahlen;
       accRightVal = `<span class="cat-total" style="background:rgba(168,85,247,0.18); color:var(--text);">${fmt(gesamt)}</span>`;
     } else {
       accRightVal = splitPills(s.grund, s.extra);
