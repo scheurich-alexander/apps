@@ -232,6 +232,9 @@
   .modal h3 { margin:0 0 16px; font-size:17px; font-weight:600; }
   .modal h3.sub { margin-top:22px; font-size:15px; }
   .field { margin-bottom:12px; }
+  .field.budget-start-field { background:rgba(168,85,247,0.06); border:1px solid rgba(168,85,247,0.25); border-radius:8px; padding:10px 12px; }
+  .field.budget-start-field label { color:#7c3aed; font-weight:600; }
+  .field .hint-inline { font-weight:400; color:var(--text-muted); font-size:11px; }
   .field label { display:block; font-size:12px; color:var(--text-muted); margin-bottom:4px; font-weight:500; }
   .field input[type=text], .field input[type=number], .field select { width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); padding:10px 12px; border-radius:9px; font-family:var(--font); font-size:14px; outline:none; }
   .field input[type=color] { width:100%; height:42px; background:var(--bg); border:1px solid var(--border); border-radius:9px; padding:4px; cursor:pointer; }
@@ -484,7 +487,14 @@
             </select>
           </div>
         </div>
-        <div class="field"><label>Beginnt</label><div class="my-row"><select id="accountBudgetStartMonth"></select><input type="number" id="accountBudgetStartYear" min="2000" max="2099" /></div></div>
+        <div class="field budget-start-field">
+          <label>Beginnt <span class="hint-inline">– ab welchem Monat zählt die Rate?</span></label>
+          <div class="my-row">
+            <select id="accountBudgetStartMonth"></select>
+            <input type="number" id="accountBudgetStartYear" min="2000" max="2099" />
+          </div>
+          <div class="hint" id="accountBudgetStartWarning" style="display:none; color:#d97706; margin-top:6px; font-weight:500;">⚠ Achtung: Start liegt in der Zukunft. Polster wird erst ab diesem Monat aufgebaut.</div>
+        </div>
         <div class="field">
           <label>Häufigkeit</label>
           <select id="accountBudgetFreq">
@@ -881,14 +891,14 @@ function accountEntries(id){ return state.entries.filter(e => e.accountId === id
 // Wenn Sonderausgabe > Polster: Polster wird 0 (Differenz wird extern bezahlt).
 // Wenn Sonderausgabe ≤ Polster: Polster reduziert sich entsprechend.
 function reserveAccountPolster(a, year, month) {
-  if (!a.budget) { console.log('[Polster]', a.name, '→ kein budget'); return 0; }
+  if (!a.budget) return 0;
   const b = a.budget;
-  if (b.active === false) { console.log('[Polster]', a.name, '→ inaktiv'); return 0; }
+  if (b.active === false) return 0;
   const rate = Number(b.rate) || 0;
-  if (rate <= 0) { console.log('[Polster]', a.name, '→ rate <= 0:', b.rate); return 0; }
+  if (rate <= 0) return 0;
   const startIdx = (b.startYear || 0) * 12 + ((b.startMonth || 1) - 1);
   const curIdx = idxOf(year, month);
-  if (curIdx < startIdx) { console.log('[Polster]', a.name, '→ cur', curIdx, '< start', startIdx, '(startY=', b.startYear, 'startM=', b.startMonth, ')'); return 0; }
+  if (curIdx < startIdx) return 0;
   const intMonths = INTERVAL_MONTHS[b.freq] || 1;
   const goal = Number(b.goal) || 0;
 
@@ -912,7 +922,6 @@ function reserveAccountPolster(a, year, month) {
       polster = Math.max(0, polster - sonderSumThisMonth);
     }
   }
-  console.log('[Polster]', a.name, '=', polster, '(rate=', rate, 'goal=', goal, 'start=', b.startYear, '/', b.startMonth, 'view=', year, '/', month, ')');
   return polster;
 }
 
@@ -2027,13 +2036,30 @@ function openAccountModal(account, catKey){
     document.getElementById('accountBudgetStartYear').value = budget.startYear || now.getFullYear();
     document.getElementById('accountBudgetFreq').value = budget.freq || 'monthly';
     updateAccountBudgetResult();
+    updateBudgetStartWarning();
   }
 
   document.getElementById('accountModal').classList.add('open');
   setTimeout(()=>document.getElementById('accountName').focus(),50);
 }
+function updateBudgetStartWarning() {
+  const warnEl = document.getElementById('accountBudgetStartWarning');
+  if (!warnEl) return;
+  const m = parseInt(document.getElementById('accountBudgetStartMonth').value, 10) || 0;
+  const y = parseInt(document.getElementById('accountBudgetStartYear').value, 10) || 0;
+  const startIdx = y * 12 + (m - 1);
+  const now = new Date();
+  const curIdx = now.getFullYear() * 12 + now.getMonth();
+  warnEl.style.display = startIdx > curIdx ? 'block' : 'none';
+}
 function closeAccountModal(){ document.getElementById('accountModal').classList.remove('open'); }
 document.getElementById('accountCancel').addEventListener('click', closeAccountModal);
+
+// Live-Warnung bei Start-Datum-Änderung
+['accountBudgetStartMonth','accountBudgetStartYear'].forEach(id => {
+  document.getElementById(id).addEventListener('input', updateBudgetStartWarning);
+  document.getElementById(id).addEventListener('change', updateBudgetStartWarning);
+});
 
 // Live-Update Reserve-Berechnung
 ['accountBudgetGoal','accountBudgetRate','accountBudgetFreq'].forEach(id => {
