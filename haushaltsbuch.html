@@ -884,7 +884,7 @@ function reserveAccountPolster(a, year, month) {
   if (!a.budget) return 0;
   const b = a.budget;
   if (b.active === false) return 0;
-  if (b.to !== 'grund') return 0; // nur Grundbudget-Polster
+  // Konto-Budget zählt immer als Polster (egal ob Rate auf Grund- oder Extra-Budget bucht)
   const rate = Number(b.rate) || 0;
   if (rate <= 0) return 0;
   const startIdx = (b.startYear || 0) * 12 + ((b.startMonth || 1) - 1);
@@ -1507,27 +1507,30 @@ function accountBudgetPlannedNet(a, year, month) {
   const curIdx = idxOf(year, month);
   const startIdx = (b.startYear || 0) * 12 + ((b.startMonth || 1) - 1);
   if (curIdx < startIdx) return 0;
-  // Anzahl fälliger Raten bis (inkl.) cur
-  const monthsSinceStart = curIdx - startIdx;
   const intMonths = INTERVAL_MONTHS[b.freq] || 1;
-  const ratesCount = Math.floor(monthsSinceStart / intMonths) + 1;
-  let planned = ratesCount * (Number(b.rate) || 0);
+  const rate = Number(b.rate) || 0;
+  const goal = Number(b.goal) || 0;
 
-  // Abbuchungen: alle negativen Beträge & Transfers von diesem Konto bis cur
-  const e0 = earliestStartIdx();
-  if (e0 !== null) {
-    for (let k = Math.max(e0, startIdx); k <= curIdx; k++) {
-      const y = Math.floor(k / 12), m = (k % 12) + 1;
-      for (const e of accountEntries(a.id)) {
-        if (!isCounted(e, y, m)) continue;
-        // Sonderausgaben gehen weg, Transfers (negative Beträge) auch
-        if (e.kind === 'sonderausgabe') planned -= effAmount(e, y, m);
-        else if (e.transfer) planned -= effAmount(e, y, m);
-        else if (Number(e.amount) < 0) planned -= Math.abs(effAmount(e, y, m));
-      }
+  // Monatsweise iterieren: Rate addieren, Sonderausgaben abziehen, nie unter 0
+  let polster = 0;
+  for (let k = startIdx; k <= curIdx; k++) {
+    const y = Math.floor(k / 12), m = (k % 12) + 1;
+    const monthsSinceStart = k - startIdx;
+    const isDue = (intMonths === 1) || (monthsSinceStart % intMonths === 0);
+    if (isDue) {
+      // Stoppen wenn Ziel erreicht
+      if (goal <= 0 || polster < goal - 0.001) polster += rate;
     }
+    // Sonderausgaben/Transfers dieses Monats abziehen
+    for (const e of accountEntries(a.id)) {
+      if (!isCounted(e, y, m)) continue;
+      if (e.kind === 'sonderausgabe') polster -= effAmount(e, y, m);
+      else if (e.transfer) polster -= effAmount(e, y, m);
+      else if (Number(e.amount) < 0) polster -= Math.abs(effAmount(e, y, m));
+    }
+    if (polster < 0) polster = 0; // nie negativ
   }
-  return planned;
+  return polster;
 }
 
 // Plan-basierte Berechnung: wieviel hätten alle Raten dieses Kontos bis zum aktuellen Monat eingezahlt?
