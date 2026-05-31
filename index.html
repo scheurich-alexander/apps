@@ -5,122 +5,278 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Organizer">
-<meta name="theme-color" content="#0a0a0c" id="themeColor">
-<title>Organizer</title>
+<meta name="apple-mobile-web-app-title" content="LCARS">
+<meta name="theme-color" content="#000000" id="themeColor">
+<title>LCARS · Organizer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root, :root[data-theme="dark"] {
-    --bg: #0a0a0c;
-    --surface: #15161a;
-    --surface-2: #1f2127;
-    --border: #2a2d35;
-    --text: #ecedf0;
-    --text-dim: #8a8d96;
-    --text-faint: #5a5d66;
+  :root {
+    --bg: #000000;
+    --text: #ffffff;
+    --orange: #ff9c00;
+    --peach: #ff9966;
+    --lilac: #cc99cc;
+    --blue: #9999ff;
+    --ice: #99ccff;
+    --gold: #ffcc66;
+    --salmon: #ff7755;
+    --red: #cc6666;
+    --plan: #99ccff;
+    --health: #ff9966;
+    --money: #cc99cc;
+    --edu: #ffcc66;
   }
   :root[data-theme="light"] {
-    --bg: #f5f7fa;
-    --surface: #ffffff;
-    --surface-2: #f0f2f5;
-    --border: #dfe3e8;
-    --text: #15161a;
-    --text-dim: #5a5d66;
-    --text-faint: #8a8d96;
+    --bg: #d6d2c4;
+    --text: #1a1a1a;
   }
   @media (prefers-color-scheme: light) {
-    :root[data-theme="auto"] { --bg: #f5f7fa; --surface: #ffffff; --surface-2: #f0f2f5; --border: #dfe3e8; --text: #15161a; --text-dim: #5a5d66; --text-faint: #8a8d96; }
-  }
-  @media (prefers-color-scheme: dark) {
-    :root[data-theme="auto"] { --bg: #0a0a0c; --surface: #15161a; --surface-2: #1f2127; --border: #2a2d35; --text: #ecedf0; --text-dim: #8a8d96; --text-faint: #5a5d66; }
+    :root[data-theme="auto"] { --bg: #d6d2c4; --text: #1a1a1a; }
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { min-height: 100%; }
   body {
-    font-family: 'Manrope', -apple-system, sans-serif;
+    font-family: 'Antonio', 'Arial Narrow', sans-serif;
     background: var(--bg);
     color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
     padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
-    transition: background 0.2s, color 0.2s;
+    overflow-x: hidden;
   }
-  .container { max-width: 600px; margin: 0 auto; padding: 28px 20px 40px; }
+  .frame { max-width: 720px; margin: 0 auto; padding: 14px 14px 30px; }
 
-  header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 36px; }
-  .brand { font-size: 14px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-dim); }
-  .theme-switch { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 3px; }
-  .theme-switch button { background: transparent; border: none; color: var(--text-dim); padding: 6px 10px; border-radius: 7px; font-family: inherit; font-size: 12px; cursor: pointer; }
-  .theme-switch button.active { background: var(--surface-2); color: var(--text); }
-
-  .apps { display: flex; flex-direction: column; gap: 14px; }
-  .app-card {
-    display: block;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 28px 24px;
-    text-decoration: none;
-    color: var(--text);
-    transition: transform 0.15s, border-color 0.15s;
+  /* ---------- top bar ---------- */
+  .topbar {
+    display: flex; align-items: flex-end; gap: 8px;
+    height: 70px; margin-bottom: 8px;
+  }
+  .elbow-tl {
+    width: 130px; height: 100%;
+    background: var(--orange);
+    border-top-left-radius: 70px;
     position: relative;
-    overflow: hidden;
+    flex-shrink: 0;
   }
-  .app-card:active { transform: scale(0.98); }
-  .app-card::before {
+  .elbow-tl::after {
     content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; height: 3px;
-    background: var(--card-color);
+    position: absolute; bottom: 0; right: -8px;
+    width: 8px; height: 26px; background: var(--orange);
   }
-  .app-card.plan   { --card-color: #94a3b8; }
-  .app-card.health { --card-color: #f97316; }
-  .app-card.money  { --card-color: #a855f7; }
-  .app-card.edu    { --card-color: #eab308; }
-  .app-card .title { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; }
-  .app-card .title .dot { color: var(--card-color); }
-  .app-card .arrow { position: absolute; top: 50%; right: 24px; transform: translateY(-50%); color: var(--text-faint); font-size: 24px; opacity: 0.5; }
+  .topbar-fill {
+    flex: 1; height: 26px;
+    background: var(--lilac);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: flex-end;
+    padding-right: 14px;
+    color: #000; font-weight: 700; font-size: 15px;
+  }
+  .topbar-cap {
+    width: 60px; height: 26px; background: var(--ice);
+    border-radius: 4px; flex-shrink: 0;
+  }
 
-  @media (max-width: 380px) {
-    .container { padding: 20px 14px 30px; }
-    .app-card { padding: 22px 18px; }
-    .app-card .title { font-size: 21px; }
+  /* ---------- header text ---------- */
+  .headline {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 4px 4px 14px 14px;
+  }
+  .headline .lcars { color: var(--orange); font-size: 30px; font-weight: 700; line-height: 1; }
+  .headline .sub { color: var(--text); opacity: 0.7; font-size: 13px; font-weight: 500; }
+
+  .stardate { color: var(--gold); font-size: 12px; font-weight: 500; padding: 0 4px 12px 14px; }
+
+  /* ---------- main two-column body ---------- */
+  .body { display: flex; gap: 8px; }
+
+  /* left rail */
+  .rail { width: 130px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; }
+  .rail .block {
+    border-radius: 4px; color: #000;
+    font-weight: 700; font-size: 13px;
+    padding: 10px 12px 8px;
+    display: flex; align-items: flex-end; min-height: 56px;
+    line-height: 0.95; word-break: break-word;
+  }
+  .rail .b1 { background: var(--peach); border-bottom-left-radius: 70px; align-items: flex-start; min-height: 90px; }
+  .rail .b2 { background: var(--lilac); }
+  .rail .b3 { background: var(--blue); }
+  .rail .b4 { background: var(--gold); }
+  .rail .b5 { background: var(--salmon); flex: 1; }
+
+  /* theme switch lives in the rail */
+  .theme-switch { display: flex; gap: 4px; }
+  .theme-switch button {
+    flex: 1; background: var(--ice); border: none; color: #000;
+    padding: 9px 0; border-radius: 4px; font-family: inherit;
+    font-size: 13px; font-weight: 700; cursor: pointer; text-transform: uppercase;
+    opacity: 0.45; transition: opacity 0.15s;
+  }
+  .theme-switch button.active { opacity: 1; }
+
+  /* right content */
+  .content { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+
+  .app-card {
+    display: block; text-decoration: none;
+    background: #000; position: relative;
+    border-radius: 4px; overflow: hidden;
+    transition: transform 0.12s;
+  }
+  :root[data-theme="light"] .app-card { background: #0c0c0c; }
+  .app-card:active { transform: scale(0.985); }
+
+  .app-row { display: flex; align-items: stretch; gap: 8px; height: 92px; }
+  .app-tab {
+    width: 110px; flex-shrink: 0;
+    border-radius: 4px;
+    color: #000; font-weight: 700;
+    display: flex; align-items: flex-end; padding: 0 0 9px 12px;
+    font-size: 26px; line-height: 0.9;
+  }
+  .app-main {
+    flex: 1; background: var(--bg);
+    border: 1px solid; border-radius: 4px;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 8px 16px;
+    position: relative;
+  }
+  .app-card.plan   .app-tab { background: var(--plan); }
+  .app-card.health .app-tab { background: var(--health); }
+  .app-card.money  .app-tab { background: var(--money); }
+  .app-card.edu    .app-tab { background: var(--edu); }
+  .app-card.plan   .app-main { border-color: var(--plan); }
+  .app-card.health .app-main { border-color: var(--health); }
+  .app-card.money  .app-main { border-color: var(--money); }
+  .app-card.edu    .app-main { border-color: var(--edu); }
+
+  .app-main .name { font-size: 28px; font-weight: 700; line-height: 1; color: var(--text); }
+  .app-main .desc { font-size: 12px; font-weight: 500; opacity: 0.6; margin-top: 5px; }
+  .app-main .num {
+    position: absolute; top: 8px; right: 14px;
+    font-size: 12px; font-weight: 500; opacity: 0.55;
+  }
+  .app-card.plan   .app-main .num { color: var(--plan); }
+  .app-card.health .app-main .num { color: var(--health); }
+  .app-card.money  .app-main .num { color: var(--money); }
+  .app-card.edu    .app-main .num { color: var(--edu); }
+
+  /* ---------- bottom bar ---------- */
+  .botbar { display: flex; align-items: flex-start; gap: 8px; height: 50px; margin-top: 10px; }
+  .elbow-bl {
+    width: 130px; height: 100%;
+    background: var(--orange);
+    border-bottom-left-radius: 70px;
+    position: relative; flex-shrink: 0;
+  }
+  .elbow-bl::after {
+    content: ''; position: absolute; top: 0; right: -8px;
+    width: 8px; height: 22px; background: var(--orange);
+  }
+  .botbar-fill {
+    flex: 1; height: 22px; background: var(--blue);
+    border-radius: 4px; display: flex; align-items: center;
+    padding-left: 14px; color: #000; font-weight: 700; font-size: 13px;
+  }
+  .botbar-cap { width: 90px; height: 22px; background: var(--salmon); border-radius: 4px; flex-shrink: 0; }
+
+  /* blink deco */
+  @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.35;} }
+  .blink { animation: blink 2.4s infinite; }
+
+  @media (max-width: 440px) {
+    .elbow-tl, .elbow-bl, .rail { width: 92px; }
+    .headline .lcars { font-size: 24px; }
+    .app-tab { width: 78px; font-size: 20px; }
+    .app-main .name { font-size: 23px; }
+    .app-row { height: 82px; }
   }
 </style>
 </head>
 <body>
-<div class="container">
-  <header>
-    <div class="brand">Organizer</div>
-    <div class="theme-switch">
-      <button data-theme="auto" title="Automatisch">A</button>
-      <button data-theme="light" title="Hell">☀</button>
-      <button data-theme="dark" title="Dunkel">🌙</button>
-    </div>
-  </header>
+<div class="frame">
 
-  <div class="apps">
-    <a href="terminplaner.html" class="app-card plan">
-      <div class="arrow">›</div>
-      <div class="title">Plan<span class="dot">.</span></div>
-    </a>
-
-    <a href="health.html" class="app-card health">
-      <div class="arrow">›</div>
-      <div class="title">Health<span class="dot">.</span></div>
-    </a>
-
-    <a href="haushaltsbuch.html" class="app-card money">
-      <div class="arrow">›</div>
-      <div class="title">Budget<span class="dot">.</span></div>
-    </a>
-
-    <a href="education.html" class="app-card edu">
-      <div class="arrow">›</div>
-      <div class="title">Education<span class="dot">.</span></div>
-    </a>
+  <div class="topbar">
+    <div class="elbow-tl"></div>
+    <div class="topbar-fill">LCARS · ORGANIZER 47</div>
+    <div class="topbar-cap blink"></div>
   </div>
+
+  <div class="headline">
+    <div class="lcars">Main Menu</div>
+    <div class="sub">Access · Authorized</div>
+  </div>
+  <div class="stardate" id="stardate">Stardate · ········</div>
+
+  <div class="body">
+    <div class="rail">
+      <div class="block b1">SYS<br>ONLINE</div>
+      <div class="block b2">MOD<br>04</div>
+      <div class="block b3">SEC<br>OK</div>
+      <div class="theme-switch">
+        <button data-theme="auto" title="Auto">A</button>
+        <button data-theme="light" title="Hell">☀</button>
+        <button data-theme="dark" title="Dunkel">☾</button>
+      </div>
+      <div class="block b5">LCARS<br>2390</div>
+    </div>
+
+    <div class="content">
+      <a href="terminplaner.html" class="app-card plan">
+        <div class="app-row">
+          <div class="app-tab">01</div>
+          <div class="app-main">
+            <span class="num">02-440</span>
+            <div class="name">Plan</div>
+            <div class="desc">Terminplaner · Schedule</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="health.html" class="app-card health">
+        <div class="app-row">
+          <div class="app-tab">02</div>
+          <div class="app-main">
+            <span class="num">11-902</span>
+            <div class="name">Health</div>
+            <div class="desc">Medical · Bio-Monitor</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="haushaltsbuch.html" class="app-card money">
+        <div class="app-row">
+          <div class="app-tab">03</div>
+          <div class="app-main">
+            <span class="num">07-318</span>
+            <div class="name">Budget</div>
+            <div class="desc">Haushaltsbuch · Credits</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="education.html" class="app-card edu">
+        <div class="app-row">
+          <div class="app-tab">04</div>
+          <div class="app-main">
+            <span class="num">19-605</span>
+            <div class="name">Education</div>
+            <div class="desc">Academy · Datacore</div>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="botbar">
+    <div class="elbow-bl"></div>
+    <div class="botbar-fill">STARFLEET · OPERATIONS</div>
+    <div class="botbar-cap blink"></div>
+  </div>
+
 </div>
 
 <script>
@@ -129,7 +285,7 @@
   function applyTheme() {
     document.documentElement.setAttribute('data-theme', theme);
     const isDark = theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    document.getElementById('themeColor').setAttribute('content', isDark ? '#0a0a0c' : '#f5f7fa');
+    document.getElementById('themeColor').setAttribute('content', isDark ? '#000000' : '#d6d2c4');
     document.querySelectorAll('.theme-switch button').forEach(b => b.classList.toggle('active', b.dataset.theme === theme));
   }
   document.querySelectorAll('.theme-switch button').forEach(b => {
@@ -143,6 +299,17 @@
     if (theme === 'auto') applyTheme();
   });
   applyTheme();
+
+  // LCARS-style stardate
+  function stardate() {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 0);
+    const day = Math.floor((now - start) / 86400000);
+    const frac = (now.getHours() * 60 + now.getMinutes()) / 1440;
+    const sd = (47000 + (now.getFullYear() - 2024) * 1000 + day * 2.74 + frac).toFixed(1);
+    document.getElementById('stardate').textContent = 'Stardate · ' + sd;
+  }
+  stardate();
 </script>
 </body>
 </html>
