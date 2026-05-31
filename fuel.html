@@ -6,108 +6,154 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Fuel">
-<meta name="theme-color" content="#0a0e0c" id="themeColor">
+<meta name="theme-color" content="#000000" id="themeColor">
 <title>Fuel – Ernährung & Wasser</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   /* ============ THEMES ============ */
   :root, :root[data-theme="dark"] {
-    --bg: #0a0e0c;
-    --surface: #131a17;
-    --surface-2: #1c2521;
-    --border: #2a3530;
-    --text: #e8efea;
-    --text-dim: #8a9590;
-    --text-faint: #5a6560;
-    --green: #10b981;
-    --green-dim: rgba(16,185,129,0.15);
-    --orange: #f59e0b;
-    --red: #ef4444;
-    --blue: #3b82f6;
-    --water: #06b6d4;
-    --kcal: #f59e0b;
-    --protein: #10b981;
-    --carbs: #eab308;
-    --fat: #a855f7;
+    --bg: #000000;
+    --surface: #14110a;
+    --surface-2: #221a0d;
+    --border: #3a2d12;
+    --text: #ffcc99;
+    --text-dim: #cc99cc;
+    --text-faint: #9999ff;
+    --green: #99cc99;
+    --green-dim: rgba(153,204,153,0.18);
+    --orange: #ff9966;
+    --red: #ff7755;
+    --blue: #9999ff;
+    --water: #99ccff;
+    --kcal: #ff9c00;
+    --protein: #99cc99;
+    --carbs: #ffcc66;
+    --fat: #cc99cc;
   }
   :root[data-theme="light"] {
-    --bg: #f5f8f6;
-    --surface: #ffffff;
-    --surface-2: #eef2ef;
-    --border: #dde3df;
-    --text: #131a17;
-    --text-dim: #5a6560;
-    --text-faint: #8a9590;
-    --green: #059669;
-    --green-dim: rgba(5,150,105,0.12);
-    --orange: #d97706;
-    --red: #dc2626;
-    --blue: #2563eb;
-    --water: #0891b2;
-    --kcal: #d97706;
-    --protein: #059669;
-    --carbs: #ca8a04;
-    --fat: #9333ea;
+    --bg: #d6d2c4;
+    --surface: #c8c2b0;
+    --surface-2: #bdb6a2;
+    --border: #a89f88;
+    --text: #1a1a1a;
+    --text-dim: #5a4a2a;
+    --text-faint: #7a6a45;
+    --green: #4a7a4a;
+    --green-dim: rgba(74,122,74,0.15);
+    --orange: #cc6600;
+    --red: #cc4422;
+    --blue: #4444aa;
+    --water: #3a7a8a;
+    --kcal: #cc6600;
+    --protein: #4a7a4a;
+    --carbs: #cc8800;
+    --fat: #8a4a8a;
   }
   @media (prefers-color-scheme: light) {
     :root[data-theme="auto"] {
-      --bg: #f5f8f6;
-      --surface: #ffffff;
-      --surface-2: #eef2ef;
-      --border: #dde3df;
-      --text: #131a17;
-      --text-dim: #5a6560;
-      --text-faint: #8a9590;
-      --green: #059669;
-      --green-dim: rgba(5,150,105,0.12);
-      --orange: #d97706;
-      --red: #dc2626;
-      --blue: #2563eb;
-      --water: #0891b2;
-      --kcal: #d97706;
-      --protein: #059669;
-      --carbs: #ca8a04;
-      --fat: #9333ea;
+      --bg: #d6d2c4;
+      --surface: #c8c2b0;
+      --surface-2: #bdb6a2;
+      --border: #a89f88;
+      --text: #1a1a1a;
+      --text-dim: #5a4a2a;
+      --text-faint: #7a6a45;
+      --green: #4a7a4a;
+      --green-dim: rgba(74,122,74,0.15);
+      --orange: #cc6600;
+      --red: #cc4422;
+      --blue: #4444aa;
+      --water: #3a7a8a;
+      --kcal: #cc6600;
+      --protein: #4a7a4a;
+      --carbs: #cc8800;
+      --fat: #8a4a8a;
     }
   }
   :root {
     --safe-top: env(safe-area-inset-top);
     --safe-bot: env(safe-area-inset-bottom);
+    --lcars-orange:#ff9c00; --lcars-peach:#ff9966; --lcars-lilac:#cc99cc; --lcars-blue:#9999ff; --lcars-ice:#99ccff; --lcars-gold:#ffcc66; --lcars-salmon:#ff7755;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; overflow: hidden; }
-  body { font-family: 'Manrope', -apple-system, sans-serif; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.5; overscroll-behavior: none; transition: background 0.2s, color 0.2s; }
-  .app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; padding-top: var(--safe-top); padding-bottom: calc(70px + var(--safe-bot)); }
-  header { padding: 14px 20px 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-shrink: 0; }
-  .back-btn { background: var(--surface-2); border: 1px solid var(--border); color: var(--text); width: 38px; height: 38px; border-radius: 10px; font-size: 22px; font-weight: 600; cursor: pointer; display: grid; place-items: center; text-decoration: none; line-height: 1; padding-bottom: 2px; }
-  .back-btn:active { background: var(--border); }
-  .title { font-weight: 800; font-size: 22px; letter-spacing: -0.02em; }
-  .title .accent { color: var(--green); }
-  .header-btn { background: var(--surface-2); border: 1px solid var(--border); color: var(--text); width: 38px; height: 38px; border-radius: 10px; font-size: 16px; cursor: pointer; display: grid; place-items: center; }
-  .header-btn:active { background: var(--border); }
+  body { font-family: 'Antonio', 'Arial Narrow', sans-serif; background: var(--bg); color: var(--text); font-size: 16px; line-height: 1.4; overscroll-behavior: none; transition: background 0.2s, color 0.2s; text-transform: uppercase; letter-spacing: 0.03em; }
+
+  /* ============ LCARS-RAHMEN ============ */
+  .app {
+    display: grid;
+    grid-template-columns: 116px 1fr;
+    grid-template-rows: 56px 1fr 30px;
+    column-gap: 6px; row-gap: 6px;
+    height: 100vh; height: 100dvh;
+    padding: var(--safe-top) 8px calc(74px + var(--safe-bot)) 8px;
+    background: var(--bg);
+  }
+  @media (max-width: 440px) { .app { grid-template-columns: 78px 1fr; } }
+
+  .lcars-top { grid-column: 1 / 3; grid-row: 1; display: flex; gap: 6px; align-items: stretch; }
+  .lcars-top .elbow { width: 116px; flex-shrink: 0; background: var(--lcars-orange); border-top-left-radius: 50px; }
+  .lcars-top .bars { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 5px; }
+  .lcars-top .tics { display: flex; gap: 6px; height: 14px; }
+  .lcars-top .tics span { display: block; height: 14px; border-radius: 999px; }
+  .lcars-top .bar { height: 26px; background: var(--lcars-lilac); border-radius: 0 999px 999px 0; display: flex; align-items: center; justify-content: flex-end; padding-right: 16px; color: #000; font-weight: 700; font-size: 13px; }
+  @media (max-width: 440px) { .lcars-top .elbow { width: 78px; } }
+
+  .lcars-rail { grid-column: 1; grid-row: 2; display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
+  .lcars-rail .rblock { color: #000; font-weight: 700; font-size: 11px; padding: 9px 9px; display: flex; flex-direction: column; align-items: flex-end; justify-content: flex-end; text-align: right; line-height: 1; min-height: 46px; }
+  .lcars-rail .r1 { background: var(--lcars-peach); min-height: 64px; }
+  .lcars-rail .r2 { background: var(--lcars-lilac); }
+  .lcars-rail .r3 { background: var(--lcars-blue); }
+  .lcars-rail .r4 { background: var(--lcars-gold); }
+  .lcars-rail .rfill { flex: 1; background: var(--lcars-salmon); min-height: 24px; display: flex; align-items: flex-start; justify-content: flex-end; padding: 9px; color: #000; font-weight: 700; font-size: 11px; text-align: right; line-height: 1.1; }
+
+  .lcars-bot { grid-column: 1 / 3; grid-row: 3; display: flex; gap: 6px; align-items: stretch; }
+  .lcars-bot .elbow { width: 116px; flex-shrink: 0; background: var(--lcars-orange); border-bottom-left-radius: 50px; }
+  .lcars-bot .bar { flex: 1; height: 100%; background: var(--lcars-blue); border-radius: 0 999px 999px 0; display: flex; align-items: center; padding-left: 16px; color: #000; font-weight: 700; font-size: 12px; }
+  @media (max-width: 440px) { .lcars-bot .elbow { width: 78px; } }
+
+  .lcars-content { grid-column: 2; grid-row: 2; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+
+  header { padding: 4px 8px 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-shrink: 0; }
+  .back-btn { background: var(--lcars-orange); border: none; color: #000; width: 46px; height: 38px; border-radius: 999px; font-size: 22px; font-weight: 700; cursor: pointer; display: grid; place-items: center; text-decoration: none; line-height: 1; padding-bottom: 2px; }
+  .back-btn:active { opacity: 0.8; }
+  .title { font-weight: 700; font-size: 26px; letter-spacing: 0.02em; color: var(--lcars-orange); flex: 1; padding-left: 4px; }
+  .title .accent { color: var(--lcars-ice); }
+  .header-btn { background: var(--lcars-gold); border: none; color: #000; min-width: 52px; height: 38px; padding: 0 14px; border-radius: 999px; font-size: 13px; cursor: pointer; display: grid; place-items: center; font-weight: 700; letter-spacing: 0.04em; }
+  .header-btn:active { opacity: 0.8; }
   .header-actions { display: flex; gap: 6px; }
 
   /* Tagestyp-Tabs */
-  .day-type-bar { padding: 0 16px 10px; display: flex; gap: 4px; flex-shrink: 0; }
-  .day-type-btn { flex: 1; background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); padding: 8px 4px; border-radius: 8px; font-family: inherit; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em; }
-  .day-type-btn.active { background: var(--green-dim); color: var(--green); border-color: var(--green); }
+  .day-type-bar { padding: 0 8px 8px; display: flex; gap: 5px; flex-shrink: 0; }
+  .day-type-btn { flex: 1; background: var(--lcars-blue); border: none; color: #000; padding: 8px 4px; border-radius: 999px; font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.5; transition: opacity 0.15s; }
+  .day-type-btn:nth-child(2) { background: var(--lcars-lilac); }
+  .day-type-btn:nth-child(3) { background: var(--lcars-peach); }
+  .day-type-btn.active { opacity: 1; }
 
   /* Datums-Nav */
-  .date-nav { display: flex; align-items: center; justify-content: space-between; padding: 4px 16px 10px; gap: 8px; flex-shrink: 0; }
-  .date-nav-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text); width: 32px; height: 32px; border-radius: 8px; cursor: pointer; }
-  .date-label { font-weight: 700; font-size: 14px; flex: 1; text-align: center; }
+  .date-nav { display: flex; align-items: center; justify-content: space-between; padding: 0 8px 10px; gap: 8px; flex-shrink: 0; }
+  .date-nav-btn { background: var(--lcars-ice); border: none; color: #000; width: 38px; height: 34px; border-radius: 999px; cursor: pointer; font-weight: 700; }
+  .date-label { font-weight: 700; font-size: 16px; flex: 1; text-align: center; color: var(--accent); }
   .date-label .sub { display: block; font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; font-weight: 500; }
-  .today-mini { background: var(--green); color: #052e1f; border: none; padding: 6px 10px; border-radius: 6px; font-family: inherit; font-weight: 700; font-size: 11px; cursor: pointer; text-transform: uppercase; }
+  .today-mini { background: var(--lcars-salmon); color: #000; border: none; padding: 7px 14px; border-radius: 999px; font-family: inherit; font-weight: 700; font-size: 12px; cursor: pointer; text-transform: uppercase; }
 
-  main { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 20px; }
+  main { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 20px; min-height: 0; }
 
   /* Bottom-Nav */
-  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); display: flex; padding: 8px 8px calc(8px + var(--safe-bot)); z-index: 50; }
-  .nav-btn { flex: 1; background: transparent; border: none; color: var(--text-faint); padding: 8px 4px; cursor: pointer; font-family: inherit; font-size: 10px; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
-  .nav-btn .icon { font-size: 22px; line-height: 1; }
-  .nav-btn.active { color: var(--green); }
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 2px solid var(--lcars-orange); display: flex; padding: 8px 8px calc(8px + var(--safe-bot)); z-index: 50; }
+  .nav-btn { flex: 1; background: transparent; border: none; color: var(--text-faint); padding: 8px 4px; cursor: pointer; font-family: inherit; font-size: 11px; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 5px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .nav-btn .icon { width: 30px; height: 6px; border-radius: 999px; background: var(--lcars-blue); display: block; opacity: 0.5; }
+  .nav-btn:nth-child(2) .icon { background: var(--lcars-lilac); }
+  .nav-btn:nth-child(3) .icon { background: var(--lcars-peach); }
+  .nav-btn:nth-child(4) .icon { background: var(--lcars-gold); }
+  .nav-btn:nth-child(5) .icon { background: var(--lcars-salmon); }
+  .nav-btn.active { color: var(--accent); }
+  .nav-btn.active .icon { opacity: 1; }
+
+  @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+  .blink { animation: blink 2.4s infinite; }
 
   /* DASHBOARD */
   .dashboard { padding: 0 16px; }
@@ -158,7 +204,7 @@
   .meal-section { margin: 0 16px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
   .meal-header { padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
   .meal-header .left { display: flex; align-items: center; gap: 10px; }
-  .meal-icon { width: 32px; height: 32px; background: var(--surface-2); border-radius: 8px; display: grid; place-items: center; font-size: 16px; }
+  .meal-icon { width: 14px; height: 32px; background: var(--lcars-gold); border-radius: 999px; display: grid; place-items: center; }
   .meal-name { font-weight: 700; font-size: 14px; }
   .meal-sum { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-dim); margin-top: 2px; }
   .meal-add { background: var(--green); color: #052e1f; border: none; width: 30px; height: 30px; border-radius: 8px; font-size: 18px; font-weight: 600; cursor: pointer; display: grid; place-items: center; }
@@ -174,10 +220,10 @@
   /* Modal */
   .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 200; display: none; align-items: flex-end; justify-content: center; }
   .modal-bg.show { display: flex; }
-  .modal { background: var(--surface); width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 20px 20px calc(20px + var(--safe-bot)); max-height: 92vh; overflow-y: auto; border-top: 1px solid var(--border); }
-  @media (min-width: 600px) { .modal-bg { align-items: center; } .modal { border-radius: 16px; max-height: 86vh; } }
+  .modal { background: var(--surface); width: 100%; max-width: 500px; border-radius: 28px 28px 0 0; padding: 20px 20px calc(20px + var(--safe-bot)); max-height: 92vh; overflow-y: auto; border-top: 3px solid var(--lcars-orange); }
+  @media (min-width: 600px) { .modal-bg { align-items: center; } .modal { border-radius: 28px; max-height: 86vh; } }
   .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 14px; }
-  .modal-title { font-weight: 800; font-size: 20px; margin-bottom: 14px; letter-spacing: -0.01em; }
+  .modal-title { font-weight: 700; font-size: 22px; margin-bottom: 14px; letter-spacing: 0.02em; color: var(--accent); }
   .form-group { margin-bottom: 12px; }
   .form-group label { display: block; font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; font-weight: 700; }
   .form-group input, .form-group textarea, .form-group select { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 11px 14px; border-radius: 10px; font-family: inherit; font-size: 15px; }
@@ -185,10 +231,10 @@
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
   .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
-  .modal-actions button { flex: 1; padding: 13px; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: 14px; cursor: pointer; border: none; }
-  .btn-cancel { background: var(--surface-2); color: var(--text); }
-  .btn-save { background: var(--green); color: #052e1f; }
-  .btn-delete { background: rgba(239,68,68,0.12); color: var(--red); margin-top: 8px; width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(239,68,68,0.3); font-family: inherit; font-weight: 600; font-size: 12px; cursor: pointer; }
+  .modal-actions button { flex: 1; padding: 14px; border-radius: 999px; font-family: inherit; font-weight: 700; font-size: 15px; cursor: pointer; border: none; text-transform: uppercase; letter-spacing: 0.04em; }
+  .btn-cancel { background: var(--lcars-lilac); color: #000; }
+  .btn-save { background: var(--lcars-orange); color: #000; }
+  .btn-delete { background: var(--lcars-salmon); color: #000; margin-top: 8px; width: 100%; padding: 12px; border-radius: 999px; border: none; font-family: inherit; font-weight: 700; font-size: 13px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.04em; }
 
   /* Lebensmittel-Suche */
   .search-tabs { display: flex; gap: 4px; margin-bottom: 12px; overflow-x: auto; scrollbar-width: none; }
@@ -210,9 +256,9 @@
   .toggle-row label { font-size: 13px; font-weight: 500; }
   /* Theme-Auswahl */
   .theme-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
-  .theme-opt { background: var(--bg); border: 1px solid var(--border); color: var(--text-dim); padding: 12px 4px; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: 12px; cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .theme-opt { background: var(--surface-2); border: none; color: var(--text); padding: 12px 4px; border-radius: 999px; font-family: inherit; font-weight: 700; font-size: 12px; cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; text-transform: uppercase; }
   .theme-opt .ic { font-size: 20px; }
-  .theme-opt.active { background: var(--green); color: #052e1f; border-color: var(--green); }
+  .theme-opt.active { background: var(--lcars-orange); color: #000; }
   .toggle { width: 44px; height: 26px; background: var(--surface-2); border-radius: 13px; position: relative; cursor: pointer; border: 1px solid var(--border); }
   .toggle.on { background: var(--green); border-color: var(--green); }
   .toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: var(--text); border-radius: 50%; transition: transform 0.2s; }
@@ -259,7 +305,7 @@
   .body-current .trend.stable { color: var(--text-dim); }
 
   .body-quick-log { display: flex; gap: 8px; margin-top: 14px; }
-  .body-quick-log button { flex: 1; background: var(--green); color: #052e1f; border: none; padding: 12px; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: 13px; cursor: pointer; }
+  .body-quick-log button { flex: 1; background: var(--lcars-orange); color: #000; border: none; padding: 12px; border-radius: 999px; font-family: inherit; font-weight: 700; font-size: 13px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.04em; }
   .body-quick-log button.secondary { background: var(--surface-2); color: var(--text); }
 
   .body-metrics { padding: 0 16px 14px; }
@@ -340,22 +386,49 @@
 </head>
 <body>
 <div class="app">
+  <div class="lcars-top">
+    <div class="elbow"></div>
+    <div class="bars">
+      <div class="tics">
+        <span class="blink" style="width:36px;background:var(--lcars-ice)"></span>
+        <span style="width:70px;background:var(--lcars-gold)"></span>
+        <span style="flex:1;background:var(--lcars-salmon)"></span>
+      </div>
+      <div class="bar">LCARS · FUEL 21</div>
+    </div>
+  </div>
+
+  <div class="lcars-rail">
+    <div class="rblock r1">NUT<br>01</div>
+    <div class="rblock r2">KCAL<br>TRK</div>
+    <div class="rblock r3">H2O<br>OK</div>
+    <div class="rblock r4">MAC<br>03</div>
+    <div class="rfill">BIO<br>FEED</div>
+  </div>
+
+  <div class="lcars-bot">
+    <div class="elbow"></div>
+    <div class="bar">STARFLEET · NUTRITION OPS</div>
+  </div>
+
+  <div class="lcars-content">
   <header>
     <a href="health.html" class="back-btn" title="Zurück zu Health">‹</a>
     <div class="title">Fuel<span class="accent">.</span></div>
     <div class="header-actions">
-      <button class="header-btn" id="settingsBtn" title="Einstellungen">⚙</button>
+      <button class="header-btn" id="settingsBtn" title="Einstellungen">SET</button>
     </div>
   </header>
 
   <main id="mainContent"></main>
+  </div>
 
   <nav class="bottom-nav">
-    <button class="nav-btn active" data-tab="today"><span class="icon">🍽️</span>Heute</button>
-    <button class="nav-btn" data-tab="body"><span class="icon">📏</span>Körper</button>
-    <button class="nav-btn" data-tab="recipes"><span class="icon">📖</span>Rezepte</button>
-    <button class="nav-btn" data-tab="stats"><span class="icon">📊</span>Statistik</button>
-    <button class="nav-btn" data-tab="settings"><span class="icon">⚙️</span>Profil</button>
+    <button class="nav-btn active" data-tab="today"><span class="icon"></span>Heute</button>
+    <button class="nav-btn" data-tab="body"><span class="icon"></span>Körper</button>
+    <button class="nav-btn" data-tab="recipes"><span class="icon"></span>Rezepte</button>
+    <button class="nav-btn" data-tab="stats"><span class="icon"></span>Statistik</button>
+    <button class="nav-btn" data-tab="settings"><span class="icon"></span>Profil</button>
   </nav>
 </div>
 
@@ -366,23 +439,23 @@
     <div class="modal-title" id="addFoodTitle">Lebensmittel hinzufügen</div>
     <div class="search-tabs">
       <button class="search-tab active" data-stab="all">Alle</button>
-      <button class="search-tab" data-stab="fav">⭐</button>
+      <button class="search-tab" data-stab="fav">FAV</button>
       <button class="search-tab" data-stab="recipe">Rezepte</button>
       <button class="search-tab" data-stab="recent">Zuletzt</button>
-      <button class="search-tab" data-stab="online">🌐 Online</button>
+      <button class="search-tab" data-stab="online">Online</button>
     </div>
     <div class="form-group" id="searchInputGroup">
       <input type="text" id="foodSearch" placeholder="Suchen oder z.B. 'Apfel'" autocomplete="off">
     </div>
     <div id="onlineSearchHint" style="display:none; margin-bottom: 12px; padding: 10px 12px; background: var(--surface-2); border-radius: 8px; font-size: 12px; color: var(--text-dim); line-height: 1.4;">
-      🌐 <strong>Online-Suche</strong> über Open Food Facts. Gib mind. 3 Buchstaben ein. Treffer landen automatisch in deinen eigenen Lebensmitteln.
+      <strong>Online-Suche</strong> über Open Food Facts. Gib mind. 3 Buchstaben ein. Treffer landen automatisch in deinen eigenen Lebensmitteln.
     </div>
     <div id="searchLoading" style="display:none; text-align:center; padding: 20px; color: var(--text-dim); font-size: 13px;">
-      <div style="display:inline-block; animation: spin 1s linear infinite; font-size: 24px">⟳</div>
+      <div style="display:inline-block; animation: spin 1s linear infinite; font-size: 24px">...</div>
       <div style="margin-top: 6px">Suche…</div>
     </div>
     <div class="food-results" id="foodResults"></div>
-    <button class="add-fav-btn" id="scannerBtn" style="margin-bottom: 8px;">📷 Barcode scannen</button>
+    <button class="add-fav-btn" id="scannerBtn" style="margin-bottom: 8px;">Barcode scannen</button>
     <button class="add-fav-btn" id="customFoodBtn">+ Eigenes Lebensmittel</button>
     <div class="modal-actions">
       <button class="btn-cancel" id="closeFoodBtn">Schließen</button>
@@ -394,7 +467,7 @@
 <div class="modal-bg" id="scannerBg">
   <div class="modal" style="max-width: 500px;">
     <div class="modal-handle"></div>
-    <div class="modal-title">📷 Barcode scannen</div>
+    <div class="modal-title">Barcode scannen</div>
     <div id="scannerStatus" style="text-align:center; padding: 10px; font-size: 13px; color: var(--text-dim);">Kamera wird gestartet…</div>
     <div style="position: relative; width: 100%; max-width: 460px; margin: 0 auto; background: #000; border-radius: 12px; overflow: hidden; aspect-ratio: 4/3;">
       <video id="scannerVideo" style="width: 100%; height: 100%; object-fit: cover; display: block;" autoplay muted playsinline></video>
@@ -403,7 +476,7 @@
       </div>
     </div>
     <div style="margin-top: 12px; padding: 10px 12px; background: var(--surface-2); border-radius: 8px; font-size: 12px; color: var(--text-dim); line-height: 1.4; text-align: center;">
-      💡 Halte den Barcode in den grünen Rahmen. Klappt am besten mit gutem Licht und ruhiger Hand.
+      Halte den Barcode in den grünen Rahmen. Klappt am besten mit gutem Licht und ruhiger Hand.
     </div>
     <div class="form-group" style="margin-top: 12px;">
       <label>Oder Barcode manuell eingeben</label>
@@ -422,26 +495,26 @@
     <div class="modal-handle"></div>
     <div class="modal-title" id="bodyLogTitle">Körper-Werte eintragen</div>
     <div style="color:var(--text-dim); font-size:12px; margin-bottom:14px; padding: 10px 12px; background:var(--surface-2); border-radius:8px; line-height:1.5;">
-      💡 Du musst nicht alle Werte eintragen. Lass leer, was du heute nicht gemessen hast.
+      Du musst nicht alle Werte eintragen. Lass leer, was du heute nicht gemessen hast.
     </div>
     <div class="form-group">
       <label>Datum</label>
       <input type="date" id="bDate">
     </div>
-    <h3 style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); font-weight: 700; margin: 14px 0 10px">⚖️ Gewicht & Körperfett</h3>
+    <h3 style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); font-weight: 700; margin: 14px 0 10px">Gewicht & Körperfett</h3>
     <div class="body-log-grid">
       <div class="body-log-field">
-        <label>Gewicht <span class="ic">⚖️</span></label>
+        <label>Gewicht </label>
         <input type="number" id="bWeight" step="0.1" inputmode="decimal" placeholder="–">
         <div class="unit-suffix">kg</div>
       </div>
       <div class="body-log-field">
-        <label>Körperfett <span class="ic">📊</span></label>
+        <label>Körperfett </label>
         <input type="number" id="bBodyfat" step="0.1" inputmode="decimal" placeholder="–">
         <div class="unit-suffix">%</div>
       </div>
     </div>
-    <h3 style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); font-weight: 700; margin: 18px 0 10px">📏 Umfänge (cm)</h3>
+    <h3 style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); font-weight: 700; margin: 18px 0 10px">Umfänge (cm)</h3>
     <div class="body-log-grid">
       <div class="body-log-field">
         <label>Brust</label>
@@ -474,21 +547,21 @@
         <div class="unit-suffix">cm</div>
       </div>
     </div>
-    <h3 style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); font-weight: 700; margin: 18px 0 10px">💤 Recovery</h3>
+    <h3 style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); font-weight: 700; margin: 18px 0 10px">Recovery</h3>
     <div class="body-log-grid">
       <div class="body-log-field">
-        <label>Schlaf <span class="ic">💤</span></label>
+        <label>Schlaf </label>
         <input type="number" id="bSleep" step="0.25" inputmode="decimal" placeholder="–">
         <div class="unit-suffix">Stunden</div>
       </div>
     </div>
-    <h3 style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); font-weight: 700; margin: 18px 0 10px">😊 Stimmung / Energie</h3>
+    <h3 style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); font-weight: 700; margin: 18px 0 10px">Stimmung / Energie</h3>
     <div class="mood-pills" id="moodPills">
-      <button class="mood-pill" data-mood="1">😩</button>
-      <button class="mood-pill" data-mood="2">😐</button>
-      <button class="mood-pill" data-mood="3">🙂</button>
-      <button class="mood-pill" data-mood="4">😄</button>
-      <button class="mood-pill" data-mood="5">💪</button>
+      <button class="mood-pill" data-mood="1">1</button>
+      <button class="mood-pill" data-mood="2">2</button>
+      <button class="mood-pill" data-mood="3">3</button>
+      <button class="mood-pill" data-mood="4">4</button>
+      <button class="mood-pill" data-mood="5">5</button>
     </div>
     <div class="modal-actions">
       <button class="btn-cancel" id="bCancel">Abbrechen</button>
@@ -698,11 +771,11 @@
       <label>Ziele automatisch nach Profil berechnen</label>
       <div class="toggle on" id="pAutoCalc"></div>
     </div>
-    <h3 style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); font-weight: 700; margin: 16px 0 4px">🎨 Erscheinungsbild</h3>
+    <h3 style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); font-weight: 700; margin: 16px 0 4px">Erscheinungsbild</h3>
     <div class="theme-options">
-      <button class="theme-opt" data-theme="auto" id="themeAuto"><span class="ic">⚙️</span>Automatisch</button>
-      <button class="theme-opt" data-theme="light" id="themeLight"><span class="ic">☀️</span>Hell</button>
-      <button class="theme-opt" data-theme="dark" id="themeDark"><span class="ic">🌙</span>Dunkel</button>
+      <button class="theme-opt" data-theme="auto" id="themeAuto">Automatisch</button>
+      <button class="theme-opt" data-theme="light" id="themeLight">Hell</button>
+      <button class="theme-opt" data-theme="dark" id="themeDark">Dunkel</button>
     </div>
     <div class="modal-actions">
       <button class="btn-cancel" id="profileCancel">Abbrechen</button>
@@ -811,15 +884,15 @@ const UNIT_FACTOR = {
 // =============================================================
 const STORAGE_KEY = 'fuel_v1';
 const DAY_TYPES = [
-  { id:'rest', name:'Ruhetag', icon:'😌' },
-  { id:'train', name:'Training', icon:'💪' },
-  { id:'night', name:'Nachtsch.', icon:'🌙' }
+  { id:'rest', name:'Ruhetag', icon:'' },
+  { id:'train', name:'Training', icon:'' },
+  { id:'night', name:'Nachtsch.', icon:'' }
 ];
 const MEALS = [
-  { id:'breakfast', name:'Frühstück', icon:'🥣' },
-  { id:'lunch', name:'Mittag', icon:'🍱' },
-  { id:'dinner', name:'Abend', icon:'🍽️' },
-  { id:'snack', name:'Snack', icon:'🍎' }
+  { id:'breakfast', name:'Frühstück', icon:'' },
+  { id:'lunch', name:'Mittag', icon:'' },
+  { id:'dinner', name:'Abend', icon:'' },
+  { id:'snack', name:'Snack', icon:'' }
 ];
 
 const DEFAULT_PROFILE = {
@@ -882,7 +955,7 @@ function applyTheme() {
   const isDark = theme === 'dark' ||
                  (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
   const tc = document.getElementById('themeColor');
-  if (tc) tc.setAttribute('content', isDark ? '#0a0e0c' : '#f5f8f6');
+  if (tc) tc.setAttribute('content', isDark ? '#000000' : '#d6d2c4');
 }
 function saveData() {
   try {
@@ -1079,7 +1152,7 @@ function renderToday() {
     </div>
     <div class="water-card">
       <div class="water-header">
-        <div class="water-title">💧 Wasser</div>
+        <div class="water-title">Wasser</div>
         <div class="water-stat">${day.water} ml <span class="goal">/ ${state.profile.waterGoal} ml</span></div>
       </div>
       <div class="water-bar">
@@ -1308,8 +1381,8 @@ function renderSettings() {
   </div>`;
 
   html += `<div style="padding:0 16px 20px"><button class="add-fav-btn" id="editProfileBtn">Profil &amp; Ziele bearbeiten</button></div>`;
-  html += `<div style="padding:0 16px 8px"><button class="add-fav-btn" id="exportBtn">📤 Backup speichern (Export)</button></div>`;
-  html += `<div style="padding:0 16px 20px"><button class="add-fav-btn" id="importBtn">📥 Backup laden (Import)</button></div>`;
+  html += `<div style="padding:0 16px 8px"><button class="add-fav-btn" id="exportBtn">Backup speichern (Export)</button></div>`;
+  html += `<div style="padding:0 16px 20px"><button class="add-fav-btn" id="importBtn">Backup laden (Import)</button></div>`;
 
   mainEl.innerHTML = html;
   $('editProfileBtn').addEventListener('click', openProfileModal);
@@ -1382,16 +1455,16 @@ function renderSettings() {
 // BODY-TAB: Helpers, Render, Modal
 // =============================================================
 const BODY_METRICS = [
-  { key:'weight',  name:'Gewicht',      unit:'kg', icon:'⚖️', decimals:1, goalDirection:null }, // wird dynamisch
-  { key:'bodyfat', name:'Körperfett',   unit:'%',  icon:'📊', decimals:1, goalDirection:'down' },
-  { key:'chest',   name:'Brust',        unit:'cm', icon:'💪', decimals:1, goalDirection:null },
-  { key:'waist',   name:'Taille',       unit:'cm', icon:'📏', decimals:1, goalDirection:'down' },
-  { key:'hip',     name:'Hüfte',        unit:'cm', icon:'📐', decimals:1, goalDirection:'down' },
-  { key:'thigh',   name:'Oberschenkel', unit:'cm', icon:'🦵', decimals:1, goalDirection:null },
-  { key:'arm',     name:'Oberarm',      unit:'cm', icon:'💪', decimals:1, goalDirection:null },
-  { key:'calf',    name:'Wade',         unit:'cm', icon:'🦵', decimals:1, goalDirection:null },
-  { key:'sleep',   name:'Schlaf',       unit:'h',  icon:'💤', decimals:1, goalDirection:'up' },
-  { key:'mood',    name:'Stimmung',     unit:'',   icon:'😊', decimals:0, goalDirection:'up', isMood:true }
+  { key:'weight',  name:'Gewicht',      unit:'kg', icon:'', decimals:1, goalDirection:null }, // wird dynamisch
+  { key:'bodyfat', name:'Körperfett',   unit:'%',  icon:'', decimals:1, goalDirection:'down' },
+  { key:'chest',   name:'Brust',        unit:'cm', icon:'', decimals:1, goalDirection:null },
+  { key:'waist',   name:'Taille',       unit:'cm', icon:'', decimals:1, goalDirection:'down' },
+  { key:'hip',     name:'Hüfte',        unit:'cm', icon:'', decimals:1, goalDirection:'down' },
+  { key:'thigh',   name:'Oberschenkel', unit:'cm', icon:'', decimals:1, goalDirection:null },
+  { key:'arm',     name:'Oberarm',      unit:'cm', icon:'', decimals:1, goalDirection:null },
+  { key:'calf',    name:'Wade',         unit:'cm', icon:'', decimals:1, goalDirection:null },
+  { key:'sleep',   name:'Schlaf',       unit:'h',  icon:'', decimals:1, goalDirection:'up' },
+  { key:'mood',    name:'Stimmung',     unit:'',   icon:'', decimals:0, goalDirection:'up', isMood:true }
 ];
 
 function getMetric(key) { return BODY_METRICS.find(m => m.key === key); }
@@ -1546,7 +1619,7 @@ function renderBody() {
   const suggestion = checkAdjustmentSuggestion();
   if (suggestion) {
     html += `<div class="suggestion-card">
-      <div class="label">💡 Anpassung empfohlen</div>
+      <div class="label">Anpassung empfohlen</div>
       <div class="text">${escape(suggestion.text)}</div>
       <div class="actions">
         <button class="dismiss" id="dismissAdjBtn">Später</button>
@@ -1571,14 +1644,14 @@ function renderBody() {
     const trendStr = weightTrend ? formatTrend(weightTrend.delta, dir, 'kg', 1) : '<span class="trend stable">Sammle Daten…</span>';
     const avgStr = weightAvg ? `Ø ${weightAvg.avg.toFixed(1)} kg (7T)` : '';
     html += `<div class="item">
-      <div class="lbl">⚖️ Gewicht</div>
+      <div class="lbl">Gewicht</div>
       <div class="val">${weightLatest.value.toFixed(1)}<span class="unit">kg</span></div>
       <div class="trend stable">${avgStr}</div>
       ${trendStr}
     </div>`;
   } else {
     html += `<div class="item">
-      <div class="lbl">⚖️ Gewicht</div>
+      <div class="lbl">Gewicht</div>
       <div class="val" style="color:var(--text-faint); font-size: 16px">noch keine Daten</div>
     </div>`;
   }
@@ -1587,21 +1660,21 @@ function renderBody() {
   if (fatLatest) {
     const trendStr = fatTrend ? formatTrend(fatTrend.delta, 'down', '%', 1) : '<span class="trend stable">Sammle Daten…</span>';
     html += `<div class="item">
-      <div class="lbl">📊 Körperfett</div>
+      <div class="lbl">Körperfett</div>
       <div class="val">${fatLatest.value.toFixed(1)}<span class="unit">%</span></div>
       ${trendStr}
     </div>`;
   } else {
     html += `<div class="item">
-      <div class="lbl">📊 Körperfett</div>
+      <div class="lbl">Körperfett</div>
       <div class="val" style="color:var(--text-faint); font-size: 16px">noch keine Daten</div>
     </div>`;
   }
 
   html += `</div>
     <div class="body-quick-log">
-      <button id="bodyLogTodayBtn">${todayData ? '✏️ Heute bearbeiten' : '+ Heute eintragen'}</button>
-      <button class="secondary" id="bodyLogOtherBtn">📅 Anderer Tag</button>
+      <button id="bodyLogTodayBtn">${todayData ? 'Heute bearbeiten' : '+ Heute eintragen'}</button>
+      <button class="secondary" id="bodyLogOtherBtn">Anderer Tag</button>
     </div>
   </div></div>`;
 
@@ -1617,7 +1690,7 @@ function renderBody() {
     let valDisplay, deltaDisplay = '';
     if (latest) {
       if (m.isMood) {
-        const moods = ['😩','😐','🙂','😄','💪'];
+        const moods = ['1','2','3','4','5'];
         valDisplay = `<span class="num" style="font-size:22px">${moods[Math.round(latest.value) - 1] || '?'}</span>`;
       } else {
         valDisplay = `<span class="num">${latest.value.toFixed(m.decimals)}<span style="font-size:10px; color:var(--text-faint); margin-left:3px">${m.unit}</span></span>`;
@@ -1702,7 +1775,7 @@ function renderBodyChart() {
 
   let chartContent = '';
   if (filtered.length < 2) {
-    chartContent = `<div style="text-align:center; padding: 60px 20px; color: var(--text-faint); font-size: 13px">📈 Mindestens 2 Einträge nötig für Verlauf</div>`;
+    chartContent = `<div style="text-align:center; padding: 60px 20px; color: var(--text-faint); font-size: 13px">Mindestens 2 Einträge nötig für Verlauf</div>`;
   } else {
     chartContent = renderLineChart(filtered, m);
   }
@@ -1948,7 +2021,7 @@ function renderOnlineResults(foods) {
   el.innerHTML = foods.map(f => `<div class="food-result" data-online="1" data-name="${escape(f.n)}" data-payload='${escape(JSON.stringify(f))}'>
     <div style="flex:1; min-width:0">
       <div class="name">${escape(f.n)}</div>
-      <div class="meta">E ${f.p}g · KH ${f.c}g · F ${f.f}g /100g${f.barcode ? ' · 🌐' : ''}</div>
+      <div class="meta">E ${f.p}g · KH ${f.c}g · F ${f.f}g /100g${f.barcode ? ' · OFF' : ''}</div>
     </div>
     <div class="kcal">${f.k} kcal</div>
   </div>`).join('');
@@ -2374,7 +2447,7 @@ async function openScanner() {
     const video = $('scannerVideo');
     video.srcObject = scannerStream;
     await video.play();
-    $('scannerStatus').textContent = '📷 Barcode in den grünen Rahmen halten';
+    $('scannerStatus').textContent = 'Barcode in den grünen Rahmen halten';
     $('scannerStatus').style.color = 'var(--green)';
     // Scanner starten
     scannerActive = true;
@@ -2387,7 +2460,7 @@ async function openScanner() {
       }
     });
   } catch(e) {
-    $('scannerStatus').textContent = '⚠ ' + e.message;
+    $('scannerStatus').textContent = 'ACHTUNG: ' + e.message;
     $('scannerStatus').style.color = '#ef4444';
   }
 }
@@ -2413,7 +2486,7 @@ async function handleBarcode(code) {
   try {
     const food = await fetchByBarcode(code);
     if (!food) {
-      $('scannerStatus').textContent = `⚠ Produkt ${code} nicht in Datenbank gefunden`;
+      $('scannerStatus').textContent = `ACHTUNG: Produkt ${code} nicht in Datenbank gefunden`;
       $('scannerStatus').style.color = '#f59e0b';
       // Scanner reaktivieren falls Kamera offen
       if (scannerStream) scannerActive = true;
@@ -2428,7 +2501,7 @@ async function handleBarcode(code) {
     // Direkt zum Portion-Modal
     openPortion(food.n, false);
   } catch(e) {
-    $('scannerStatus').textContent = '⚠ Fehler: ' + e.message;
+    $('scannerStatus').textContent = 'ACHTUNG: Fehler: ' + e.message;
     $('scannerStatus').style.color = '#ef4444';
     if (scannerStream) scannerActive = true;
   }
@@ -2449,7 +2522,7 @@ document.querySelectorAll('.search-tab').forEach(t => {
     state.searchTab = t.dataset.stab;
     document.querySelectorAll('.search-tab').forEach(x => x.classList.toggle('active', x === t));
     if (state.searchTab === 'online') {
-      $('foodSearch').placeholder = '🌐 Online suchen (mind. 3 Buchstaben)…';
+      $('foodSearch').placeholder = 'Online suchen (mind. 3 Buchstaben)…';
       if (state.searchTerm && state.searchTerm.length >= 3) {
         triggerOnlineSearch(state.searchTerm);
       } else {

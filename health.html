@@ -6,115 +6,160 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Health">
-<meta name="theme-color" content="#0a0a0c" id="themeColor">
-<title>Health</title>
+<meta name="theme-color" content="#000000" id="themeColor">
+<title>LCARS · Health</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root, :root[data-theme="dark"] {
-    --bg: #0a0a0c;
-    --surface: #15161a;
-    --surface-2: #1f2127;
-    --border: #2a2d35;
-    --text: #ecedf0;
-    --text-dim: #8a8d96;
-    --text-faint: #5a5d66;
+  :root {
+    --bg: #000000;
+    --text: #ffcc99;
+    --orange: #ff9c00;
+    --peach: #ff9966;
+    --lilac: #cc99cc;
+    --blue: #9999ff;
+    --ice: #99ccff;
+    --gold: #ffcc66;
+    --salmon: #ff7755;
+    --fuel: #99cc99;
+    --train: #ff7755;
   }
-  :root[data-theme="light"] {
-    --bg: #f5f7fa;
-    --surface: #ffffff;
-    --surface-2: #f0f2f5;
-    --border: #dfe3e8;
-    --text: #15161a;
-    --text-dim: #5a5d66;
-    --text-faint: #8a8d96;
-  }
+  :root[data-theme="light"] { --bg: #d6d2c4; --text: #1a1a1a; }
   @media (prefers-color-scheme: light) {
-    :root[data-theme="auto"] { --bg: #f5f7fa; --surface: #ffffff; --surface-2: #f0f2f5; --border: #dfe3e8; --text: #15161a; --text-dim: #5a5d66; --text-faint: #8a8d96; }
-  }
-  @media (prefers-color-scheme: dark) {
-    :root[data-theme="auto"] { --bg: #0a0a0c; --surface: #15161a; --surface-2: #1f2127; --border: #2a2d35; --text: #ecedf0; --text-dim: #8a8d96; --text-faint: #5a5d66; }
+    :root[data-theme="auto"] { --bg: #d6d2c4; --text: #1a1a1a; }
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { min-height: 100%; }
   body {
-    font-family: 'Manrope', -apple-system, sans-serif;
+    font-family: 'Antonio', 'Arial Narrow', sans-serif;
     background: var(--bg);
     color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
     padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
-    transition: background 0.2s, color 0.2s;
+    overflow-x: hidden;
   }
-  .container { max-width: 600px; margin: 0 auto; padding: 28px 20px 40px; }
+  .frame { max-width: 720px; margin: 0 auto; padding: 12px 12px 24px; }
 
-  header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; gap: 8px; }
-  .back-link { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 9px; font-size: 13px; color: var(--text-dim); text-decoration: none; font-weight: 600; }
-  .back-link:active { background: var(--surface-2); }
-  .theme-switch { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 3px; }
-  .theme-switch button { background: transparent; border: none; color: var(--text-dim); padding: 6px 10px; border-radius: 7px; font-family: inherit; font-size: 12px; cursor: pointer; }
-  .theme-switch button.active { background: var(--surface-2); color: var(--text); }
-
-  .page-title { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 24px; }
-  .page-title .dot { color: #f97316; }
-
-  .apps { display: flex; flex-direction: column; gap: 14px; }
-  .app-card {
-    display: block;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 28px 24px;
-    text-decoration: none;
-    color: var(--text);
-    transition: transform 0.15s, border-color 0.15s;
-    position: relative;
-    overflow: hidden;
+  .lcars {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    grid-template-rows: auto 1fr auto;
+    gap: 6px;
+    min-height: calc(100vh - 60px);
+    min-height: calc(100dvh - 60px);
   }
-  .app-card:active { transform: scale(0.98); }
-  .app-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; height: 3px;
-    background: var(--card-color);
-  }
-  .app-card.fuel  { --card-color: #10b981; }
-  .app-card.train { --card-color: #ef4444; }
-  .app-card .title { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; }
-  .app-card .title .dot { color: var(--card-color); }
-  .app-card .arrow { position: absolute; top: 50%; right: 24px; transform: translateY(-50%); color: var(--text-faint); font-size: 24px; opacity: 0.5; }
+  @media (max-width: 440px) { .lcars { grid-template-columns: 96px 1fr; } }
 
-  @media (max-width: 380px) {
-    .container { padding: 20px 14px 30px; }
-    .app-card { padding: 22px 18px; }
-    .app-card .title { font-size: 21px; }
-    .page-title { font-size: 24px; }
+  .top-row { grid-column: 1 / 3; grid-row: 1; display: flex; gap: 6px; align-items: stretch; height: 70px; }
+  .elbow-top { width: 140px; flex-shrink: 0; height: 100%; background: var(--orange); border-top-left-radius: 60px; }
+  .top-bar-stack { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 6px; }
+  .top-bar { height: 30px; background: var(--lilac); border-radius: 0 999px 999px 0; display: flex; align-items: center; justify-content: flex-end; padding-right: 16px; color: #000; font-weight: 700; font-size: 15px; }
+  .top-tics { display: flex; gap: 6px; align-items: flex-end; height: 18px; }
+  .top-tics span { display: block; height: 18px; border-radius: 999px; }
+  @media (max-width: 440px) { .elbow-top { width: 96px; } }
+
+  .rail { grid-column: 1; grid-row: 2; display: flex; flex-direction: column; gap: 6px; }
+  .rail .block { background: var(--peach); color: #000; font-weight: 700; font-size: 12px; padding: 10px 10px; display: flex; flex-direction: column; align-items: flex-end; justify-content: flex-end; text-align: right; line-height: 1; min-height: 52px; }
+  .rail .b1 { background: var(--lilac); min-height: 70px; }
+  .rail .b2 { background: var(--blue); }
+  .rail .b3 { background: var(--gold); }
+  .rail .spacer { flex: 1; background: var(--salmon); min-height: 30px; display: flex; align-items: flex-start; justify-content: flex-end; padding: 10px; color: #000; font-weight: 700; font-size: 12px; text-align: right; line-height: 1.1; }
+
+  .theme-switch { display: flex; flex-direction: column; gap: 4px; }
+  .theme-switch button { background: var(--ice); border: none; color: #000; padding: 9px 0; font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; text-transform: uppercase; opacity: 0.4; transition: opacity 0.15s; }
+  .theme-switch button.active { opacity: 1; }
+
+  .bot-row { grid-column: 1 / 3; grid-row: 3; display: flex; gap: 6px; align-items: stretch; height: 54px; }
+  .elbow-bot { width: 140px; flex-shrink: 0; height: 100%; background: var(--orange); border-bottom-left-radius: 60px; }
+  .bot-bar-stack { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; gap: 6px; }
+  .bot-bar { height: 26px; background: var(--blue); border-radius: 0 999px 999px 0; display: flex; align-items: center; padding-left: 16px; color: #000; font-weight: 700; font-size: 13px; }
+  @media (max-width: 440px) { .elbow-bot { width: 96px; } }
+
+  .content { grid-column: 2; grid-row: 2; display: flex; flex-direction: column; gap: 8px; padding: 2px 0; }
+  .headline { padding: 0 4px 6px 4px; }
+  .headline .ttl { color: var(--orange); font-size: 28px; font-weight: 700; line-height: 1; }
+  .headline .sub { color: var(--text); opacity: 0.65; font-size: 12px; font-weight: 500; margin-top: 4px; }
+  .stardate { color: var(--gold); font-size: 12px; font-weight: 500; padding: 0 4px 4px; }
+
+  .app-card { display: block; text-decoration: none; transition: transform 0.12s; }
+  .app-card:active { transform: scale(0.985); }
+  .app-row { display: flex; align-items: stretch; height: 92px; border-radius: 0 999px 999px 0; overflow: hidden; }
+  .app-card.fuel  .app-row { background: var(--fuel); }
+  .app-card.train .app-row { background: var(--train); }
+  .app-tab { width: 96px; flex-shrink: 0; color: #000; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 28px; border-right: 3px solid rgba(0,0,0,0.2); }
+  .app-main { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 8px 20px; position: relative; }
+  .app-main .name { font-size: 28px; font-weight: 700; line-height: 1; color: #000; }
+  .app-main .desc { font-size: 12px; font-weight: 500; opacity: 0.7; margin-top: 5px; color: #000; }
+  .app-main .num { position: absolute; top: 8px; right: 20px; font-size: 12px; font-weight: 500; opacity: 0.55; color: #000; }
+  @media (max-width: 440px) {
+    .app-tab { width: 64px; font-size: 22px; }
+    .app-main .name { font-size: 22px; }
+    .headline .ttl { font-size: 23px; }
   }
+
+  @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+  .blink { animation: blink 2.4s infinite; }
 </style>
 </head>
 <body>
-<div class="container">
-  <header>
-    <a href="index.html" class="back-link">← Apps</a>
-    <div class="theme-switch">
-      <button data-theme="auto">A</button>
-      <button data-theme="light">☀</button>
-      <button data-theme="dark">🌙</button>
+<div class="frame">
+  <div class="lcars">
+
+    <div class="top-row">
+      <div class="elbow-top"></div>
+      <div class="top-bar-stack">
+        <div class="top-tics">
+          <span class="blink" style="width:40px;background:var(--ice)"></span>
+          <span style="width:80px;background:var(--gold)"></span>
+          <span style="flex:1;background:var(--salmon)"></span>
+        </div>
+        <div class="top-bar">LCARS · HEALTH 47</div>
+      </div>
     </div>
-  </header>
 
-  <div class="page-title">Health<span class="dot">.</span></div>
+    <div class="rail">
+      <div class="block b1">MED<br>ONLINE</div>
+      <div class="block b2">BIO<br>02</div>
+      <div class="theme-switch">
+        <button data-theme="auto" title="Automatisch">AUTO</button>
+        <button data-theme="light" title="Hell">HELL</button>
+        <button data-theme="dark" title="Dunkel">DUNKEL</button>
+      </div>
+      <div class="block b3">VIT<br>OK</div>
+      <div class="spacer">LCARS<br>2390</div>
+    </div>
 
-  <div class="apps">
-    <a href="fuel.html" class="app-card fuel">
-      <div class="arrow">›</div>
-      <div class="title">Fuel<span class="dot">.</span></div>
-    </a>
+    <div class="content">
+      <div class="headline">
+        <div class="ttl">Medical</div>
+        <div class="sub">Bio-Monitor · Authorized</div>
+      </div>
+      <div class="stardate" id="stardate">Stardate · ········</div>
 
-    <a href="train.html" class="app-card train">
-      <div class="arrow">›</div>
-      <div class="title">Train<span class="dot">.</span></div>
-    </a>
+      <a href="fuel.html" class="app-card fuel">
+        <div class="app-row">
+          <div class="app-tab">01</div>
+          <div class="app-main"><span class="num">21-330</span><div class="name">Fuel</div><div class="desc">Ernährung · Nutrition</div></div>
+        </div>
+      </a>
+      <a href="train.html" class="app-card train">
+        <div class="app-row">
+          <div class="app-tab">02</div>
+          <div class="app-main"><span class="num">21-885</span><div class="name">Train</div><div class="desc">Training · Conditioning</div></div>
+        </div>
+      </a>
+    </div>
+
+    <div class="bot-row">
+      <div class="elbow-bot"></div>
+      <div class="bot-bar-stack">
+        <div class="bot-bar">STARFLEET · MEDICAL OPS</div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -124,7 +169,7 @@
   function applyTheme() {
     document.documentElement.setAttribute('data-theme', theme);
     const isDark = theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    document.getElementById('themeColor').setAttribute('content', isDark ? '#0a0a0c' : '#f5f7fa');
+    document.getElementById('themeColor').setAttribute('content', isDark ? '#000000' : '#d6d2c4');
     document.querySelectorAll('.theme-switch button').forEach(b => b.classList.toggle('active', b.dataset.theme === theme));
   }
   document.querySelectorAll('.theme-switch button').forEach(b => {
@@ -138,6 +183,16 @@
     if (theme === 'auto') applyTheme();
   });
   applyTheme();
+
+  function stardate() {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 0);
+    const day = Math.floor((now - start) / 86400000);
+    const frac = (now.getHours() * 60 + now.getMinutes()) / 1440;
+    const sd = (47000 + (now.getFullYear() - 2024) * 1000 + day * 2.74 + frac).toFixed(1);
+    document.getElementById('stardate').textContent = 'Stardate · ' + sd;
+  }
+  stardate();
 </script>
 </body>
 </html>
