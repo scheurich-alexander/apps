@@ -285,6 +285,8 @@
   .theme-opt { background: var(--surface-2); border: none; color: var(--text); padding: 12px 4px; border-radius: 999px; font-family: inherit; font-weight: 700; font-size: 12px; cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; text-transform: uppercase; }
   .theme-opt .ic { font-size: 20px; }
   .theme-opt.active { background: var(--lcars-orange); color: #000; }
+  .snd-opt { background: var(--surface-2); border: none; color: var(--text); padding: 12px 4px; border-radius: 999px; font-family: inherit; font-weight: 700; font-size: 12px; cursor: pointer; text-align: center; text-transform: uppercase; }
+  .snd-opt.active { background: var(--lcars-gold); color: #000; }
 
   /* Kategorie-Editor */
   .cat-editor-list { display: flex; flex-direction: column; gap: 6px; }
@@ -493,6 +495,14 @@
     </div>
 
     <div class="settings-section">
+      <h3>LCARS-Töne</h3>
+      <div class="theme-options" style="grid-template-columns:1fr 1fr;">
+        <button class="snd-opt" data-snd="on">An</button>
+        <button class="snd-opt" data-snd="off">Aus</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
       <h3>Kategorien</h3>
       <div class="cat-editor-list" id="catEditor"></div>
       <button class="add-cat-btn" id="addCatBtn">+ Neue Kategorie</button>
@@ -531,6 +541,68 @@
 </div>
 
 <script>
+// ============= LCARS SOUND ENGINE =============
+const LCARS_SND_KEY = 'lcars_sound_enabled';
+const lcarsSound = (() => {
+  let ctx = null;
+  let enabled = localStorage.getItem(LCARS_SND_KEY) !== 'off'; // default an
+  function ensure() {
+    if (!ctx) { try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) { return null; } }
+    if (ctx.state === 'suspended') ctx.resume();
+    return ctx;
+  }
+  // ein einzelner Beep: freq (Hz), dur (s), type, vol
+  function beep(freq, dur, type, vol, delay) {
+    const c = ensure(); if (!c) return;
+    const t0 = c.currentTime + (delay || 0);
+    const osc = c.createOscillator();
+    const g = c.createGain();
+    osc.type = type || 'square';
+    osc.frequency.setValueAtTime(freq, t0);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(vol || 0.05, t0 + 0.006);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    osc.connect(g); g.connect(c.destination);
+    osc.start(t0); osc.stop(t0 + dur + 0.02);
+  }
+  // verschiedene LCARS-typische Töne je Button-Kategorie
+  const tones = {
+    tab:     () => { beep(660, 0.09, 'square', 0.05); },
+    nav:     () => { beep(880, 0.07, 'square', 0.045); },
+    primary: () => { beep(523, 0.07, 'square', 0.05); beep(784, 0.10, 'square', 0.045, 0.05); }, // zwei-Ton aufwärts
+    cancel:  () => { beep(440, 0.10, 'sine', 0.05); beep(330, 0.10, 'sine', 0.045, 0.05); }, // zwei-Ton abwärts
+    danger:  () => { beep(220, 0.16, 'sawtooth', 0.05); },
+    toggle:  () => { beep(740, 0.06, 'square', 0.045); },
+    back:    () => { beep(392, 0.08, 'triangle', 0.05); },
+    generic: () => { beep(700, 0.07, 'square', 0.045); }
+  };
+  function play(kind) { if (!enabled) return; (tones[kind] || tones.generic)(); }
+  function setEnabled(v) { enabled = v; localStorage.setItem(LCARS_SND_KEY, v ? 'on' : 'off'); if (v) play('toggle'); }
+  function isEnabled() { return enabled; }
+  return { play, setEnabled, isEnabled, ensure };
+})();
+
+// Klassifiziert einen Button anhand seiner Klassen/IDs und spielt den passenden Ton
+function lcarsClassify(el) {
+  const cl = el.classList;
+  const id = el.id || '';
+  if (cl.contains('btn-delete') || cl.contains('danger') || /delete|Delete/.test(id)) return 'danger';
+  if (cl.contains('btn-save') || cl.contains('today-btn') || cl.contains('fab') || /save|Save/.test(id)) return 'primary';
+  if (cl.contains('btn-cancel') || /cancel|Cancel/.test(id)) return 'cancel';
+  if (cl.contains('back-btn') || cl.contains('home-link') || cl.contains('back-link')) return 'back';
+  if (cl.contains('tab')) return 'tab';
+  if (cl.contains('date-nav-btn') || cl.contains('nav-btn') || cl.contains('header-btn')) return 'nav';
+  if (cl.contains('snd-opt') || cl.contains('theme-opt') || cl.contains('cat-pill') || el.type === 'checkbox') return 'toggle';
+  return 'generic';
+}
+// Globaler Listener: erster Tap aktiviert AudioContext (iOS), danach klingt jeder Button
+document.addEventListener('click', (e) => {
+  const el = e.target.closest('button, a, .tab, .theme-opt, .snd-opt');
+  if (!el) return;
+  lcarsSound.ensure();
+  lcarsSound.play(lcarsClassify(el));
+}, true);
+
 // ============= STORAGE & THEME =============
 const STORAGE_KEY = 'planer_v3';
 const PROXIES = [
@@ -2004,6 +2076,18 @@ document.querySelectorAll('.theme-opt').forEach(b => {
     document.querySelectorAll('.theme-opt').forEach(x => x.classList.toggle('active', x === b));
   });
 });
+// LCARS-Sound-Toggle
+function syncSndOpts() {
+  document.querySelectorAll('.snd-opt').forEach(x =>
+    x.classList.toggle('active', (x.dataset.snd === 'on') === lcarsSound.isEnabled()));
+}
+document.querySelectorAll('.snd-opt').forEach(b => {
+  b.addEventListener('click', () => {
+    lcarsSound.setEnabled(b.dataset.snd === 'on');
+    syncSndOpts();
+  });
+});
+syncSndOpts();
 $('addCatBtn').addEventListener('click', () => {
   const newId = 'cat_' + Date.now();
   const usedColors = state.categories.map(c => c.color);
