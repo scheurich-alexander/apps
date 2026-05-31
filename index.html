@@ -14,7 +14,7 @@
 <style>
   :root {
     --bg: #000000;
-    --text: #ffffff;
+    --text: #ffcc99;
     --orange: #ff9c00;
     --peach: #ff9966;
     --lilac: #cc99cc;
@@ -22,16 +22,12 @@
     --ice: #99ccff;
     --gold: #ffcc66;
     --salmon: #ff7755;
-    --red: #cc6666;
     --plan: #99ccff;
     --health: #ff9966;
     --money: #cc99cc;
     --edu: #ffcc66;
   }
-  :root[data-theme="light"] {
-    --bg: #d6d2c4;
-    --text: #1a1a1a;
-  }
+  :root[data-theme="light"] { --bg: #d6d2c4; --text: #1a1a1a; }
   @media (prefers-color-scheme: light) {
     :root[data-theme="auto"] { --bg: #d6d2c4; --text: #1a1a1a; }
   }
@@ -47,236 +43,181 @@
     padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
     overflow-x: hidden;
   }
-  .frame { max-width: 720px; margin: 0 auto; padding: 14px 14px 30px; }
+  .frame { max-width: 720px; margin: 0 auto; padding: 12px 12px 24px; }
 
-  /* ---------- top bar ---------- */
-  .topbar {
-    display: flex; align-items: flex-end; gap: 8px;
-    height: 70px; margin-bottom: 8px;
+  /* ============ LCARS L-RAHMEN ============ */
+  /* Der Rahmen besteht aus: oberer Balken (mit Elbow), linke Säule, unterer Balken (mit Elbow).
+     Inhalt schwebt rechts daneben. Alles greift ineinander wie im echten LCARS. */
+
+  .lcars {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    grid-template-rows: auto 1fr auto;
+    gap: 6px;
+    min-height: calc(100vh - 60px);
+    min-height: calc(100dvh - 60px);
   }
-  .elbow-tl {
-    width: 130px; height: 100%;
+  @media (max-width: 440px) {
+    .lcars { grid-template-columns: 96px 1fr; }
+  }
+
+  /* --- obere Reihe: Elbow + Balken --- */
+  .top-row { grid-column: 1 / 3; grid-row: 1; display: flex; gap: 6px; align-items: stretch; height: 70px; }
+  .elbow-top {
+    width: 140px; flex-shrink: 0; height: 100%;
     background: var(--orange);
-    border-top-left-radius: 70px;
+    border-top-left-radius: 60px;
     position: relative;
-    flex-shrink: 0;
   }
-  .elbow-tl::after {
-    content: '';
-    position: absolute; bottom: 0; right: -8px;
-    width: 8px; height: 26px; background: var(--orange);
-  }
-  .topbar-fill {
-    flex: 1; height: 26px;
-    background: var(--lilac);
-    border-radius: 4px;
-    display: flex; align-items: center; justify-content: flex-end;
-    padding-right: 14px;
-    color: #000; font-weight: 700; font-size: 15px;
-  }
-  .topbar-cap {
-    width: 60px; height: 26px; background: var(--ice);
-    border-radius: 4px; flex-shrink: 0;
-  }
+  /* füllt die Ecke, wo Säule und Balken zusammentreffen */
+  .top-bar-stack { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 6px; }
+  .top-bar { height: 30px; background: var(--lilac); border-radius: 0 999px 999px 0; display: flex; align-items: center; justify-content: flex-end; padding-right: 16px; color: #000; font-weight: 700; font-size: 15px; gap: 8px; }
+  .top-bar .seg { height: 30px; }
+  .top-tics { display: flex; gap: 6px; align-items: flex-end; height: 18px; }
+  .top-tics span { display: block; height: 18px; border-radius: 999px; }
+  @media (max-width: 440px) { .elbow-top { width: 96px; } }
 
-  /* ---------- header text ---------- */
-  .headline {
-    display: flex; justify-content: space-between; align-items: baseline;
-    padding: 4px 4px 14px 14px;
-  }
-  .headline .lcars { color: var(--orange); font-size: 30px; font-weight: 700; line-height: 1; }
-  .headline .sub { color: var(--text); opacity: 0.7; font-size: 13px; font-weight: 500; }
-
-  .stardate { color: var(--gold); font-size: 12px; font-weight: 500; padding: 0 4px 12px 14px; }
-
-  /* ---------- main two-column body ---------- */
-  .body { display: flex; gap: 8px; }
-
-  /* left rail */
-  .rail { width: 130px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; }
+  /* --- linke Säule --- */
+  .rail { grid-column: 1; grid-row: 2; display: flex; flex-direction: column; gap: 6px; }
   .rail .block {
-    border-radius: 4px; color: #000;
-    font-weight: 700; font-size: 13px;
-    padding: 10px 12px 8px;
-    display: flex; align-items: flex-end; min-height: 56px;
-    line-height: 0.95; word-break: break-word;
+    background: var(--peach); color: #000;
+    font-weight: 700; font-size: 12px;
+    padding: 10px 10px;
+    display: flex; flex-direction: column; align-items: flex-end; justify-content: flex-end;
+    text-align: right; line-height: 1; min-height: 52px;
+    border-radius: 0;
   }
-  .rail .b1 { background: var(--peach); border-bottom-left-radius: 70px; align-items: flex-start; min-height: 90px; }
-  .rail .b2 { background: var(--lilac); }
-  .rail .b3 { background: var(--blue); }
-  .rail .b4 { background: var(--gold); }
-  .rail .b5 { background: var(--salmon); flex: 1; }
+  .rail .b1 { background: var(--lilac); min-height: 70px; }
+  .rail .b2 { background: var(--blue); }
+  .rail .b3 { background: var(--gold); }
+  .rail .b4 { background: var(--peach); }
+  .rail .spacer { flex: 1; background: var(--salmon); min-height: 30px; display: flex; align-items: flex-start; justify-content: flex-end; padding: 10px; color: #000; font-weight: 700; font-size: 12px; }
 
-  /* theme switch lives in the rail */
-  .theme-switch { display: flex; gap: 4px; }
+  /* --- theme switch (in der Säule) --- */
+  .theme-switch { display: flex; flex-direction: column; gap: 4px; }
   .theme-switch button {
-    flex: 1; background: var(--ice); border: none; color: #000;
-    padding: 9px 0; border-radius: 4px; font-family: inherit;
-    font-size: 13px; font-weight: 700; cursor: pointer; text-transform: uppercase;
-    opacity: 0.45; transition: opacity 0.15s;
+    background: var(--ice); border: none; color: #000;
+    padding: 9px 0; font-family: inherit;
+    font-size: 12px; font-weight: 700; cursor: pointer; text-transform: uppercase;
+    opacity: 0.4; transition: opacity 0.15s; border-radius: 0;
   }
+  .theme-switch button:first-child { border-top-left-radius: 0; }
   .theme-switch button.active { opacity: 1; }
 
-  /* right content */
-  .content { flex: 1; display: flex; flex-direction: column; gap: 10px; }
-
-  .app-card {
-    display: block; text-decoration: none;
-    background: #000; position: relative;
-    border-radius: 4px; overflow: hidden;
-    transition: transform 0.12s;
-  }
-  :root[data-theme="light"] .app-card { background: #0c0c0c; }
-  .app-card:active { transform: scale(0.985); }
-
-  .app-row { display: flex; align-items: stretch; gap: 8px; height: 92px; }
-  .app-tab {
-    width: 110px; flex-shrink: 0;
-    border-radius: 4px;
-    color: #000; font-weight: 700;
-    display: flex; align-items: flex-end; padding: 0 0 9px 12px;
-    font-size: 26px; line-height: 0.9;
-  }
-  .app-main {
-    flex: 1; background: var(--bg);
-    border: 1px solid; border-radius: 4px;
-    display: flex; flex-direction: column; justify-content: center;
-    padding: 8px 16px;
-    position: relative;
-  }
-  .app-card.plan   .app-tab { background: var(--plan); }
-  .app-card.health .app-tab { background: var(--health); }
-  .app-card.money  .app-tab { background: var(--money); }
-  .app-card.edu    .app-tab { background: var(--edu); }
-  .app-card.plan   .app-main { border-color: var(--plan); }
-  .app-card.health .app-main { border-color: var(--health); }
-  .app-card.money  .app-main { border-color: var(--money); }
-  .app-card.edu    .app-main { border-color: var(--edu); }
-
-  .app-main .name { font-size: 28px; font-weight: 700; line-height: 1; color: var(--text); }
-  .app-main .desc { font-size: 12px; font-weight: 500; opacity: 0.6; margin-top: 5px; }
-  .app-main .num {
-    position: absolute; top: 8px; right: 14px;
-    font-size: 12px; font-weight: 500; opacity: 0.55;
-  }
-  .app-card.plan   .app-main .num { color: var(--plan); }
-  .app-card.health .app-main .num { color: var(--health); }
-  .app-card.money  .app-main .num { color: var(--money); }
-  .app-card.edu    .app-main .num { color: var(--edu); }
-
-  /* ---------- bottom bar ---------- */
-  .botbar { display: flex; align-items: flex-start; gap: 8px; height: 50px; margin-top: 10px; }
-  .elbow-bl {
-    width: 130px; height: 100%;
+  /* --- untere Reihe: Elbow + Balken --- */
+  .bot-row { grid-column: 1 / 3; grid-row: 3; display: flex; gap: 6px; align-items: stretch; height: 54px; }
+  .elbow-bot {
+    width: 140px; flex-shrink: 0; height: 100%;
     background: var(--orange);
-    border-bottom-left-radius: 70px;
-    position: relative; flex-shrink: 0;
+    border-bottom-left-radius: 60px;
   }
-  .elbow-bl::after {
-    content: ''; position: absolute; top: 0; right: -8px;
-    width: 8px; height: 22px; background: var(--orange);
-  }
-  .botbar-fill {
-    flex: 1; height: 22px; background: var(--blue);
-    border-radius: 4px; display: flex; align-items: center;
-    padding-left: 14px; color: #000; font-weight: 700; font-size: 13px;
-  }
-  .botbar-cap { width: 90px; height: 22px; background: var(--salmon); border-radius: 4px; flex-shrink: 0; }
+  .bot-bar-stack { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; gap: 6px; }
+  .bot-bar { height: 26px; background: var(--blue); border-radius: 0 999px 999px 0; display: flex; align-items: center; padding-left: 16px; color: #000; font-weight: 700; font-size: 13px; gap: 8px; }
+  @media (max-width: 440px) { .elbow-bot { width: 96px; } }
 
-  /* blink deco */
-  @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.35;} }
-  .blink { animation: blink 2.4s infinite; }
+  /* ============ INHALT ============ */
+  .content { grid-column: 2; grid-row: 2; display: flex; flex-direction: column; gap: 8px; padding: 2px 0; }
 
+  .headline { padding: 0 4px 6px 4px; }
+  .headline .ttl { color: var(--orange); font-size: 28px; font-weight: 700; line-height: 1; }
+  .headline .sub { color: var(--text); opacity: 0.65; font-size: 12px; font-weight: 500; margin-top: 4px; }
+  .stardate { color: var(--gold); font-size: 12px; font-weight: 500; padding: 0 4px 4px; }
+
+  .app-card { display: block; text-decoration: none; transition: transform 0.12s; }
+  .app-card:active { transform: scale(0.985); }
+  .app-row { display: flex; align-items: stretch; height: 86px; border-radius: 0 999px 999px 0; overflow: hidden; }
+  .app-card.plan   .app-row { background: var(--plan); }
+  .app-card.health .app-row { background: var(--health); }
+  .app-card.money  .app-row { background: var(--money); }
+  .app-card.edu    .app-row { background: var(--edu); }
+  .app-tab { width: 96px; flex-shrink: 0; color: #000; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 28px; border-right: 3px solid rgba(0,0,0,0.2); }
+  .app-main { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 8px 20px; position: relative; }
+  .app-main .name { font-size: 28px; font-weight: 700; line-height: 1; color: #000; }
+  .app-main .desc { font-size: 12px; font-weight: 500; opacity: 0.7; margin-top: 5px; color: #000; }
+  .app-main .num { position: absolute; top: 8px; right: 20px; font-size: 12px; font-weight: 500; opacity: 0.55; color: #000; }
   @media (max-width: 440px) {
-    .elbow-tl, .elbow-bl, .rail { width: 92px; }
-    .headline .lcars { font-size: 24px; }
-    .app-tab { width: 78px; font-size: 20px; }
-    .app-main .name { font-size: 23px; }
-    .app-row { height: 82px; }
+    .app-tab { width: 64px; font-size: 22px; }
+    .app-main .name { font-size: 22px; }
+    .headline .ttl { font-size: 23px; }
   }
+
+  @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+  .blink { animation: blink 2.4s infinite; }
 </style>
 </head>
 <body>
 <div class="frame">
+  <div class="lcars">
 
-  <div class="topbar">
-    <div class="elbow-tl"></div>
-    <div class="topbar-fill">LCARS · ORGANIZER 47</div>
-    <div class="topbar-cap blink"></div>
-  </div>
+    <!-- obere Reihe -->
+    <div class="top-row">
+      <div class="elbow-top"></div>
+      <div class="top-bar-stack">
+        <div class="top-tics">
+          <span class="blink" style="width:40px;background:var(--ice)"></span>
+          <span style="width:80px;background:var(--gold)"></span>
+          <span style="flex:1;background:var(--salmon)"></span>
+        </div>
+        <div class="top-bar">LCARS · ORGANIZER 47</div>
+      </div>
+    </div>
 
-  <div class="headline">
-    <div class="lcars">Main Menu</div>
-    <div class="sub">Access · Authorized</div>
-  </div>
-  <div class="stardate" id="stardate">Stardate · ········</div>
-
-  <div class="body">
+    <!-- linke Säule -->
     <div class="rail">
       <div class="block b1">SYS<br>ONLINE</div>
       <div class="block b2">MOD<br>04</div>
-      <div class="block b3">SEC<br>OK</div>
       <div class="theme-switch">
-        <button data-theme="auto" title="Auto">A</button>
-        <button data-theme="light" title="Hell">☀</button>
-        <button data-theme="dark" title="Dunkel">☾</button>
+        <button data-theme="auto" title="Automatisch">AUTO</button>
+        <button data-theme="light" title="Hell">HELL</button>
+        <button data-theme="dark" title="Dunkel">DUNKEL</button>
       </div>
-      <div class="block b5">LCARS<br>2390</div>
+      <div class="block b3">SEC<br>OK</div>
+      <div class="spacer">LCARS<br>2390</div>
     </div>
 
+    <!-- Inhalt -->
     <div class="content">
+      <div class="headline">
+        <div class="ttl">Main Menu</div>
+        <div class="sub">Access · Authorized</div>
+      </div>
+      <div class="stardate" id="stardate">Stardate · ········</div>
+
       <a href="terminplaner.html" class="app-card plan">
         <div class="app-row">
           <div class="app-tab">01</div>
-          <div class="app-main">
-            <span class="num">02-440</span>
-            <div class="name">Plan</div>
-            <div class="desc">Terminplaner · Schedule</div>
-          </div>
+          <div class="app-main"><span class="num">02-440</span><div class="name">Plan</div><div class="desc">Terminplaner · Schedule</div></div>
         </div>
       </a>
-
       <a href="health.html" class="app-card health">
         <div class="app-row">
           <div class="app-tab">02</div>
-          <div class="app-main">
-            <span class="num">11-902</span>
-            <div class="name">Health</div>
-            <div class="desc">Medical · Bio-Monitor</div>
-          </div>
+          <div class="app-main"><span class="num">11-902</span><div class="name">Health</div><div class="desc">Medical · Bio-Monitor</div></div>
         </div>
       </a>
-
       <a href="haushaltsbuch.html" class="app-card money">
         <div class="app-row">
           <div class="app-tab">03</div>
-          <div class="app-main">
-            <span class="num">07-318</span>
-            <div class="name">Budget</div>
-            <div class="desc">Haushaltsbuch · Credits</div>
-          </div>
+          <div class="app-main"><span class="num">07-318</span><div class="name">Budget</div><div class="desc">Haushaltsbuch · Credits</div></div>
         </div>
       </a>
-
       <a href="education.html" class="app-card edu">
         <div class="app-row">
           <div class="app-tab">04</div>
-          <div class="app-main">
-            <span class="num">19-605</span>
-            <div class="name">Education</div>
-            <div class="desc">Academy · Datacore</div>
-          </div>
+          <div class="app-main"><span class="num">19-605</span><div class="name">Education</div><div class="desc">Academy · Datacore</div></div>
         </div>
       </a>
     </div>
-  </div>
 
-  <div class="botbar">
-    <div class="elbow-bl"></div>
-    <div class="botbar-fill">STARFLEET · OPERATIONS</div>
-    <div class="botbar-cap blink"></div>
-  </div>
+    <!-- untere Reihe -->
+    <div class="bot-row">
+      <div class="elbow-bot"></div>
+      <div class="bot-bar-stack">
+        <div class="bot-bar">STARFLEET · OPERATIONS</div>
+      </div>
+    </div>
 
+  </div>
 </div>
 
 <script>
@@ -300,7 +241,6 @@
   });
   applyTheme();
 
-  // LCARS-style stardate
   function stardate() {
     const now = new Date();
     const start = new Date(now.getFullYear(), 0, 0);
