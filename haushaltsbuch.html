@@ -881,32 +881,27 @@ function accountEntries(id){ return state.entries.filter(e => e.accountId === id
 // Wenn Sonderausgabe > Polster: Polster wird 0 (Differenz wird extern bezahlt).
 // Wenn Sonderausgabe ≤ Polster: Polster reduziert sich entsprechend.
 function reserveAccountPolster(a, year, month) {
-  if (!a.budget) return 0;
+  if (!a.budget) { console.log('[Polster]', a.name, '→ kein budget'); return 0; }
   const b = a.budget;
-  if (b.active === false) return 0;
-  // Konto-Budget zählt immer als Polster (egal ob Rate auf Grund- oder Extra-Budget bucht)
+  if (b.active === false) { console.log('[Polster]', a.name, '→ inaktiv'); return 0; }
   const rate = Number(b.rate) || 0;
-  if (rate <= 0) return 0;
+  if (rate <= 0) { console.log('[Polster]', a.name, '→ rate <= 0:', b.rate); return 0; }
   const startIdx = (b.startYear || 0) * 12 + ((b.startMonth || 1) - 1);
   const curIdx = idxOf(year, month);
-  if (curIdx < startIdx) return 0;
+  if (curIdx < startIdx) { console.log('[Polster]', a.name, '→ cur', curIdx, '< start', startIdx, '(startY=', b.startYear, 'startM=', b.startMonth, ')'); return 0; }
   const intMonths = INTERVAL_MONTHS[b.freq] || 1;
   const goal = Number(b.goal) || 0;
 
   let polster = 0;
-  // Iteriere Monat für Monat ab StartIdx
   for (let k = startIdx; k <= curIdx; k++) {
     const y = Math.floor(k / 12), m = (k % 12) + 1;
-    // Rate fällig diesen Monat?
     const monthsSinceStart = k - startIdx;
     const isDue = (intMonths === 1) || (monthsSinceStart % intMonths === 0);
-    // Ziel-Erreichungs-Check: wenn Polster (vor Rate-Addition) bereits Ziel erreicht hat, keine weitere Rate
     if (isDue) {
       if (goal <= 0 || polster < goal - 0.001) {
         polster += rate;
       }
     }
-    // Sonderausgaben dieses Monats von Posten abziehen
     let sonderSumThisMonth = 0;
     for (const e of accountEntries(a.id)) {
       if (e.kind !== 'sonderausgabe') continue;
@@ -917,6 +912,7 @@ function reserveAccountPolster(a, year, month) {
       polster = Math.max(0, polster - sonderSumThisMonth);
     }
   }
+  console.log('[Polster]', a.name, '=', polster, '(rate=', rate, 'goal=', goal, 'start=', b.startYear, '/', b.startMonth, 'view=', year, '/', month, ')');
   return polster;
 }
 
