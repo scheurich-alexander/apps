@@ -4,62 +4,104 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="theme-color" content="#7c3aed" />
+<meta name="theme-color" content="#000000" />
 <title>Budget</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root, :root[data-theme="light"] {
-    --bg:#f5f5f7; --surface:#fff; --surface-2:#ececef; --border:#e3e3e6;
-    --text:#1a1a1a; --text-muted:#6b6b70; --accent:#2563eb;
-    --grund:#16a34a; --grund-bg:#e3f5ea; --extra:#2563eb; --extra-bg:#e3eefb; --danger:#dc2626; --reserve:#0891b2;
-    --radius:12px; --radius-lg:16px; --shadow:0 1px 2px rgba(0,0,0,0.04),0 1px 3px rgba(0,0,0,0.04);
-    --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --bg:#d6d2c4; --surface:#c8c2b0; --surface-2:#bdb6a2; --border:#a89f88;
+    --text:#1a1a1a; --text-muted:#5a4a2a; --accent:#cc6600;
+    --grund:#4a7a4a; --grund-bg:#bcc4a8; --extra:#4444aa; --extra-bg:#b4b6cc; --danger:#cc4422; --reserve:#3a7a8a;
+    --radius:14px; --radius-lg:18px; --shadow:0 1px 2px rgba(0,0,0,0.08),0 1px 3px rgba(0,0,0,0.06);
+    --font:'Antonio','Arial Narrow',sans-serif;
+    --lcars-orange:#ff9c00; --lcars-peach:#ff9966; --lcars-lilac:#cc99cc; --lcars-blue:#9999ff; --lcars-ice:#99ccff; --lcars-gold:#ffcc66; --lcars-salmon:#ff7755;
   }
   :root[data-theme="dark"] {
-    --bg:#131312; --surface:#1c1c1b; --surface-2:#242423; --border:#2e2e2c; --text:#f2f2f0; --text-muted:#9a9a96;
-    --grund-bg:#13351f; --extra-bg:#13243f; --shadow:0 1px 2px rgba(0,0,0,0.4);
+    --bg:#000000; --surface:#14110a; --surface-2:#221a0d; --border:#3a2d12; --text:#ffcc99; --text-muted:#cc99cc;
+    --accent:#ff9c00; --grund:#99cc99; --grund-bg:#13351f; --extra:#9999ff; --extra-bg:#1a1a3f; --danger:#ff7755; --reserve:#99ccff;
+    --shadow:0 1px 2px rgba(0,0,0,0.5);
   }
   @media (prefers-color-scheme: dark) {
-    :root[data-theme="auto"] { --bg:#131312; --surface:#1c1c1b; --surface-2:#242423; --border:#2e2e2c; --text:#f2f2f0; --text-muted:#9a9a96; --grund-bg:#13351f; --extra-bg:#13243f; --shadow:0 1px 2px rgba(0,0,0,0.4); }
+    :root[data-theme="auto"] { --bg:#000000; --surface:#14110a; --surface-2:#221a0d; --border:#3a2d12; --text:#ffcc99; --text-muted:#cc99cc; --accent:#ff9c00; --grund:#99cc99; --grund-bg:#13351f; --extra:#9999ff; --extra-bg:#1a1a3f; --danger:#ff7755; --reserve:#99ccff; --shadow:0 1px 2px rgba(0,0,0,0.5); }
   }
   * { box-sizing: border-box; }
-  html, body { margin:0; padding:0; background:var(--bg); color:var(--text); font-family:var(--font); -webkit-font-smoothing:antialiased; }
+  html, body { margin:0; padding:0; background:var(--bg); color:var(--text); font-family:var(--font); -webkit-font-smoothing:antialiased; text-transform:uppercase; letter-spacing:0.03em; }
   body { padding-bottom: env(safe-area-inset-bottom); }
-  .app { max-width:920px; margin:0 auto; padding:20px 18px 80px; }
+
+  /* ============ LCARS-RAHMEN ============ */
+  .app { max-width:960px; margin:0 auto; padding:10px 10px 40px; }
+  .lcars {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    grid-template-rows: auto 1fr auto;
+    gap: 6px;
+    min-height: calc(100vh - 50px);
+    min-height: calc(100dvh - 50px);
+  }
+  @media (max-width: 440px) { .lcars { grid-template-columns: 78px 1fr; } }
+
+  .lcars-top { grid-column: 1 / 3; grid-row: 1; display: flex; gap: 6px; align-items: stretch; height: 60px; }
+  .lcars-top .elbow { width: 120px; flex-shrink: 0; background: var(--lcars-orange); border-top-left-radius: 52px; }
+  .lcars-top .bars { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 5px; }
+  .lcars-top .tics { display: flex; gap: 6px; height: 14px; }
+  .lcars-top .tics span { display: block; height: 14px; border-radius: 999px; }
+  .lcars-top .bar { height: 26px; background: var(--lcars-lilac); border-radius: 0 999px 999px 0; display: flex; align-items: center; justify-content: flex-end; padding-right: 16px; color: #000; font-weight: 700; font-size: 13px; }
+  @media (max-width: 440px) { .lcars-top .elbow { width: 78px; } }
+
+  .lcars-rail { grid-column: 1; grid-row: 2; display: flex; flex-direction: column; gap: 6px; }
+  .lcars-rail .rblock { color: #000; font-weight: 700; font-size: 11px; padding: 9px 9px; display: flex; flex-direction: column; align-items: flex-end; justify-content: flex-end; text-align: right; line-height: 1; min-height: 50px; }
+  .lcars-rail .r1 { background: var(--lcars-lilac); min-height: 66px; }
+  .lcars-rail .r2 { background: var(--lcars-gold); }
+  .lcars-rail .r3 { background: var(--lcars-blue); }
+  .lcars-rail .r4 { background: var(--lcars-peach); }
+  .lcars-rail .rfill { flex: 1; background: var(--lcars-salmon); min-height: 40px; display: flex; align-items: flex-start; justify-content: flex-end; padding: 9px; color: #000; font-weight: 700; font-size: 11px; text-align: right; line-height: 1.1; }
+
+  .lcars-bot { grid-column: 1 / 3; grid-row: 3; display: flex; gap: 6px; align-items: stretch; height: 44px; }
+  .lcars-bot .elbow { width: 120px; flex-shrink: 0; background: var(--lcars-orange); border-bottom-left-radius: 52px; }
+  .lcars-bot .bar { flex: 1; height: 24px; align-self: flex-start; background: var(--lcars-blue); border-radius: 0 999px 999px 0; display: flex; align-items: center; padding-left: 16px; color: #000; font-weight: 700; font-size: 12px; }
+  @media (max-width: 440px) { .lcars-bot .elbow { width: 78px; } }
+
+  .lcars-content { grid-column: 2; grid-row: 2; display: flex; flex-direction: column; min-width: 0; }
   header { display:none; }
   .top-bar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
   .top-bar-left { display:flex; align-items:center; gap:8px; }
-  .top-title { font-size:32px; margin:0; letter-spacing:-0.02em; font-weight:800; }
-  .top-title .accent { color: #a855f7; }
-  @media (max-width:480px) { .top-title { font-size:26px; } }
-  .back-link { display:inline-flex; align-items:center; gap:6px; padding:7px 12px; background:var(--surface); border:1px solid var(--border); border-radius:8px; font-size:13px; color:var(--text-muted); text-decoration:none; font-weight:500; }
-  .back-link:hover { background:var(--surface-2); color:var(--text); }
-  .theme-switch { display:flex; gap:3px; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:3px; }
-  .theme-switch button { background:transparent; border:none; color:var(--text-muted); padding:5px 9px; border-radius:5px; font-size:12px; cursor:pointer; font-family:var(--font); }
-  .theme-switch button.active { background:var(--surface-2); color:var(--text); }
+  .top-title { font-size:34px; margin:0; letter-spacing:0.02em; font-weight:700; color:var(--lcars-orange); }
+  .top-title .accent { color: var(--lcars-ice); }
+  @media (max-width:480px) { .top-title { font-size:28px; } }
+  .back-link { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; background:var(--lcars-orange); border:none; border-radius:999px; font-size:14px; color:#000; text-decoration:none; font-weight:700; letter-spacing:0.04em; }
+  .back-link:hover { opacity:0.85; }
+  .theme-switch { display:flex; gap:3px; background:var(--surface); border:none; border-radius:999px; padding:3px; }
+  .theme-switch button { background:transparent; border:none; color:var(--text-muted); padding:6px 11px; border-radius:999px; font-size:12px; cursor:pointer; font-family:var(--font); font-weight:700; text-transform:uppercase; }
+  .theme-switch button.active { background:var(--lcars-gold); color:#000; }
 
-  .month-picker { display:flex; align-items:center; gap:2px; background:var(--surface); border:1px solid var(--border); padding:4px; border-radius:10px; }
+  .month-picker { display:flex; align-items:center; gap:2px; background:var(--surface); border:none; padding:4px; border-radius:999px; }
   .month-picker-wrap { display:flex; justify-content:center; align-items:center; gap:8px; margin:0 0 16px; flex-wrap:wrap; }
   .month-picker-wrap.month-picker-bottom { margin-top:32px; }
-  .month-picker button { background:transparent; border:none; cursor:pointer; color:var(--text); height:30px; min-width:30px; border-radius:7px; font-size:17px; line-height:1; padding:0 6px; }
-  .month-picker button:hover { background:var(--bg); }
-  .month-picker button#todayBtn, .month-picker button#todayBtnB { font-size:12px; font-weight:600; color:var(--accent); padding:0 12px; }
-  .month-picker span { min-width:104px; text-align:center; font-weight:500; font-size:14px; }
+  .month-picker button { background:transparent; border:none; cursor:pointer; color:var(--text); height:30px; min-width:30px; border-radius:999px; font-size:17px; line-height:1; padding:0 6px; }
+  .month-picker button:hover { background:var(--surface-2); }
+  .month-picker button#todayBtn, .month-picker button#todayBtnB { font-size:12px; font-weight:700; color:#000; background:var(--lcars-salmon); padding:0 14px; border-radius:999px; }
+  .month-picker span { min-width:104px; text-align:center; font-weight:600; font-size:15px; }
 
-  nav.tabs { display:flex; gap:4px; background:var(--surface); border:1px solid var(--border); padding:4px; border-radius:12px; margin-bottom:14px; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  nav.tabs { display:flex; gap:5px; background:transparent; border:none; padding:0; border-radius:0; margin-bottom:14px; overflow-x:auto; -webkit-overflow-scrolling:touch; }
   nav.tabs::-webkit-scrollbar { display:none; }
-  nav.tabs button { flex:1; min-width:max-content; background:transparent; border:none; color:var(--text-muted); padding:9px 14px; font-size:13px; font-weight:500; border-radius:8px; cursor:pointer; white-space:nowrap; font-family:var(--font); }
-  nav.tabs button.active { background:var(--surface-2); color:var(--text); }
+  nav.tabs button { flex:1; min-width:max-content; background:var(--lcars-blue); border:none; color:#000; padding:9px 16px; font-size:14px; font-weight:600; border-radius:999px; cursor:pointer; white-space:nowrap; font-family:var(--font); text-transform:uppercase; letter-spacing:0.04em; opacity:0.5; transition:opacity 0.15s; }
+  nav.tabs button:nth-child(2) { background:var(--lcars-lilac); }
+  nav.tabs button:nth-child(3) { background:var(--lcars-peach); }
+  nav.tabs button:nth-child(4) { background:var(--lcars-gold); }
+  nav.tabs button.active { opacity:1; }
 
   .page { display:none; }
   .page.active { display:block; }
 
   .hero-grid { display:grid; grid-template-columns:1fr; gap:10px; margin-bottom:12px; }
-  .hero { color:white; border-radius:var(--radius-lg); padding:20px 22px; }
-  .hero-main { background:linear-gradient(135deg,#7c3aed 0%,#a855f7 100%); box-shadow:0 6px 20px rgba(124,58,237,0.18); text-align:center; }
-  .hero-inc { background:linear-gradient(135deg,#3b82f6,#2563eb); box-shadow:0 6px 20px rgba(37,99,235,0.18); }
-  .hero .label { font-size:13px; opacity:0.92; font-weight:500; }
-  .hero .value { font-size:30px; font-weight:700; letter-spacing:-0.02em; margin-top:4px; word-break:break-word; line-height:1.1; }
-  .hero .value.neg { color:#ffb3b3; }
+  .hero { color:#000; border-radius:var(--radius-lg); padding:20px 22px; }
+  .hero-main { background:var(--lcars-orange); text-align:center; }
+  .hero-inc { background:var(--lcars-blue); }
+  .hero .label { font-size:13px; opacity:0.85; font-weight:700; }
+  .hero .value { font-size:32px; font-weight:700; letter-spacing:-0.01em; margin-top:4px; word-break:break-word; line-height:1.1; font-family:'JetBrains Mono',monospace; }
+  .hero .value.neg { color:#8b0000; }
 
   .budget-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
   @media (max-width:540px) {
@@ -73,10 +115,10 @@
   .budget-box { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:14px 16px; }
   .budget-box.grund { border-top:3px solid var(--grund); }
   .budget-box.extra { border-top:3px solid var(--extra); }
-  .budget-box.budget-5030 { border-top:3px solid #7c3aed; margin-bottom:14px; }
-  .budget-box.gesamt { border-top:3px solid #a855f7; margin-bottom:14px; }
-  .budget-box.gesamt .bsum-val { color:#a855f7; }
-  .budget-box.gesamt .box-title span { color:#a855f7; }
+  .budget-box.budget-5030 { border-top:3px solid var(--lcars-orange); margin-bottom:14px; }
+  .budget-box.gesamt { border-top:3px solid var(--lcars-gold); margin-bottom:14px; }
+  .budget-box.gesamt .bsum-val { color:var(--lcars-gold); }
+  .budget-box.gesamt .box-title span { color:var(--lcars-gold); }
 
   /* Reserve-Konto-Header */
   .reserve-info { padding: 8px 12px 10px; background: var(--surface-2); border-top: 1px solid var(--border); }
@@ -168,7 +210,7 @@
   .entry-item .desc { font-size:13px; font-weight:500; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
   .entry-item .meta { font-size:11px; color:var(--text-muted); margin-top:2px; }
   .entry-item .meta.warn { color:var(--danger); font-weight:600; }
-  .entry-item .meta.duenote { color:#7c3aed; font-weight:700; }
+  .entry-item .meta.duenote { color:var(--lcars-gold); font-weight:700; }
   .badge.due { background:#ede9fe; color:#6d28d9; }
   @media (prefers-color-scheme: dark) { .badge.due { background:#2e1065; color:#c4b5fd; } .entry-item .meta.duenote { color:#c4b5fd; } }
   .entry-item .right { display:flex; align-items:center; gap:6px; flex-shrink:0; }
@@ -228,12 +270,12 @@
 
   .modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.45); display:none; align-items:flex-start; justify-content:center; padding:24px 16px; z-index:100; overflow-y:auto; }
   .modal-backdrop.open { display:flex; }
-  .modal { background:var(--surface); border-radius:16px; padding:22px; width:100%; max-width:460px; box-shadow:0 20px 50px rgba(0,0,0,0.25); margin:auto; }
-  .modal h3 { margin:0 0 16px; font-size:17px; font-weight:600; }
+  .modal { background:var(--surface); border-radius:24px; padding:22px; width:100%; max-width:460px; box-shadow:0 20px 50px rgba(0,0,0,0.35); margin:auto; border-top:3px solid var(--lcars-orange); }
+  .modal h3 { margin:0 0 16px; font-size:20px; font-weight:700; color:var(--accent); }
   .modal h3.sub { margin-top:22px; font-size:15px; }
   .field { margin-bottom:12px; }
-  .field.budget-start-field { background:rgba(168,85,247,0.06); border:1px solid rgba(168,85,247,0.25); border-radius:8px; padding:10px 12px; }
-  .field.budget-start-field label { color:#7c3aed; font-weight:600; }
+  .field.budget-start-field { background:rgba(255,156,0,0.08); border:1px solid rgba(255,156,0,0.3); border-radius:12px; padding:10px 12px; }
+  .field.budget-start-field label { color:var(--accent); font-weight:700; }
   .field .hint-inline { font-weight:400; color:var(--text-muted); font-size:11px; }
   .field label { display:block; font-size:12px; color:var(--text-muted); margin-bottom:4px; font-weight:500; }
   .field input[type=text], .field input[type=number], .field select { width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); padding:10px 12px; border-radius:9px; font-family:var(--font); font-size:14px; outline:none; }
@@ -258,9 +300,9 @@
   .modal .actions { display:flex; gap:8px; justify-content:flex-end; margin-top:18px; flex-wrap:wrap; }
   .modal .actions .grow { flex:1; }
 
-  .btn { background:var(--accent); color:white; border:none; padding:10px 16px; border-radius:9px; cursor:pointer; font-family:var(--font); font-weight:500; font-size:14px; }
-  .btn.ghost { background:transparent; color:var(--text); border:1px solid var(--border); }
-  .btn.danger { background:var(--danger); }
+  .btn { background:var(--lcars-orange); color:#000; border:none; padding:11px 18px; border-radius:999px; cursor:pointer; font-family:var(--font); font-weight:700; font-size:14px; text-transform:uppercase; letter-spacing:0.04em; }
+  .btn.ghost { background:var(--lcars-lilac); color:#000; border:none; }
+  .btn.danger { background:var(--lcars-salmon); color:#000; }
   .btn:hover { filter:brightness(0.95); }
 
   .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--text); color:var(--bg); padding:10px 16px; border-radius:9px; font-size:14px; opacity:0; pointer-events:none; transition:opacity 0.2s; z-index:200; }
@@ -269,17 +311,47 @@
   .legend { display:flex; gap:14px; justify-content:center; margin:4px 0 0; font-size:11px; color:var(--text-muted); flex-wrap:wrap; }
   .legend span { display:inline-flex; align-items:center; gap:5px; }
   .legend i { width:10px; height:10px; border-radius:3px; display:inline-block; }
+
+  @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+  .blink { animation: blink 2.4s infinite; }
 </style>
 </head>
 <body>
 <div class="app">
+  <div class="lcars">
+    <div class="lcars-top">
+      <div class="elbow"></div>
+      <div class="bars">
+        <div class="tics">
+          <span class="blink" style="width:36px;background:var(--lcars-ice)"></span>
+          <span style="width:70px;background:var(--lcars-gold)"></span>
+          <span style="flex:1;background:var(--lcars-salmon)"></span>
+        </div>
+        <div class="bar">LCARS · BUDGET 07</div>
+      </div>
+    </div>
+
+    <div class="lcars-rail">
+      <div class="rblock r1">BDG<br>03</div>
+      <div class="rblock r2">503020<br>RULE</div>
+      <div class="rblock r3">RES<br>OK</div>
+      <div class="rblock r4">CRD<br>EUR</div>
+      <div class="rfill">LEDGER<br>ACTIVE</div>
+    </div>
+
+    <div class="lcars-bot">
+      <div class="elbow"></div>
+      <div class="bar">STARFLEET · CREDITS OPS</div>
+    </div>
+
+    <div class="lcars-content">
   <div class="top-bar">
     <div class="top-bar-left">
-      <a href="index.html" class="back-link">← Apps</a>
+      <a href="index.html" class="back-link">APPS</a>
       <div class="theme-switch">
-        <button data-theme="auto" title="Automatisch">Auto</button>
-        <button data-theme="light" title="Hell">☀</button>
-        <button data-theme="dark" title="Dunkel">🌙</button>
+        <button data-theme="auto" title="Automatisch">AUTO</button>
+        <button data-theme="light" title="Hell">HELL</button>
+        <button data-theme="dark" title="Dunkel">DUNKEL</button>
       </div>
     </div>
     <h1 class="top-title">Budget<span class="accent">.</span></h1>
@@ -367,7 +439,9 @@
     </div>
   </div>
 
-  <div style="text-align:center;"><span class="settings-link" id="openSettings">⚙ Einstellungen</span></div>
+  <div style="text-align:center;"><span class="settings-link" id="openSettings">Einstellungen</span></div>
+    </div>
+  </div>
 </div>
 
 <!-- POSTEN-MODAL -->
@@ -493,7 +567,7 @@
             <select id="accountBudgetStartMonth"></select>
             <input type="number" id="accountBudgetStartYear" min="2000" max="2099" />
           </div>
-          <div class="hint" id="accountBudgetStartWarning" style="display:none; color:#d97706; margin-top:6px; font-weight:500;">⚠ Achtung: Start liegt in der Zukunft. Polster wird erst ab diesem Monat aufgebaut.</div>
+          <div class="hint" id="accountBudgetStartWarning" style="display:none; color:#d97706; margin-top:6px; font-weight:500;">ACHTUNG: Achtung: Start liegt in der Zukunft. Polster wird erst ab diesem Monat aufgebaut.</div>
         </div>
         <div class="field">
           <label>Häufigkeit</label>
@@ -722,7 +796,7 @@ function applyTheme() {
   document.querySelectorAll('.theme-switch button').forEach(b => b.classList.toggle('active', b.dataset.theme === theme));
   const isDark = theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
   const tc = document.querySelector('meta[name="theme-color"]');
-  if (tc) tc.setAttribute('content', isDark ? '#131312' : '#f5f5f7');
+  if (tc) tc.setAttribute('content', isDark ? '#000000' : '#d6d2c4');
 }
 window.addEventListener('DOMContentLoaded', () => {
   applyTheme();
@@ -1486,7 +1560,7 @@ function renderAccountsForCategory(cat, year, month, readonly){
       const polster = reserveAccountPolster(a, year, month);
       const nochZuZahlen = Math.max(0, s.extra - polster);
       const gesamt = polster + nochZuZahlen;
-      accRightVal = `<span class="cat-total" style="background:rgba(168,85,247,0.18); color:var(--text);">${fmt(gesamt)}</span>`;
+      accRightVal = `<span class="cat-total" style="background:rgba(255,204,102,0.22); color:var(--text);">${fmt(gesamt)}</span>`;
     } else {
       accRightVal = splitPills(s.grund, s.extra);
     }
@@ -1674,7 +1748,7 @@ function entryRowHtml(e, readonly){
         <div class="desc">${escapeHtml(effDesc(e,year,month))} ${kindBadge(e.kind)}${transferBadge}${paused?'<span class="badge paused">Pausiert</span>':''}${due?'<span class="badge due">Zahltermin</span>':''}</div>
         <div class="meta">${meta}</div>
         ${due ? `<div class="meta duenote">⏰ Gesamtbetrag fällig: ${fmt(e.totalGoal)} am ${effDay(e,year,month)}.</div>` : ''}
-        ${over ? `<div class="meta warn">⚠ Rate übersteigt verfügbares Budget (${fmt(avail)})</div>` : ''}
+        ${over ? `<div class="meta warn">ACHTUNG: Rate übersteigt verfügbares Budget (${fmt(avail)})</div>` : ''}
       </div>
       <div class="right">${splitPills(g, x)}${readonly ? '' : `<button class="edit" data-editentry="${e.id}" aria-label="Bearbeiten">✎</button>`}</div>
     </div>`;
@@ -1691,7 +1765,7 @@ function planEntryRowHtml(e){
   if (e.kind === 'anschaffung') {
     const tM = e.targetMonth||1, tY = e.targetYear||state.view.year;
     line2 = `Ziel ${MONTHS_SHORT[tM-1]} ${tY} · Rate ${fmt(p.rate)}/Monat`;
-    if (e.active && p.payoff && idxOf(p.payoff.year,p.payoff.month) > idxOf(tY,tM)) goalWarn = `<div class="plan-warn">⚠ Ziel nicht erreicht – bei aktueller Aktivierung erst ${MONTHS_SHORT[p.payoff.month-1]} ${p.payoff.year}</div>`;
+    if (e.active && p.payoff && idxOf(p.payoff.year,p.payoff.month) > idxOf(tY,tM)) goalWarn = `<div class="plan-warn">ACHTUNG: Ziel nicht erreicht – bei aktueller Aktivierung erst ${MONTHS_SHORT[p.payoff.month-1]} ${p.payoff.year}</div>`;
   } else {
     line2 = `Rate ${fmt(p.rate)}/Monat`;
   }
@@ -1707,7 +1781,7 @@ function planEntryRowHtml(e){
       </div>
       <div class="plan-bar"><span style="width:${pct}%;${overBudget?'background:var(--danger);':''}"></span></div>
       <div class="meta" style="margin-top:4px;">Bezahlt: ${fmt(p.paid)} von ${fmt(p.total)} · ${p.paidCount}/${p.N} Monate · ${statusLine}</div>
-      ${goalWarn}${overBudget ? `<div class="plan-warn">⚠ Rate ${fmt(p.rate)} passt nicht ins Monatsbudget (verfügbar ${fmt(avail)})</div>` : ''}
+      ${goalWarn}${overBudget ? `<div class="plan-warn">ACHTUNG: Rate ${fmt(p.rate)} passt nicht ins Monatsbudget (verfügbar ${fmt(avail)})</div>` : ''}
     </div>`;
 }
 function renderKindPage(containerId, kind, titlePlural, addLabel){
@@ -1735,7 +1809,7 @@ function renderKindPage(containerId, kind, titlePlural, addLabel){
     <div class="sub-summary">
       <div class="label">${titlePlural} · aktive Raten ${MONTHS_FULL[month-1]} ${year}</div>
       <div class="value">${fmt(monthlyRate)} <span style="font-size:13px;color:var(--text-muted);font-weight:500;">/ Monat</span></div>
-      <div class="sub">Offen gesamt: ${fmt(openGoal)} · ${charged.length} aktiv / ${all.length} offen${warnCount?` · <span style="color:var(--danger);font-weight:600;">⚠ ${warnCount} über Budget</span>`:''}</div>
+      <div class="sub">Offen gesamt: ${fmt(openGoal)} · ${charged.length} aktiv / ${all.length} offen${warnCount?` · <span style="color:var(--danger);font-weight:600;">ACHTUNG: ${warnCount} über Budget</span>`:''}</div>
     </div>
     ${accountsHtml}${addButton}`;
 }
@@ -1863,7 +1937,7 @@ function updateAffordHint(){
   const avail=availableForRate(document.getElementById('entryId').value||null, state.view.year, state.view.month);
   hint.style.display='';
   hint.innerHTML = (amt>avail+0.001)
-    ? `Verfügbar diesen Monat: <b>${fmt(avail)}</b><span class="warn">⚠ Sparbetrag ${fmt(amt)} übersteigt dein verfügbares Budget</span>`
+    ? `Verfügbar diesen Monat: <b>${fmt(avail)}</b><span class="warn">ACHTUNG: Sparbetrag ${fmt(amt)} übersteigt dein verfügbares Budget</span>`
     : `Verfügbar diesen Monat: <b>${fmt(avail)}</b> · <span class="ok">✓ leistbar</span>`;
 }
 function updateSparziel(){
@@ -1876,7 +1950,7 @@ function updateSparziel(){
   const rate=goal/months;
   let html=`Laufzeit: <b>${months}</b> Monate · Monatliche Sparrate: <b>${fmt(rate)}</b>`;
   const avail=availableForRate(document.getElementById('entryId').value||null, state.view.year, state.view.month);
-  if (rate>avail+0.001) html+=`<span class="warn">⚠ Sparplan derzeit nicht leistbar – verfügbar nur ${fmt(avail)}/Monat</span>`;
+  if (rate>avail+0.001) html+=`<span class="warn">ACHTUNG: Sparplan derzeit nicht leistbar – verfügbar nur ${fmt(avail)}/Monat</span>`;
   else html+=`<br><span class="ok">✓ Sparplan ist leistbar.</span>`;
   box.style.display=''; box.innerHTML=html;
 }
@@ -1897,7 +1971,7 @@ function updatePlanResult(){
     const needed=total/monthsInclusive(sYear,sMonth,tYear,tMonth);
     html = `Bei ${fmt(rate)}/Monat: abbezahlt in <b>${payMonths}</b> aktiven Monaten.`;
     if (idxOf(payoff.year,payoff.month) <= idxOf(tYear,tMonth)) html += `<br><span class="ok">✓ Ziel ${MONTHS_SHORT[tMonth-1]} ${tYear} erreichbar (bei Start ${MONTHS_SHORT[sMonth-1]} ${sYear}).</span>`;
-    else html += `<span class="warn">⚠ Für Ziel ${MONTHS_SHORT[tMonth-1]} ${tYear} nötig: ${fmt(needed)}/Monat</span>`;
+    else html += `<span class="warn">ACHTUNG: Für Ziel ${MONTHS_SHORT[tMonth-1]} ${tYear} nötig: ${fmt(needed)}/Monat</span>`;
   } else {
     html = `Abbezahlt nach <b>${payMonths}</b> aktiven Monaten.`;
   }

@@ -6,68 +6,118 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Education">
-<meta name="theme-color" content="#0a0a0c" id="themeColor">
+<meta name="theme-color" content="#000000" id="themeColor">
 <title>Education</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root, :root[data-theme="dark"] {
-    --bg: #14110a;
-    --surface: #1f1a10;
-    --surface-2: #2a2418;
-    --border: #3a3220;
-    --text: #ecedf0;
-    --text-dim: #b0a890;
-    --text-faint: #7a7058;
-    --accent: #eab308;
-    --accent-dim: rgba(234, 179, 8, 0.15);
-    --green: #10b981;
-    --orange: #f59e0b;
-    --red: #ef4444;
-    --blue: #3b82f6;
+    --bg: #000000;
+    --surface: #14110a;
+    --surface-2: #221a0d;
+    --border: #3a2d12;
+    --text: #ffcc99;
+    --text-dim: #cc99cc;
+    --text-faint: #9999ff;
+    --accent: #ffcc66;
+    --accent-dim: rgba(255, 204, 102, 0.15);
+    --green: #99cc99;
+    --orange: #ff9966;
+    --red: #ff7755;
+    --blue: #9999ff;
   }
   :root[data-theme="light"] {
-    --bg: #fefdf5;
-    --surface: #ffffff;
-    --surface-2: #fdf9e7;
-    --border: #f0eacc;
-    --text: #1a1525;
-    --text-dim: #6e6648;
-    --text-faint: #a59c80;
-    --accent: #ca8a04;
-    --accent-dim: rgba(202, 138, 4, 0.12);
-    --green: #059669;
-    --orange: #d97706;
-    --red: #dc2626;
-    --blue: #2563eb;
+    --bg: #d6d2c4;
+    --surface: #c8c2b0;
+    --surface-2: #bdb6a2;
+    --border: #a89f88;
+    --text: #1a1a1a;
+    --text-dim: #5a4a2a;
+    --text-faint: #7a6a45;
+    --accent: #cc8800;
+    --accent-dim: rgba(204, 136, 0, 0.15);
+    --green: #4a7a4a;
+    --orange: #cc6600;
+    --red: #cc4422;
+    --blue: #4444aa;
   }
   @media (prefers-color-scheme: light) {
-    :root[data-theme="auto"] { --bg: #fefdf5; --surface: #ffffff; --surface-2: #fdf9e7; --border: #f0eacc; --text: #1a1525; --text-dim: #6e6648; --text-faint: #a59c80; --accent: #ca8a04; --accent-dim: rgba(202, 138, 4, 0.12); --green: #059669; --orange: #d97706; --red: #dc2626; --blue: #2563eb; }
+    :root[data-theme="auto"] { --bg: #d6d2c4; --surface: #c8c2b0; --surface-2: #bdb6a2; --border: #a89f88; --text: #1a1a1a; --text-dim: #5a4a2a; --text-faint: #7a6a45; --accent: #cc8800; --accent-dim: rgba(204, 136, 0, 0.15); --green: #4a7a4a; --orange: #cc6600; --red: #cc4422; --blue: #4444aa; }
   }
   @media (prefers-color-scheme: dark) {
-    :root[data-theme="auto"] { --bg: #14110a; --surface: #1f1a10; --surface-2: #2a2418; --border: #3a3220; --text: #ecedf0; --text-dim: #b0a890; --text-faint: #7a7058; --accent: #eab308; --accent-dim: rgba(234, 179, 8, 0.15); --green: #10b981; --orange: #f59e0b; --red: #ef4444; --blue: #3b82f6; }
+    :root[data-theme="auto"] { --bg: #000000; --surface: #14110a; --surface-2: #221a0d; --border: #3a2d12; --text: #ffcc99; --text-dim: #cc99cc; --text-faint: #9999ff; --accent: #ffcc66; --accent-dim: rgba(255, 204, 102, 0.15); --green: #99cc99; --orange: #ff9966; --red: #ff7755; --blue: #9999ff; }
+  }
+
+  /* LCARS-Akzentfarben */
+  :root {
+    --lcars-orange: #ff9c00;
+    --lcars-peach: #ff9966;
+    --lcars-lilac: #cc99cc;
+    --lcars-blue: #9999ff;
+    --lcars-ice: #99ccff;
+    --lcars-gold: #ffcc66;
+    --lcars-salmon: #ff7755;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  html, body { height: 100%; }
-  body { font-family: 'Manrope', -apple-system, sans-serif; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.5; overflow-x: hidden; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); transition: background 0.2s, color 0.2s; }
+  html, body { min-height: 100%; }
+  body { font-family: 'Antonio', 'Arial Narrow', sans-serif; background: var(--bg); color: var(--text); font-size: 16px; line-height: 1.4; overflow-x: hidden; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); transition: background 0.2s, color 0.2s; text-transform: uppercase; letter-spacing: 0.03em; }
+
+  /* ============ LCARS-RAHMEN ============ */
+  .lcars {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    grid-template-rows: auto 1fr auto;
+    gap: 6px;
+    max-width: 760px; margin: 0 auto;
+    padding: 10px 10px 90px;
+    min-height: calc(100vh - 20px);
+    min-height: calc(100dvh - 20px);
+  }
+  @media (max-width: 440px) { .lcars { grid-template-columns: 80px 1fr; } }
+
+  .lcars-top { grid-column: 1 / 3; grid-row: 1; display: flex; gap: 6px; align-items: stretch; height: 60px; }
+  .lcars-top .elbow { width: 120px; flex-shrink: 0; background: var(--lcars-orange); border-top-left-radius: 52px; }
+  .lcars-top .bars { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 5px; }
+  .lcars-top .tics { display: flex; gap: 6px; height: 14px; }
+  .lcars-top .tics span { display: block; height: 14px; border-radius: 999px; }
+  .lcars-top .bar { height: 26px; background: var(--lcars-lilac); border-radius: 0 999px 999px 0; display: flex; align-items: center; justify-content: flex-end; padding-right: 16px; color: #000; font-weight: 700; font-size: 13px; }
+  @media (max-width: 440px) { .lcars-top .elbow { width: 80px; } }
+
+  .lcars-rail { grid-column: 1; grid-row: 2; display: flex; flex-direction: column; gap: 6px; }
+  .lcars-rail .rblock { color: #000; font-weight: 700; font-size: 11px; padding: 9px 9px; display: flex; flex-direction: column; align-items: flex-end; justify-content: flex-end; text-align: right; line-height: 1; min-height: 50px; }
+  .lcars-rail .r1 { background: var(--lcars-gold); min-height: 66px; }
+  .lcars-rail .r2 { background: var(--lcars-peach); }
+  .lcars-rail .r3 { background: var(--lcars-blue); }
+  .lcars-rail .r4 { background: var(--lcars-lilac); }
+  .lcars-rail .rfill { flex: 1; background: var(--lcars-salmon); min-height: 40px; display: flex; align-items: flex-start; justify-content: flex-end; padding: 9px; color: #000; font-weight: 700; font-size: 11px; text-align: right; line-height: 1.1; }
+
+  .lcars-bot { grid-column: 1 / 3; grid-row: 3; display: flex; gap: 6px; align-items: stretch; height: 44px; }
+  .lcars-bot .elbow { width: 120px; flex-shrink: 0; background: var(--lcars-orange); border-bottom-left-radius: 52px; }
+  .lcars-bot .bar { flex: 1; height: 24px; align-self: flex-start; background: var(--lcars-blue); border-radius: 0 999px 999px 0; display: flex; align-items: center; padding-left: 16px; color: #000; font-weight: 700; font-size: 12px; }
+  @media (max-width: 440px) { .lcars-bot .elbow { width: 80px; } }
+
+  .lcars-content { grid-column: 2; grid-row: 2; display: flex; flex-direction: column; min-width: 0; }
 
   /* TOP BAR */
-  .top-bar { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 0; gap: 8px; }
-  .back-link { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 9px; font-size: 13px; color: var(--text-dim); text-decoration: none; font-weight: 600; }
-  .back-link:active { background: var(--surface-2); }
+  .top-bar { display: flex; align-items: center; justify-content: space-between; padding: 0 4px 8px; gap: 8px; }
+  .back-link { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; background: var(--lcars-orange); border: none; border-radius: 999px; font-size: 14px; color: #000; text-decoration: none; font-weight: 700; letter-spacing: 0.04em; }
+  .back-link:active { opacity: 0.8; }
   .top-actions { display: flex; gap: 6px; }
-  .header-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text); width: 38px; height: 38px; border-radius: 10px; font-size: 16px; cursor: pointer; display: grid; place-items: center; }
-  .header-btn:active { background: var(--surface-2); }
+  .header-btn { background: var(--lcars-gold); border: none; color: #000; min-width: 52px; height: 38px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 700; cursor: pointer; display: grid; place-items: center; letter-spacing: 0.04em; }
+  .header-btn:active { opacity: 0.8; }
 
   /* TABS */
   .tabs { display: flex; gap: 4px; padding: 12px 16px 8px; overflow-x: auto; scrollbar-width: none; }
   .tabs::-webkit-scrollbar { display: none; }
-  .tab { background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); padding: 8px 14px; border-radius: 9px; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
-  .tab.active { background: var(--accent); color: #1a1410; border-color: var(--accent); }
+  .tab { background: var(--lcars-blue); border: none; color: #000; padding: 8px 18px; border-radius: 999px; font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.5; transition: opacity 0.15s; }
+  .tab:nth-child(2) { background: var(--lcars-lilac); }
+  .tab:nth-child(3) { background: var(--lcars-peach); }
+  .tab:nth-child(4) { background: var(--lcars-gold); }
+  .tab.active { opacity: 1; }
 
-  main { padding: 0 16px 100px; }
+  main { padding: 0 2px 20px; }
 
   /* TITLE */
   .page-title { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; margin: 12px 0 16px; }
@@ -76,7 +126,7 @@
   /* HERO STATS */
   .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
   .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
-  .stat-card.accent { background: linear-gradient(135deg, #fbbf24, #d97706); color: white; border: none; }
+  .stat-card.accent { background: var(--lcars-orange); color: #000; border: none; }
   .stat-card .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; opacity: 0.85; margin-bottom: 6px; }
   .stat-card .value { font-family: 'JetBrains Mono', monospace; font-size: 26px; font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
   .stat-card .value .unit { font-size: 13px; font-weight: 500; opacity: 0.7; margin-left: 4px; }
@@ -114,21 +164,21 @@
   .empty .text { font-size: 13px; }
 
   /* FAB */
-  .fab { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--accent); color: #1a1410; border: none; font-size: 28px; font-weight: 300; cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,0.4); z-index: 100; display: grid; place-items: center; }
+  .fab { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); right: 20px; width: 64px; height: 56px; border-radius: 999px; background: var(--lcars-orange); color: #000; border: none; font-size: 30px; font-weight: 400; cursor: pointer; box-shadow: 0 6px 18px rgba(0,0,0,0.5); z-index: 100; display: grid; place-items: center; }
   .fab:active { transform: scale(0.92); }
 
   /* THEME SWITCH (in Settings) */
-  .theme-switch { display: flex; gap: 4px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 3px; }
-  .theme-switch button { background: transparent; border: none; color: var(--text-dim); padding: 8px 12px; border-radius: 7px; font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; flex: 1; }
-  .theme-switch button.active { background: var(--accent); color: #1a1410; }
+  .theme-switch { display: flex; gap: 4px; background: var(--surface-2); border: none; border-radius: 999px; padding: 3px; }
+  .theme-switch button { background: transparent; border: none; color: var(--text-dim); padding: 9px 12px; border-radius: 999px; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; flex: 1; text-transform: uppercase; }
+  .theme-switch button.active { background: var(--lcars-orange); color: #000; }
 
   /* MODALS */
   .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 200; display: none; align-items: flex-end; justify-content: center; }
   .modal-bg.show { display: flex; }
-  .modal { background: var(--surface); width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 20px 20px calc(20px + env(safe-area-inset-bottom)); max-height: 90vh; overflow-y: auto; border-top: 1px solid var(--border); }
-  @media (min-width: 600px) { .modal-bg { align-items: center; } .modal { border-radius: 16px; max-height: 86vh; } }
-  .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; }
-  .modal-title { font-weight: 800; font-size: 20px; margin-bottom: 16px; letter-spacing: -0.01em; }
+  .modal { background: var(--surface); width: 100%; max-width: 500px; border-radius: 28px 28px 0 0; padding: 20px 20px calc(20px + env(safe-area-inset-bottom)); max-height: 90vh; overflow-y: auto; border-top: 3px solid var(--lcars-orange); }
+  @media (min-width: 600px) { .modal-bg { align-items: center; } .modal { border-radius: 28px; max-height: 86vh; } }
+  .modal-handle { width: 40px; height: 4px; background: var(--lcars-orange); border-radius: 2px; margin: 0 auto 16px; }
+  .modal-title { font-weight: 700; font-size: 22px; margin-bottom: 16px; letter-spacing: 0.02em; color: var(--accent); }
 
   .form-group { margin-bottom: 14px; }
   .form-group label { display: block; font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; font-weight: 700; }
@@ -137,23 +187,23 @@
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
   .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
-  .modal-actions button { flex: 1; padding: 14px; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: 15px; cursor: pointer; border: none; }
-  .btn-cancel { background: var(--surface-2); color: var(--text); }
-  .btn-save { background: var(--accent); color: #1a1410; }
-  .btn-delete { background: rgba(239,68,68,0.15); color: var(--red); margin-top: 8px; width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(239,68,68,0.3); font-family: inherit; font-weight: 600; font-size: 13px; cursor: pointer; }
+  .modal-actions button { flex: 1; padding: 14px; border-radius: 999px; font-family: inherit; font-weight: 700; font-size: 16px; cursor: pointer; border: none; text-transform: uppercase; letter-spacing: 0.04em; }
+  .btn-cancel { background: var(--lcars-lilac); color: #000; }
+  .btn-save { background: var(--lcars-orange); color: #000; }
+  .btn-delete { background: var(--lcars-salmon); color: #000; margin-top: 8px; width: 100%; padding: 12px; border-radius: 999px; border: none; font-family: inherit; font-weight: 700; font-size: 14px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.04em; }
 
   /* POMODORO TIMER */
-  .timer-card { background: linear-gradient(135deg, #fbbf24, #d97706); color: white; border-radius: 18px; padding: 28px 24px; text-align: center; margin-bottom: 14px; }
+  .timer-card { background: var(--lcars-orange); color: #000; border-radius: 28px; padding: 28px 24px; text-align: center; margin-bottom: 14px; }
   .timer-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.8; font-weight: 700; }
   .timer-display { font-family: 'JetBrains Mono', monospace; font-size: 64px; font-weight: 800; letter-spacing: -0.04em; margin: 14px 0; line-height: 1; }
   .timer-status { font-size: 13px; opacity: 0.85; margin-bottom: 18px; }
   .timer-controls { display: flex; gap: 10px; justify-content: center; }
-  .timer-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 12px 24px; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: 14px; cursor: pointer; backdrop-filter: blur(8px); }
-  .timer-btn:active { background: rgba(255,255,255,0.3); }
-  .timer-btn.primary { background: white; color: #92400e; }
+  .timer-btn { background: rgba(0,0,0,0.2); border: none; color: #000; padding: 12px 24px; border-radius: 999px; font-family: inherit; font-weight: 700; font-size: 14px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.04em; }
+  .timer-btn:active { background: rgba(0,0,0,0.3); }
+  .timer-btn.primary { background: #000; color: var(--lcars-gold); }
   .preset-row { display: flex; gap: 6px; margin-top: 14px; }
-  .preset-btn { flex: 1; background: rgba(255,255,255,0.15); border: none; color: white; padding: 8px; border-radius: 8px; font-family: inherit; font-size: 11px; font-weight: 700; cursor: pointer; }
-  .preset-btn.active { background: white; color: #92400e; }
+  .preset-btn { flex: 1; background: rgba(0,0,0,0.15); border: none; color: #000; padding: 8px; border-radius: 999px; font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+  .preset-btn.active { background: #000; color: var(--lcars-gold); }
 
   /* CARDS - Karteikarten Flashcard-Modus */
   .flashcard { background: var(--surface); border: 2px solid var(--border); border-radius: 16px; padding: 32px 20px; min-height: 220px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; cursor: pointer; margin-bottom: 14px; position: relative; }
@@ -163,7 +213,7 @@
   .flashcard .progress-text { position: absolute; bottom: 12px; left: 0; right: 0; font-size: 11px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
 
   .rating-buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-  .rating-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 12px 4px; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: 11px; cursor: pointer; text-transform: uppercase; }
+  .rating-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 12px 4px; border-radius: 999px; font-family: inherit; font-weight: 700; font-size: 12px; cursor: pointer; text-transform: uppercase; }
   .rating-btn .label-emoji { font-size: 18px; margin-bottom: 4px; display: block; }
   .rating-btn.again { background: rgba(239,68,68,0.10); color: var(--red); border-color: rgba(239,68,68,0.3); }
   .rating-btn.hard { background: rgba(245,158,11,0.10); color: var(--orange); border-color: rgba(245,158,11,0.3); }
@@ -177,7 +227,7 @@
   /* STATS-Tab */
   .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
   .stat-tile { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; text-align: center; }
-  .stat-tile .ic { font-size: 22px; margin-bottom: 4px; }
+  .stat-tile .ic { width: 40px; height: 8px; border-radius: 999px; margin: 0 auto 8px; }
   .stat-tile .num { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
   .stat-tile .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-dim); font-weight: 700; margin-top: 2px; }
 
@@ -210,24 +260,56 @@
   .quiz-opt:active { background: var(--surface-2); }
   .quiz-opt.correct { background: rgba(16,185,129,0.15); border-color: var(--green); color: var(--green); }
   .quiz-opt.wrong { background: rgba(239,68,68,0.15); border-color: var(--red); color: var(--red); }
+
+  @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+  .blink { animation: blink 2.4s infinite; }
 </style>
 </head>
 <body>
-  <div class="top-bar">
-    <a href="index.html" class="back-link">← Apps</a>
-    <div class="top-actions">
-      <button class="header-btn" id="settingsBtn" title="Einstellungen">⚙</button>
+  <div class="lcars">
+    <div class="lcars-top">
+      <div class="elbow"></div>
+      <div class="bars">
+        <div class="tics">
+          <span class="blink" style="width:36px;background:var(--lcars-ice)"></span>
+          <span style="width:70px;background:var(--lcars-gold)"></span>
+          <span style="flex:1;background:var(--lcars-salmon)"></span>
+        </div>
+        <div class="bar">LCARS · EDUCATION 19</div>
+      </div>
+    </div>
+
+    <div class="lcars-rail">
+      <div class="rblock r1">EDU<br>04</div>
+      <div class="rblock r2">FOM<br>STD</div>
+      <div class="rblock r3">NSAN<br>CME</div>
+      <div class="rblock r4">REV<br>OK</div>
+      <div class="rfill">DATA<br>CORE</div>
+    </div>
+
+    <div class="lcars-bot">
+      <div class="elbow"></div>
+      <div class="bar">STARFLEET · ACADEMY OPS</div>
+    </div>
+
+    <div class="lcars-content">
+      <div class="top-bar">
+        <a href="index.html" class="back-link">APPS</a>
+        <div class="top-actions">
+          <button class="header-btn" id="settingsBtn" title="Einstellungen">SET</button>
+        </div>
+      </div>
+
+      <div class="tabs" id="tabs">
+        <button class="tab active" data-tab="fom">FOM</button>
+        <button class="tab" data-tab="notsan">NotSan</button>
+        <button class="tab" data-tab="learn">Lernen</button>
+        <button class="tab" data-tab="stats">Statistik</button>
+      </div>
+
+      <main id="mainContent"></main>
     </div>
   </div>
-
-  <div class="tabs" id="tabs">
-    <button class="tab active" data-tab="fom">FOM</button>
-    <button class="tab" data-tab="notsan">NotSan</button>
-    <button class="tab" data-tab="learn">Lernen</button>
-    <button class="tab" data-tab="stats">Statistik</button>
-  </div>
-
-  <main id="mainContent"></main>
 
   <button class="fab" id="fabAdd">+</button>
 
@@ -411,8 +493,8 @@
       </div>
 
       <div style="margin-top: 14px;">
-        <button class="btn-delete" id="exportBtn" style="background:var(--surface-2); color:var(--text); border-color:var(--border)">📤 Backup exportieren</button>
-        <button class="btn-delete" id="importBtn" style="background:var(--surface-2); color:var(--text); border-color:var(--border); margin-top: 6px;">📥 Backup importieren</button>
+        <button class="btn-delete" id="exportBtn" style="background:var(--surface-2); color:var(--text); border-color:var(--border)">Backup exportieren</button>
+        <button class="btn-delete" id="importBtn" style="background:var(--surface-2); color:var(--text); border-color:var(--border); margin-top: 6px;">Backup importieren</button>
       </div>
     </div>
   </div>
@@ -470,7 +552,7 @@ function saveData() {
 function applyTheme() {
   document.documentElement.setAttribute('data-theme', state.settings.theme);
   const isDark = state.settings.theme === 'dark' || (state.settings.theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-  document.getElementById('themeColor').setAttribute('content', isDark ? '#0d0a14' : '#fafaff');
+  document.getElementById('themeColor').setAttribute('content', isDark ? '#000000' : '#d6d2c4');
 }
 
 // ============= HELPERS =============
@@ -514,7 +596,7 @@ function syncToPlan() {
       events.push({
         id: 'edu_exam_' + m.id,
         date: m.examDate,
-        title: `📚 Klausur: ${m.name}`,
+        title: `Klausur: ${m.name}`,
         allDay: true,
         fromEducation: true,
         category: 'FOM',
@@ -524,7 +606,7 @@ function syncToPlan() {
     // NotSan-Fortbildungen (geplant + absolviert)
     state.fortbild.forEach(f => {
       if (!f.date) return;
-      const icon = f.status === 'absolviert' ? '✓' : '🩺';
+      const icon = f.status === 'absolviert' ? '[OK]' : '[GEPLANT]';
       events.push({
         id: 'edu_fb_' + f.id,
         date: f.date,
@@ -642,7 +724,7 @@ function renderFOM() {
   }
 
   if (mods.length === 0) {
-    html += `<div class="empty"><div class="ic">🎓</div><div class="text">Noch keine Module.<br>Tippe „+" um dein erstes Modul anzulegen.</div></div>`;
+    html += `<div class="empty"><div class="text">Noch keine Module.<br>Tippe „+" um dein erstes Modul anzulegen.</div></div>`;
   }
 
   mainEl.innerHTML = html;
@@ -723,7 +805,7 @@ function renderNotSan() {
             <div class="title">${escape(f.name)}</div>
             <div class="meta">${dateStr} · ${TOPIC_LABELS[f.topic] || f.topic} · ${f.hours}h</div>
           </div>
-          <span class="badge done">✓</span>
+          <span class="badge done">OK</span>
         </div>
       </div>`;
     });
@@ -731,7 +813,7 @@ function renderNotSan() {
   }
 
   if (state.fortbild.length === 0) {
-    html += `<div class="empty"><div class="ic">🩺</div><div class="text">Noch keine Fortbildung erfasst.<br>Tippe „+" um deine erste anzulegen.</div></div>`;
+    html += `<div class="empty"><div class="text">Noch keine Fortbildung erfasst.<br>Tippe „+" um deine erste anzulegen.</div></div>`;
   }
 
   mainEl.innerHTML = html;
@@ -931,7 +1013,7 @@ function renderStudySession() {
   const sm = state.studyMode;
   if (!sm || sm.currentIdx >= sm.queue.length) {
     state.studyMode = null;
-    alert('🎉 Session beendet!');
+    alert('Session beendet!');
     renderLearn();
     return;
   }
@@ -949,10 +1031,10 @@ function renderStudySession() {
 
   if (sm.showAnswer) {
     html += `<div class="rating-buttons">
-      <button class="rating-btn again" data-rate="again"><span class="label-emoji">😩</span>Nochmal</button>
-      <button class="rating-btn hard" data-rate="hard"><span class="label-emoji">😣</span>Schwer</button>
-      <button class="rating-btn good" data-rate="good"><span class="label-emoji">🙂</span>Gut</button>
-      <button class="rating-btn easy" data-rate="easy"><span class="label-emoji">😎</span>Leicht</button>
+      <button class="rating-btn again" data-rate="again">Nochmal</button>
+      <button class="rating-btn hard" data-rate="hard">Schwer</button>
+      <button class="rating-btn good" data-rate="good">Gut</button>
+      <button class="rating-btn easy" data-rate="easy">Leicht</button>
     </div>`;
   } else {
     html += `<button class="btn-save" id="showAnswerBtn" style="width:100%; padding:14px; border-radius:10px; border:none; font-family:inherit; font-weight:700; font-size:15px; cursor:pointer; background:var(--accent); color:#1a1410">Antwort zeigen</button>`;
@@ -1075,22 +1157,22 @@ function renderStats() {
   // Tiles
   html += `<div class="stats-grid">
     <div class="stat-tile">
-      <div class="ic">⏱️</div>
+      <div class="ic" style="background:var(--lcars-ice)"></div>
       <div class="num">${Math.round(totalMin/60)}h</div>
       <div class="lbl">Lernzeit 30T</div>
     </div>
     <div class="stat-tile">
-      <div class="ic">🃏</div>
+      <div class="ic" style="background:var(--lcars-lilac)"></div>
       <div class="num">${cardsLearned}</div>
       <div class="lbl">Karten-Sessions</div>
     </div>
     <div class="stat-tile">
-      <div class="ic">🎯</div>
+      <div class="ic" style="background:var(--lcars-peach)"></div>
       <div class="num">${masteredCards}/${totalCards}</div>
       <div class="lbl">Gemastert</div>
     </div>
     <div class="stat-tile">
-      <div class="ic">🩺</div>
+      <div class="ic" style="background:var(--lcars-gold)"></div>
       <div class="num">${yearHours.toFixed(0)}/${goal}h</div>
       <div class="lbl">NotSan ${year}</div>
     </div>
@@ -1316,7 +1398,7 @@ function importBackup() {
         state.sessions = data.sessions || [];
         if (data.settings) state.settings = { ...state.settings, ...data.settings };
         saveData(); applyTheme(); render();
-        alert('✓ Backup geladen!');
+        alert('Backup geladen!');
       } catch(err) { alert('Fehler: ' + err.message); }
     };
     reader.readAsText(file);

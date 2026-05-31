@@ -6,81 +6,125 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Train">
-<meta name="theme-color" content="#0a0a0c" id="themeColor">
+<meta name="theme-color" content="#000000" id="themeColor">
 <title>Train – Krav Maga & Krafttraining</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   /* ============ THEMES ============ */
   :root, :root[data-theme="dark"] {
-    --bg: #0a0a0c;
-    --surface: #15161a;
-    --surface-2: #1f2127;
-    --border: #2a2d35;
-    --text: #ecedf0;
-    --text-dim: #8a8d96;
-    --text-faint: #5a5d66;
-    --accent: #ef4444;
-    --accent-dim: rgba(239,68,68,0.15);
-    --orange: #f59e0b;
-    --green: #10b981;
-    --blue: #3b82f6;
-    --purple: #a855f7;
+    --bg: #000000;
+    --surface: #14110a;
+    --surface-2: #221a0d;
+    --border: #3a2d12;
+    --text: #ffcc99;
+    --text-dim: #cc99cc;
+    --text-faint: #9999ff;
+    --accent: #ff7755;
+    --accent-dim: rgba(255,119,85,0.18);
+    --orange: #ff9c00;
+    --green: #99cc99;
+    --blue: #9999ff;
+    --purple: #cc99cc;
   }
   :root[data-theme="light"] {
-    --bg: #f6f7f9;
-    --surface: #ffffff;
-    --surface-2: #eef0f3;
-    --border: #d8dce2;
-    --text: #15161a;
-    --text-dim: #5a5d66;
-    --text-faint: #8a8d96;
-    --accent: #dc2626;
-    --accent-dim: rgba(220,38,38,0.10);
-    --orange: #d97706;
-    --green: #059669;
-    --blue: #2563eb;
-    --purple: #9333ea;
+    --bg: #d6d2c4;
+    --surface: #c8c2b0;
+    --surface-2: #bdb6a2;
+    --border: #a89f88;
+    --text: #1a1a1a;
+    --text-dim: #5a4a2a;
+    --text-faint: #7a6a45;
+    --accent: #cc4422;
+    --accent-dim: rgba(204,68,34,0.12);
+    --orange: #cc6600;
+    --green: #4a7a4a;
+    --blue: #4444aa;
+    --purple: #8a4a8a;
   }
   @media (prefers-color-scheme: light) {
     :root[data-theme="auto"] {
-      --bg: #f6f7f9;
-      --surface: #ffffff;
-      --surface-2: #eef0f3;
-      --border: #d8dce2;
-      --text: #15161a;
-      --text-dim: #5a5d66;
-      --text-faint: #8a8d96;
-      --accent: #dc2626;
-      --accent-dim: rgba(220,38,38,0.10);
-      --orange: #d97706;
-      --green: #059669;
-      --blue: #2563eb;
-      --purple: #9333ea;
+      --bg: #d6d2c4;
+      --surface: #c8c2b0;
+      --surface-2: #bdb6a2;
+      --border: #a89f88;
+      --text: #1a1a1a;
+      --text-dim: #5a4a2a;
+      --text-faint: #7a6a45;
+      --accent: #cc4422;
+      --accent-dim: rgba(204,68,34,0.12);
+      --orange: #cc6600;
+      --green: #4a7a4a;
+      --blue: #4444aa;
+      --purple: #8a4a8a;
     }
   }
   :root {
     --safe-top: env(safe-area-inset-top);
     --safe-bot: env(safe-area-inset-bottom);
+    --lcars-orange:#ff9c00; --lcars-peach:#ff9966; --lcars-lilac:#cc99cc; --lcars-blue:#9999ff; --lcars-ice:#99ccff; --lcars-gold:#ffcc66; --lcars-salmon:#ff7755;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; overflow: hidden; }
-  body { font-family: 'Manrope', -apple-system, sans-serif; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.5; overscroll-behavior: none; transition: background 0.2s, color 0.2s; }
-  .app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; padding-top: var(--safe-top); padding-bottom: calc(70px + var(--safe-bot)); }
-  header { padding: 14px 20px 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-shrink: 0; }
-  .home-link { background: var(--surface-2); border: 1px solid var(--border); color: var(--text); width: 38px; height: 38px; border-radius: 10px; font-size: 22px; font-weight: 600; cursor: pointer; display: grid; place-items: center; text-decoration: none; line-height: 1; padding-bottom: 2px; }
-  .home-link:active { background: var(--border); }
-  .title { font-weight: 900; font-size: 22px; letter-spacing: -0.03em; text-transform: uppercase; }
-  .title .accent { color: var(--accent); }
-  .header-btn { background: var(--surface-2); border: 1px solid var(--border); color: var(--text); width: 38px; height: 38px; border-radius: 10px; font-size: 16px; cursor: pointer; display: grid; place-items: center; }
+  body { font-family: 'Antonio', 'Arial Narrow', sans-serif; background: var(--bg); color: var(--text); font-size: 16px; line-height: 1.4; overscroll-behavior: none; transition: background 0.2s, color 0.2s; text-transform: uppercase; letter-spacing: 0.03em; }
 
-  main { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 20px; }
+  /* ============ LCARS-RAHMEN ============ */
+  .app {
+    display: grid;
+    grid-template-columns: 116px 1fr;
+    grid-template-rows: 56px 1fr 30px;
+    column-gap: 6px; row-gap: 6px;
+    height: 100vh; height: 100dvh;
+    padding: var(--safe-top) 8px calc(74px + var(--safe-bot)) 8px;
+    background: var(--bg);
+  }
+  @media (max-width: 440px) { .app { grid-template-columns: 78px 1fr; } }
 
-  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); display: flex; padding: 8px 4px calc(8px + var(--safe-bot)); z-index: 50; }
-  .nav-btn { flex: 1; background: transparent; border: none; color: var(--text-faint); padding: 8px 2px; cursor: pointer; font-family: inherit; font-size: 9px; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 3px; text-transform: uppercase; letter-spacing: 0.04em; }
-  .nav-btn .icon { font-size: 20px; line-height: 1; }
+  .lcars-top { grid-column: 1 / 3; grid-row: 1; display: flex; gap: 6px; align-items: stretch; }
+  .lcars-top .elbow { width: 116px; flex-shrink: 0; background: var(--lcars-orange); border-top-left-radius: 50px; }
+  .lcars-top .bars { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 5px; }
+  .lcars-top .tics { display: flex; gap: 6px; height: 14px; }
+  .lcars-top .tics span { display: block; height: 14px; border-radius: 999px; }
+  .lcars-top .bar { height: 26px; background: var(--lcars-lilac); border-radius: 0 999px 999px 0; display: flex; align-items: center; justify-content: flex-end; padding-right: 16px; color: #000; font-weight: 700; font-size: 13px; }
+  @media (max-width: 440px) { .lcars-top .elbow { width: 78px; } }
+
+  .lcars-rail { grid-column: 1; grid-row: 2; display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
+  .lcars-rail .rblock { color: #000; font-weight: 700; font-size: 11px; padding: 9px 9px; display: flex; flex-direction: column; align-items: flex-end; justify-content: flex-end; text-align: right; line-height: 1; min-height: 46px; }
+  .lcars-rail .r1 { background: var(--lcars-salmon); min-height: 64px; }
+  .lcars-rail .r2 { background: var(--lcars-peach); }
+  .lcars-rail .r3 { background: var(--lcars-gold); }
+  .lcars-rail .r4 { background: var(--lcars-blue); }
+  .lcars-rail .rfill { flex: 1; background: var(--lcars-lilac); min-height: 24px; display: flex; align-items: flex-start; justify-content: flex-end; padding: 9px; color: #000; font-weight: 700; font-size: 11px; text-align: right; line-height: 1.1; }
+
+  .lcars-bot { grid-column: 1 / 3; grid-row: 3; display: flex; gap: 6px; align-items: stretch; }
+  .lcars-bot .elbow { width: 116px; flex-shrink: 0; background: var(--lcars-orange); border-bottom-left-radius: 50px; }
+  .lcars-bot .bar { flex: 1; height: 100%; background: var(--lcars-blue); border-radius: 0 999px 999px 0; display: flex; align-items: center; padding-left: 16px; color: #000; font-weight: 700; font-size: 12px; }
+  @media (max-width: 440px) { .lcars-bot .elbow { width: 78px; } }
+
+  .lcars-content { grid-column: 2; grid-row: 2; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+
+  header { padding: 4px 8px 8px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-shrink: 0; }
+  .home-link { background: var(--lcars-orange); border: none; color: #000; width: 46px; height: 38px; border-radius: 999px; font-size: 22px; font-weight: 700; cursor: pointer; display: grid; place-items: center; text-decoration: none; line-height: 1; padding-bottom: 2px; }
+  .home-link:active { opacity: 0.8; }
+  .title { font-weight: 700; font-size: 26px; letter-spacing: 0.02em; text-transform: uppercase; color: var(--lcars-orange); flex: 1; padding-left: 4px; }
+  .title .accent { color: var(--lcars-ice); }
+  .header-btn { background: var(--lcars-gold); border: none; color: #000; min-width: 52px; height: 38px; padding: 0 14px; border-radius: 999px; font-size: 13px; cursor: pointer; display: grid; place-items: center; font-weight: 700; letter-spacing: 0.04em; }
+
+  main { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 20px; min-height: 0; }
+
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 2px solid var(--lcars-orange); display: flex; padding: 8px 4px calc(8px + var(--safe-bot)); z-index: 50; }
+  .nav-btn { flex: 1; background: transparent; border: none; color: var(--text-faint); padding: 8px 2px; cursor: pointer; font-family: inherit; font-size: 11px; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 5px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .nav-btn .icon { width: 28px; height: 6px; border-radius: 999px; background: var(--lcars-salmon); display: block; opacity: 0.5; }
+  .nav-btn:nth-child(2) .icon { background: var(--lcars-peach); }
+  .nav-btn:nth-child(3) .icon { background: var(--lcars-gold); }
+  .nav-btn:nth-child(4) .icon { background: var(--lcars-blue); }
+  .nav-btn:nth-child(5) .icon { background: var(--lcars-lilac); }
   .nav-btn.active { color: var(--accent); }
+  .nav-btn.active .icon { opacity: 1; }
+
+  @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+  .blink { animation: blink 2.4s infinite; }
 
   /* HOME / Heute */
   .hero { padding: 0 16px 20px; }
@@ -89,7 +133,7 @@
   .hero-card .greeting { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; }
   .hero-card .sub { font-size: 13px; color: var(--text-dim); margin-top: 4px; }
   .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
-  .quick-btn { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 14px; border-radius: 12px; font-family: inherit; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+  .quick-btn { background: var(--surface-2); border: none; color: var(--text); padding: 14px; border-radius: 999px; font-family: inherit; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 10px; justify-content: center; text-transform: uppercase; letter-spacing: 0.04em; }
   .quick-btn .ic { font-size: 22px; }
   .quick-btn:active { background: var(--surface-2); }
 
@@ -169,7 +213,7 @@
   .tech-detail-title .cat { font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
   .tech-detail-title h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; margin-top: 4px; }
   .tech-detail-title .level { display: inline-block; background: var(--surface-2); color: var(--text-dim); padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; margin-top: 8px; letter-spacing: 0.04em; }
-  .back-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 8px; font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; margin: 0 16px 12px; display: inline-flex; align-items: center; gap: 6px; }
+  .back-btn { background: var(--lcars-peach); border: none; color: #000; padding: 8px 16px; border-radius: 999px; font-family: inherit; font-size: 12px; font-weight: 700; cursor: pointer; margin: 0 16px 12px; display: inline-flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
   .tech-block { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
   .tech-block h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); font-weight: 700; margin-bottom: 8px; }
   .tech-block ol, .tech-block ul { padding-left: 18px; }
@@ -217,20 +261,20 @@
   .settings-section { margin-bottom: 18px; }
   .settings-section h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); font-weight: 700; margin-bottom: 10px; }
   .theme-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-  .theme-opt { background: var(--bg); border: 1px solid var(--border); color: var(--text-dim); padding: 12px 4px; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: 12px; cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .theme-opt { background: var(--surface-2); border: none; color: var(--text); padding: 12px 4px; border-radius: 999px; font-family: inherit; font-weight: 700; font-size: 12px; cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; text-transform: uppercase; }
   .theme-opt .ic { font-size: 20px; }
-  .theme-opt.active { background: var(--accent); color: white; border-color: var(--accent); }
-  .settings-btn { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 12px; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: 13px; cursor: pointer; }
+  .theme-opt.active { background: var(--lcars-orange); color: #000; }
+  .settings-btn { width: 100%; background: var(--lcars-gold); border: none; color: #000; padding: 12px; border-radius: 999px; font-family: inherit; font-weight: 700; font-size: 13px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
   .settings-btn:active { background: var(--surface-2); }
   .settings-info { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 12px; color: var(--text-dim); line-height: 1.5; }
 
   /* MODAL */
   .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 200; display: none; align-items: flex-end; justify-content: center; }
   .modal-bg.show { display: flex; }
-  .modal { background: var(--surface); width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 20px 20px calc(20px + var(--safe-bot)); max-height: 92vh; overflow-y: auto; border-top: 1px solid var(--border); }
-  @media (min-width: 600px) { .modal-bg { align-items: center; } .modal { border-radius: 16px; max-height: 86vh; } }
+  .modal { background: var(--surface); width: 100%; max-width: 500px; border-radius: 28px 28px 0 0; padding: 20px 20px calc(20px + var(--safe-bot)); max-height: 92vh; overflow-y: auto; border-top: 3px solid var(--lcars-orange); }
+  @media (min-width: 600px) { .modal-bg { align-items: center; } .modal { border-radius: 28px; max-height: 86vh; } }
   .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 14px; }
-  .modal-title { font-weight: 800; font-size: 20px; margin-bottom: 14px; letter-spacing: -0.01em; }
+  .modal-title { font-weight: 700; font-size: 22px; margin-bottom: 14px; letter-spacing: 0.02em; color: var(--accent); }
   .form-group { margin-bottom: 12px; }
   .form-group label { display: block; font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; font-weight: 700; }
   .form-group input, .form-group textarea, .form-group select { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 11px 14px; border-radius: 10px; font-family: inherit; font-size: 15px; }
@@ -238,19 +282,19 @@
   .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--accent); }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .modal-actions { display: flex; gap: 10px; margin-top: 18px; }
-  .modal-actions button { flex: 1; padding: 13px; border-radius: 10px; font-family: inherit; font-weight: 700; font-size: 14px; cursor: pointer; border: none; }
-  .btn-cancel { background: var(--surface-2); color: var(--text); }
-  .btn-save { background: var(--accent); color: white; }
+  .modal-actions button { flex: 1; padding: 14px; border-radius: 999px; font-family: inherit; font-weight: 700; font-size: 15px; cursor: pointer; border: none; text-transform: uppercase; letter-spacing: 0.04em; }
+  .btn-cancel { background: var(--lcars-lilac); color: #000; }
+  .btn-save { background: var(--lcars-orange); color: #000; }
   .btn-delete { background: rgba(239,68,68,0.12); color: var(--accent); margin-top: 8px; width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(239,68,68,0.3); font-family: inherit; font-weight: 600; font-size: 12px; cursor: pointer; }
 
   .type-pills { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
-  .type-pill { background: var(--bg); border: 1px solid var(--border); color: var(--text-dim); padding: 12px 8px; border-radius: 10px; cursor: pointer; font-family: inherit; font-size: 12px; font-weight: 700; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .type-pill { background: var(--surface-2); border: none; color: var(--text); padding: 12px 8px; border-radius: 999px; cursor: pointer; font-family: inherit; font-size: 12px; font-weight: 700; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
   .type-pill .ic { font-size: 22px; }
-  .type-pill.active { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
+  .type-pill.active { background: var(--lcars-orange); color: #000; }
 
   .intensity-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
-  .int-btn { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 10px 4px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 11px; font-weight: 700; }
-  .int-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+  .int-btn { background: var(--surface-2); border: none; color: var(--text); padding: 10px 4px; border-radius: 999px; cursor: pointer; font-family: inherit; font-size: 11px; font-weight: 700; }
+  .int-btn.active { background: var(--lcars-orange); color: #000; }
 
   .empty { text-align: center; padding: 30px 16px; color: var(--text-faint); font-size: 13px; }
 
@@ -266,18 +310,45 @@
 </head>
 <body>
 <div class="app">
+  <div class="lcars-top">
+    <div class="elbow"></div>
+    <div class="bars">
+      <div class="tics">
+        <span class="blink" style="width:36px;background:var(--lcars-ice)"></span>
+        <span style="width:70px;background:var(--lcars-gold)"></span>
+        <span style="flex:1;background:var(--lcars-salmon)"></span>
+      </div>
+      <div class="bar">LCARS · TRAIN 21</div>
+    </div>
+  </div>
+
+  <div class="lcars-rail">
+    <div class="rblock r1">TRN<br>02</div>
+    <div class="rblock r2">SES<br>LOG</div>
+    <div class="rblock r3">TMR<br>RDY</div>
+    <div class="rblock r4">STA<br>OK</div>
+    <div class="rfill">COND<br>ACTIVE</div>
+  </div>
+
+  <div class="lcars-bot">
+    <div class="elbow"></div>
+    <div class="bar">STARFLEET · CONDITIONING OPS</div>
+  </div>
+
+  <div class="lcars-content">
   <header>
-    <a href="health.html" class="back-btn" title="Zurück zu Health">‹</a>
+    <a href="health.html" class="home-link" title="Zurück zu Health">‹</a>
     <div class="title">Train<span class="accent">.</span></div>
-    <button class="header-btn" id="settingsBtn">⚙</button>
+    <button class="header-btn" id="settingsBtn">SET</button>
   </header>
   <main id="mainContent"></main>
+  </div>
   <nav class="bottom-nav">
-    <button class="nav-btn active" data-tab="home"><span class="icon">🏠</span>Home</button>
-    <button class="nav-btn" data-tab="techniques"><span class="icon">🥊</span>Techniken</button>
-    <button class="nav-btn" data-tab="plans"><span class="icon">📋</span>Pläne</button>
-    <button class="nav-btn" data-tab="timer"><span class="icon">⏱️</span>Timer</button>
-    <button class="nav-btn" data-tab="stats"><span class="icon">📊</span>Statistik</button>
+    <button class="nav-btn active" data-tab="home"><span class="icon"></span>Home</button>
+    <button class="nav-btn" data-tab="techniques"><span class="icon"></span>Techniken</button>
+    <button class="nav-btn" data-tab="plans"><span class="icon"></span>Pläne</button>
+    <button class="nav-btn" data-tab="timer"><span class="icon"></span>Timer</button>
+    <button class="nav-btn" data-tab="stats"><span class="icon"></span>Statistik</button>
   </nav>
 </div>
 
@@ -289,12 +360,12 @@
     <div class="form-group">
       <label>Art des Trainings</label>
       <div class="type-pills" id="typePills">
-        <div class="type-pill" data-type="km"><span class="ic">🥊</span>Krav Maga (Verein)</div>
-        <div class="type-pill" data-type="kmh"><span class="ic">🏠</span>Krav Maga (Home)</div>
-        <div class="type-pill" data-type="strength"><span class="ic">🏋️</span>Krafttraining</div>
-        <div class="type-pill" data-type="cardio"><span class="ic">🏃</span>Cardio</div>
-        <div class="type-pill" data-type="mob"><span class="ic">🧘</span>Mobility</div>
-        <div class="type-pill" data-type="other"><span class="ic">⚡</span>Sonstiges</div>
+        <div class="type-pill" data-type="km">Krav Maga (Verein)</div>
+        <div class="type-pill" data-type="kmh">Krav Maga (Home)</div>
+        <div class="type-pill" data-type="strength">Krafttraining</div>
+        <div class="type-pill" data-type="cardio">Cardio</div>
+        <div class="type-pill" data-type="mob">Mobility</div>
+        <div class="type-pill" data-type="other">Sonstiges</div>
       </div>
     </div>
     <div class="form-row">
@@ -310,11 +381,11 @@
     <div class="form-group">
       <label>Intensität</label>
       <div class="intensity-bar" id="intensityBar">
-        <button class="int-btn" data-i="1">😌<br>Locker</button>
-        <button class="int-btn" data-i="2">🙂<br>Moderat</button>
-        <button class="int-btn active" data-i="3">😤<br>Solide</button>
-        <button class="int-btn" data-i="4">🥵<br>Hart</button>
-        <button class="int-btn" data-i="5">💀<br>Brutal</button>
+        <button class="int-btn" data-i="1">Locker</button>
+        <button class="int-btn" data-i="2">Moderat</button>
+        <button class="int-btn active" data-i="3">Solide</button>
+        <button class="int-btn" data-i="4">Hart</button>
+        <button class="int-btn" data-i="5">Brutal</button>
       </div>
     </div>
     <div class="form-group">
@@ -336,24 +407,24 @@
     <div class="modal-title">Einstellungen</div>
 
     <div class="settings-section">
-      <h3>🎨 Erscheinungsbild</h3>
+      <h3>Erscheinungsbild</h3>
       <div class="theme-options">
-        <button class="theme-opt" data-theme="auto"><span class="ic">⚙️</span>Automatisch</button>
-        <button class="theme-opt" data-theme="light"><span class="ic">☀️</span>Hell</button>
-        <button class="theme-opt" data-theme="dark"><span class="ic">🌙</span>Dunkel</button>
+        <button class="theme-opt" data-theme="auto">Automatisch</button>
+        <button class="theme-opt" data-theme="light">Hell</button>
+        <button class="theme-opt" data-theme="dark">Dunkel</button>
       </div>
     </div>
 
     <div class="settings-section">
-      <h3>💾 Backup</h3>
+      <h3>Backup</h3>
       <div class="form-row">
-        <button class="settings-btn" id="settingsExportBtn">📤 Export</button>
-        <button class="settings-btn" id="settingsImportBtn">📥 Import</button>
+        <button class="settings-btn" id="settingsExportBtn">Export</button>
+        <button class="settings-btn" id="settingsImportBtn">Import</button>
       </div>
     </div>
 
     <div class="settings-section">
-      <h3>ℹ️ Status</h3>
+      <h3>Status</h3>
       <div class="settings-info" id="settingsStats">–</div>
     </div>
 
@@ -766,7 +837,7 @@ const TECH_CATS = [
   { id:'kicks', name:'Tritte' },
   { id:'defense', name:'Abwehr' },
   { id:'ground', name:'Boden' },
-  { id:'favorites', name:'Favoriten ⭐' }
+  { id:'favorites', name:'Favoriten' }
 ];
 
 // =============================================================
@@ -777,7 +848,7 @@ const PLANS = [
     id: 'plan-km-home-30',
     name: 'Krav Maga Home – 30 Min',
     type: 'kmh',
-    icon: '🥊',
+    icon: '',
     desc: 'Solo-Training zu Hause, Boxsack oder freie Übung',
     duration: 30,
     steps: [
@@ -795,7 +866,7 @@ const PLANS = [
     id: 'plan-strength-fullbody',
     name: 'Krafttraining Ganzkörper',
     type: 'strength',
-    icon: '🏋️',
+    icon: '',
     desc: 'Klassisches Ganzkörper-Workout, 3× pro Woche möglich',
     duration: 60,
     steps: [
@@ -813,7 +884,7 @@ const PLANS = [
     id: 'plan-bag-rounds',
     name: 'Boxsack Intervall',
     type: 'kmh',
-    icon: '💥',
+    icon: '',
     desc: 'Klassisches Boxer-Format: 6 Runden Boxsack',
     duration: 24,
     steps: [
@@ -836,7 +907,7 @@ const PLANS = [
     id: 'plan-conditioning',
     name: 'Krav Maga Conditioning',
     type: 'kmh',
-    icon: '🔥',
+    icon: '',
     desc: 'Kraft + Ausdauer + Technik in einem',
     duration: 25,
     steps: [
@@ -853,7 +924,7 @@ const PLANS = [
     id: 'plan-mobility',
     name: 'Mobility Routine',
     type: 'mob',
-    icon: '🧘',
+    icon: '',
     desc: 'An Ruhetagen oder zum Aufwärmen',
     duration: 15,
     steps: [
@@ -888,12 +959,12 @@ const STORAGE_KEY = 'train_v1';
 const DAYS_DE = ['So','Mo','Di','Mi','Do','Fr','Sa'];
 const MONTHS_SHORT = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
 const TYPE_INFO = {
-  km: { name:'Krav Maga (Verein)', icon:'🥊', cls:'km' },
-  kmh: { name:'Krav Maga (Home)', icon:'🏠', cls:'kmh' },
-  strength: { name:'Krafttraining', icon:'🏋️', cls:'strength' },
-  cardio: { name:'Cardio', icon:'🏃', cls:'cardio' },
-  mob: { name:'Mobility', icon:'🧘', cls:'mob' },
-  other: { name:'Sonstiges', icon:'⚡', cls:'mob' }
+  km: { name:'Krav Maga (Verein)', icon:'', cls:'km' },
+  kmh: { name:'Krav Maga (Home)', icon:'', cls:'kmh' },
+  strength: { name:'Krafttraining', icon:'', cls:'strength' },
+  cardio: { name:'Cardio', icon:'', cls:'cardio' },
+  mob: { name:'Mobility', icon:'', cls:'mob' },
+  other: { name:'Sonstiges', icon:'', cls:'mob' }
 };
 
 let state = {
@@ -948,7 +1019,7 @@ function applyTheme() {
   const isDark = theme === 'dark' ||
                  (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
   const tc = document.getElementById('themeColor');
-  if (tc) tc.setAttribute('content', isDark ? '#0a0a0c' : '#f6f7f9');
+  if (tc) tc.setAttribute('content', isDark ? '#000000' : '#d6d2c4');
 }
 
 // =============================================================
@@ -1178,8 +1249,8 @@ function renderHome() {
           ? `${todaySessions.length} Session${todaySessions.length > 1 ? 's' : ''} geloggt · weiter so`
           : 'Bereit für dein Training?'}</div>
         <div class="quick-actions">
-          <button class="quick-btn" id="quickLogBtn"><span class="ic">➕</span><span>Training loggen</span></button>
-          <button class="quick-btn" id="quickTimerBtn"><span class="ic">⏱️</span><span>Timer starten</span></button>
+          <button class="quick-btn" id="quickLogBtn"><span>Training loggen</span></button>
+          <button class="quick-btn" id="quickTimerBtn"><span>Timer starten</span></button>
         </div>
       </div>
     </div>
@@ -1220,7 +1291,7 @@ function renderHome() {
       const t = TYPE_INFO[s.type] || TYPE_INFO.other;
       const d = new Date(s.date);
       const dateLabel = isToday(d) ? 'Heute' : `${DAYS_DE[d.getDay()]}, ${d.getDate()}. ${MONTHS_SHORT[d.getMonth()]}`;
-      const intLabel = ['😌 locker','🙂 moderat','😤 solide','🥵 hart','💀 brutal'][s.intensity - 1] || '';
+      const intLabel = ['locker','moderat','solide','hart','brutal'][s.intensity - 1] || '';
       html += `<div class="session-card" data-id="${s.id}">
         <div class="session-icon ${t.cls}">${t.icon}</div>
         <div class="session-info">
@@ -1258,7 +1329,7 @@ function renderTechniques() {
   let html = `
     <div class="section-title">Techniken-Bibliothek<span class="more">${TECHNIQUES.length}</span></div>
     <div class="tech-search">
-      <input type="text" id="techSearch" placeholder="🔍 Suchen (z.B. 'Front Kick', 'Würgegriff')" value="${escape(state.techSearch)}">
+      <input type="text" id="techSearch" placeholder="Suchen (z.B. 'Front Kick', 'Würgegriff')" value="${escape(state.techSearch)}">
     </div>
     <div class="tech-categories">`;
   TECH_CATS.forEach(c => {
@@ -1352,15 +1423,15 @@ function renderTechDetail() {
         <ol>${t.steps.map(s => `<li>${escape(s)}</li>`).join('')}</ol>
       </div>
       <div class="tech-block">
-        <h3>🎯 Schlüsselpunkte</h3>
+        <h3>Schlüsselpunkte</h3>
         <ul>${t.keys.map(s => `<li>${escape(s)}</li>`).join('')}</ul>
       </div>
       <div class="tech-block warn">
-        <h3>⚠️ Häufige Fehler</h3>
+        <h3>Häufige Fehler</h3>
         <ul>${t.mistakes.map(s => `<li>${escape(s)}</li>`).join('')}</ul>
       </div>
       <div class="tech-block">
-        <h3>💪 Übungsempfehlung</h3>
+        <h3>Übungsempfehlung</h3>
         <p>${escape(t.drill)}</p>
       </div>
     </div>`;
@@ -1572,7 +1643,7 @@ function nextPhase() {
 function finishTimer() {
   beep('finish');
   document.body.removeChild($('timerRunning'));
-  alert('🎉 Workout fertig! Gut gemacht.');
+  alert('Workout fertig! Gut gemacht.');
   // Frage ob loggen
   if (confirm('Möchtest du das Training direkt loggen?')) {
     openSession(null);
